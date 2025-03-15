@@ -1,0 +1,23 @@
+# Pasta do Node.js
+node_modules/
+dist/
+lib/
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.*.local
+
+# Cache e logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.DS_Store
+
+# Configuração do editor (caso use VS Code)
+.vscode/
+.idea/
+
+# Arquivos de build do TypeScript
+*.tsbuildinfo
