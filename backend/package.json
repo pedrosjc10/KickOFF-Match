@@ -1,0 +1,39 @@
+{
+  "name": "tcc",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx tsc-watch --onSuccess \"node ./lib/index.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mysql2": "^3.13.0",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.21"
+  },
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.8",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.5",
+    "ts-node": "^10.9.2",
+    "tsc-watch": "^6.2.1",
+    "typescript": "^5.8.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pedrosjc10/TCC.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pedrosjc10/TCC/issues"
+  },
+  "homepage": "https://github.com/pedrosjc10/TCC#readme",
+  "directories": {
+    "lib": "lib"
+  },
+  "description": ""
+}
