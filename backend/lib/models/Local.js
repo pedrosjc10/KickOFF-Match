@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Local = void 0;
 const typeorm_1 = require("typeorm");
+const Partida_1 = require("./Partida");
 let Local = class Local extends typeorm_1.BaseEntity {
 };
 exports.Local = Local;
@@ -34,6 +35,26 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Local.prototype, "modalidade", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Local.prototype, "cep", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Local.prototype, "logradouro", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Local.prototype, "numero", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Local.prototype, "cidade", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => Partida_1.Partida, (partida) => partida.local),
+    __metadata("design:type", Array)
+], Local.prototype, "partidas", void 0);
 exports.Local = Local = __decorate([
     (0, typeorm_1.Entity)("local")
 ], Local);

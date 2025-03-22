@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, BeforeUpdate, OneToMany } from "typeorm";
+import bcrypt from "bcrypt";
+import { Partida } from "./Partida";
 
 @Entity()
 export class Usuario {
@@ -17,10 +19,21 @@ export class Usuario {
   @Column({ type: "int", default: 0 })
   overall!: number;
 
-  @Column({ type: "date", nullable: true })
-  nascimento?: Date;
+  @Column({ type: "boolean", default: false })
+  posicao: boolean = false;
 
   @Column({ type: "boolean", default: false })
   tipo: boolean = false;
 
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (this.senha && !this.senha.startsWith("$2b$")) {
+      this.senha = await bcrypt.hash(this.senha, 10);
+    }
+  }
+
+  // Relação inversa com Partida
+  @OneToMany(() => Partida, (partida) => partida.usuario)
+  partidas!: Partida[];
 }

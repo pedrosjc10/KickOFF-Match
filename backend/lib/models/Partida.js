@@ -11,6 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Partida = void 0;
 const typeorm_1 = require("typeorm");
+const Local_1 = require("./Local");
+const Usuario_1 = require("./Usuario");
+const TipoPartida_1 = require("./TipoPartida");
 let Partida = class Partida extends typeorm_1.BaseEntity {
 };
 exports.Partida = Partida;
@@ -19,8 +22,8 @@ __decorate([
     __metadata("design:type", Number)
 ], Partida.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
+    (0, typeorm_1.Column)({ type: "tinyint" }),
+    __metadata("design:type", Number)
 ], Partida.prototype, "tipo", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "date" }),
@@ -31,17 +34,34 @@ __decorate([
     __metadata("design:type", String)
 ], Partida.prototype, "hora", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "int" }),
-    __metadata("design:type", Number)
-], Partida.prototype, "qtdjogadores", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: "text", nullable: true }),
+    (0, typeorm_1.Column)({ type: "varchar", length: 100 }),
     __metadata("design:type", String)
 ], Partida.prototype, "time", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text", nullable: true }),
+    (0, typeorm_1.Column)({ type: "varchar", length: 45 }),
     __metadata("design:type", String)
 ], Partida.prototype, "placar", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => Local_1.Local, (local) => local.partidas, {
+        onDelete: "CASCADE",
+    }),
+    (0, typeorm_1.JoinColumn)({ name: "local_id" }),
+    __metadata("design:type", Local_1.Local)
+], Partida.prototype, "local", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => Usuario_1.Usuario, (usuario) => usuario.partidas, {
+        onDelete: "CASCADE",
+    }),
+    (0, typeorm_1.JoinColumn)({ name: "usuario_id" }),
+    __metadata("design:type", Usuario_1.Usuario)
+], Partida.prototype, "usuario", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => TipoPartida_1.TipoPartida, (tipoPartida) => tipoPartida.partidas, {
+        onDelete: "CASCADE",
+    }),
+    (0, typeorm_1.JoinColumn)({ name: "tipoPartida_idtipoPartida" }),
+    __metadata("design:type", TipoPartida_1.TipoPartida)
+], Partida.prototype, "tipoPartida", void 0);
 exports.Partida = Partida = __decorate([
     (0, typeorm_1.Entity)("partida")
 ], Partida);

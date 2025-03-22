@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from "typeorm";
+import { Partida } from "./Partida";
 
 @Entity("local")
 export class Local extends BaseEntity {
@@ -16,4 +17,20 @@ export class Local extends BaseEntity {
 
   @Column()
   modalidade!: string;
+
+  @Column()
+  cep!: string;
+
+  @Column()
+  logradouro!: string;
+
+  @Column()
+  numero!: string;
+
+  @Column()
+  cidade!: string;
+
+  // Relação inversa com Partida
+  @OneToMany(() => Partida, (partida) => partida.local)
+  partidas!: Partida[];
 }

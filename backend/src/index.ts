@@ -1,22 +1,27 @@
+// src/index.ts
 import express from "express";
-import { AppDataSource } from "./config/database"; // Importe a configuração do TypeORM
+import dotenv from "dotenv";
+import { initializeDatabase } from "./config/database"; // ajuste o caminho conforme necessário
+import routes from "./routes"; // supondo que você tenha um arquivo de rotas
+
+dotenv.config(); // carrega as variáveis de ambiente
 
 const app = express();
 app.use(express.json());
 
-app.get("/", (req, res) => {
-    res.send("oi");
-});
+// Carregando as rotas da aplicação
+app.use(routes);
 
-// Iniciar conexão com o banco antes do servidor
-AppDataSource.initialize()
-    .then(() => {
-        console.log("Banco de dados conectado com sucesso!");
+const PORT = process.env.PORT || 3000;
 
-        app.listen(3000, () => {
-            console.log("Servidor rodando na porta 3000");
-        });
-    })
-    .catch((error) => {
-        console.error("Erro ao conectar no banco:", error);
-    });
+const startServer = async () => {
+  // Inicializa o banco de dados
+  await initializeDatabase();
+
+  // Inicia o servidor
+  app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+  });
+};
+
+startServer();
