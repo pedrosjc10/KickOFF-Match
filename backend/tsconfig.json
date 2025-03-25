@@ -2,6 +2,7 @@
   "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
     "rootDir": "./src",
+    "typeRoots": ["./node_modules/@types", "./types"],
     "outDir": "./lib",
     "sourceMap": true,
     "noImplicitAny": true,
@@ -13,7 +14,7 @@
     "emitDecoratorMetadata": true
   },
   "compileOnSave": true,
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "types"],
   "exclude": ["**/*.spec.ts"]
 
 }

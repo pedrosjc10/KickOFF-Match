@@ -9,6 +9,9 @@ export class Usuario {
 
   @Column({ type: "varchar", length: 100 })
   nome!: string;
+  
+  @Column({ type: "varchar", length: 200 })
+  email!: string;
 
   @Column({ type: "varchar", length: 14, unique: true })
   cpf!: string;
