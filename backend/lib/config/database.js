@@ -23,7 +23,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
     port: 3306,
     username: "root", // Altere conforme sua configuração
     password: "", // Altere conforme sua configuração
-    database: "TCC", // Nome do seu banco de dados
+    database: "tcc2", // Nome do seu banco de dados
     synchronize: false, // Sincroniza automaticamente as tabelas (usar com cuidado em produção)
     logging: false,
     entities: [Usuario_1.Usuario, Partida_1.Partida, Local_1.Local, TipoPartida_1.TipoPartida],

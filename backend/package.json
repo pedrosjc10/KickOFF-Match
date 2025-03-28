@@ -4,7 +4,10 @@
   "main": "index.js",
   "scripts": {
     "start": "npx tsc-watch --onSuccess \"node ./lib/index.js\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration:generate": "npm run typeorm migration:generate -- -d src/config/database.ts",
+    "migration:run": "npm run typeorm migration:run -- -d src/config/database.ts"
   },
   "keywords": [],
   "author": "",

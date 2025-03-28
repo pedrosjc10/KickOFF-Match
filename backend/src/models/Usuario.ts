@@ -7,25 +7,25 @@ export class Usuario {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: "varchar", length: 100 })
+  @Column()
   nome!: string;
   
-  @Column({ type: "varchar", length: 200 })
+  @Column()
   email!: string;
 
-  @Column({ type: "varchar", length: 14, unique: true })
+  @Column()
   cpf!: string;
 
-  @Column({ type: "varchar", length: 255 })
+  @Column()
   senha!: string;
 
-  @Column({ type: "int", default: 0 })
+  @Column()
   overall!: number;
 
-  @Column({ type: "boolean", default: false })
+  @Column()
   posicao: boolean = false;
 
-  @Column({ type: "boolean", default: false })
+  @Column()
   tipo: boolean = false;
 
   @BeforeInsert()

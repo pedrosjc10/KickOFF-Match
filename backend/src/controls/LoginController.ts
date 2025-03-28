@@ -8,29 +8,32 @@ import jwt from "jsonwebtoken";
 export class LoginController {
   static async login(req: Request, res: Response) {
     try {
-      const { cpf, senha } = req.body;
+      const { email, senha } = req.body;
 
-      if (!cpf || !senha) {
-        return res.status(400).json({ error: "Cpf e senha são obrigatórios" });
+      if (!email || !senha) {
+        return res.status(400).json({ error: "email e senha são obrigatórios" });
       }
 
       const repo = AppDataSource.getRepository(Usuario);
-      const usuario = await repo.findOne({ where: { cpf } });
+      const usuario = await repo.findOne({ where: { email } });
 
       if (!usuario) {
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
-
+      console.log("JWT_SECRET:", process.env.JWT_SECRET);
+      console.log("Senha recebida:", senha);
+      console.log("Senha armazenada:", usuario.senha);
       const senhaValida = await bcrypt.compare(senha, usuario.senha);
       if (!senhaValida) {
         return res.status(401).json({ error: "Credenciais inválidas" });
       }
 
 
-      const secretKey = "minhaChaveSecreta"; 
-      const token = jwt.sign({ userId: usuario.id }, secretKey, {
-        expiresIn: "1h", 
-      });
+      const token = jwt.sign(
+        { userId: usuario.id },
+        process.env.JWT_SECRET as string,
+        { expiresIn: "1h" }
+      );
 
       return res.json({
         message: "Login bem-sucedido",

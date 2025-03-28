@@ -44,31 +44,31 @@ __decorate([
     __metadata("design:type", Number)
 ], Usuario.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "varchar", length: 100 }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Usuario.prototype, "nome", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "varchar", length: 200 }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Usuario.prototype, "email", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "varchar", length: 14, unique: true }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Usuario.prototype, "cpf", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "varchar", length: 255 }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Usuario.prototype, "senha", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "int", default: 0 }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
 ], Usuario.prototype, "overall", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "boolean", default: false }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", Boolean)
 ], Usuario.prototype, "posicao", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "boolean", default: false }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", Boolean)
 ], Usuario.prototype, "tipo", void 0);
 __decorate([
