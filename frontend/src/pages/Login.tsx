@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../services/authServices';
 import '../styles/Login.css';
 
@@ -54,7 +54,7 @@ const Login: React.FC = () => {
         </button>
       </form>
       <p className="signup-text">
-        Don’t have an account? <a href="/cadastro">Sign up for free!</a>
+        Don’t have an account? <Link to="/usuarios">Sign up for free!</Link>
       </p>
     </div>
   );
