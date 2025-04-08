@@ -12,15 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// src/index.ts
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const database_1 = require("./config/database"); // ajuste o caminho conforme necessário
-const routes_1 = __importDefault(require("./routes")); // supondo que você tenha um arquivo de rotas
-dotenv_1.default.config(); // carrega as variáveis de ambiente
+const database_1 = require("./config/database");
+const routes_1 = __importDefault(require("./routes"));
+const cors_1 = __importDefault(require("cors"));
+dotenv_1.default.config();
 const app = (0, express_1.default)();
+app.use((0, cors_1.default)());
 app.use(express_1.default.json());
-// Carregando as rotas da aplicação
 app.use(routes_1.default);
 const PORT = process.env.PORT || 3000;
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {

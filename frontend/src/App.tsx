@@ -1,8 +1,7 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import MeusRachas from "./pages/MeusRachas";
-import PrivateRoute from "./routes/PrivateRoute";
-
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './pages/Login';
+import MeusRachas from './pages/MeusRachas';
+import PrivateRoute from './routes/PrivateRoute';
 
 const App = () => {
   return (

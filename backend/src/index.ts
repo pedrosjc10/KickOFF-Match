@@ -1,15 +1,18 @@
-// src/index.ts
 import express from "express";
 import dotenv from "dotenv";
-import { initializeDatabase } from "./config/database"; // ajuste o caminho conforme necessário
-import routes from "./routes"; // supondo que você tenha um arquivo de rotas
+import { initializeDatabase } from "./config/database"; 
+import routes from "./routes"; 
+import cors from "cors";
 
-dotenv.config(); // carrega as variáveis de ambiente
+dotenv.config(); 
 
 const app = express();
+
+app.use(cors());
+
 app.use(express.json());
 
-// Carregando as rotas da aplicação
+
 app.use(routes);
 
 const PORT = process.env.PORT || 3000;

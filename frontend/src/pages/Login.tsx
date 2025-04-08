@@ -1,48 +1,60 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { login } from "../services/authServices";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../services/authServices';
+import '../styles/Login.css';
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
-    setError("");
+    setError('');
 
     try {
       await login(email, senha);
-      navigate("/meusrachas"); // Redireciona para a página após login bem-sucedido
+      navigate('/meusrachas');
     } catch (error) {
-      setError("Email ou senha incorretos!");
+      setError('Email ou senha incorretos!');
     }
   };
 
   return (
     <div className="login-container">
-      <h2>Login</h2>
+      <h1>SEJA BEM VINDO!</h1>
+      <p>BEM VINDO DE VOLTA! COLOQUE SUAS INFORMAÇÕES</p>
       {error && <p className="error">{error}</p>}
-      <form onSubmit={handleLogin}>
+      <form className="login-form" onSubmit={handleLogin}>
+        <label>Email</label>
         <input
           type="email"
-          placeholder="Email"
+          placeholder="exemplo@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+
+        <label>Senha</label>
         <input
           type="password"
-          placeholder="Senha"
+          placeholder="********"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           required
         />
-        <button type="submit">Entrar</button>
+
+        <a href="#" className="forgot-password">
+          Forgot password
+        </a>
+
+        <button type="submit" className="sign-in-btn">
+          Sign in
+        </button>
       </form>
-      <p>
-        Não tem conta? <a href="/cadastro">Cadastre-se</a>
+      <p className="signup-text">
+        Don’t have an account? <a href="/cadastro">Sign up for free!</a>
       </p>
     </div>
   );

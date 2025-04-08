@@ -7,7 +7,7 @@ import usuarioRouter from "./usuarioRoute";
 const routes = Router();
 
 // Se quiser que a rota de login seja literalmente POST /
-routes.use("/", loginRouter);
+routes.use("/login", loginRouter);
 routes.use("/usuarios", usuarioRouter);
 
 // Se tivesse outras rotas, poderia fazer:
