@@ -10,9 +10,6 @@ export class Local extends BaseEntity {
   nome!: string;
 
   @Column()
-  endereco!: string;
-
-  @Column()
   tipo!: string;
 
   @Column()

@@ -2,15 +2,18 @@
 import { Router } from "express";
 import loginRouter from "./loginRoute";
 import usuarioRouter from "./usuarioRoute";
+import tPartidarouter from "./tipoPartidaRoute";
+import partidarouter from "./partidaRoute";
+import localrouter from "./localRoute";
 // import userRouter from "./userRoute"; etc.
 
 const routes = Router();
 
-// Se quiser que a rota de login seja literalmente POST /
 routes.use("/login", loginRouter);
 routes.use("/usuarios", usuarioRouter);
+routes.use("/tPartida", tPartidarouter);
+routes.use("/meusrachas", partidarouter);
+routes.use("/local", localrouter);
 
-// Se tivesse outras rotas, poderia fazer:
-// routes.use("/usuarios", userRouter);
 
 export default routes;

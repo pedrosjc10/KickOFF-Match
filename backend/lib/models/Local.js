@@ -26,10 +26,6 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Local.prototype, "endereco", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
 ], Local.prototype, "tipo", void 0);
 __decorate([
     (0, typeorm_1.Column)(),

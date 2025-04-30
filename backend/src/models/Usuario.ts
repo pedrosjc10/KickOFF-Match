@@ -36,7 +36,6 @@ export class Usuario {
     }
   }
 
-  // Relação inversa com Partida
   @OneToMany(() => Partida, (partida) => partida.usuario)
   partidas!: Partida[];
 }
