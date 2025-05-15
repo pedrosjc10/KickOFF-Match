@@ -16,6 +16,7 @@ const Usuario_1 = require("../models/Usuario");
 const Partida_1 = require("../models/Partida");
 const Local_1 = require("../models/Local");
 const TipoPartida_1 = require("../models/TipoPartida");
+const PartidaUsuario_1 = require("../models/PartidaUsuario");
 // Configuração da conexão com o banco de dados
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "mysql",
@@ -26,7 +27,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
     database: "tcc2", // Nome do seu banco de dados
     synchronize: false, // Sincroniza automaticamente as tabelas (usar com cuidado em produção)
     logging: false,
-    entities: [Usuario_1.Usuario, Partida_1.Partida, Local_1.Local, TipoPartida_1.TipoPartida],
+    entities: [Usuario_1.Usuario, Partida_1.Partida, Local_1.Local, TipoPartida_1.TipoPartida, PartidaUsuario_1.PartidaUsuario],
     migrations: ["src/migrations/*.ts"],
     subscribers: [],
 });

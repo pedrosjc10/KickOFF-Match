@@ -4,6 +4,7 @@ import { Usuario } from "../models/Usuario";
 import { Partida } from "../models/Partida";
 import { Local } from "../models/Local";
 import { TipoPartida } from "../models/TipoPartida";
+import { PartidaUsuario } from "../models/PartidaUsuario";
 
 // Configuração da conexão com o banco de dados
 export const AppDataSource = new DataSource({
@@ -15,7 +16,7 @@ export const AppDataSource = new DataSource({
   database: "tcc2", // Nome do seu banco de dados
   synchronize: false, // Sincroniza automaticamente as tabelas (usar com cuidado em produção)
   logging: false,
-  entities: [Usuario, Partida, Local, TipoPartida],
+  entities: [Usuario, Partida, Local, TipoPartida, PartidaUsuario],
   migrations: ["src/migrations/*.ts"],
   subscribers: [],
 });

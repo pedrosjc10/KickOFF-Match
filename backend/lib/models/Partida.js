@@ -14,6 +14,7 @@ const typeorm_1 = require("typeorm");
 const Local_1 = require("./Local");
 const Usuario_1 = require("./Usuario");
 const TipoPartida_1 = require("./TipoPartida");
+const PartidaUsuario_1 = require("./PartidaUsuario");
 let Partida = class Partida extends typeorm_1.BaseEntity {
 };
 exports.Partida = Partida;
@@ -62,6 +63,10 @@ __decorate([
     (0, typeorm_1.JoinColumn)({ name: "tipoPartida_idtipoPartida" }),
     __metadata("design:type", TipoPartida_1.TipoPartida)
 ], Partida.prototype, "tipoPartida", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => PartidaUsuario_1.PartidaUsuario, (partidaUsuario) => partidaUsuario.partida),
+    __metadata("design:type", Array)
+], Partida.prototype, "partidaUsuarios", void 0);
 exports.Partida = Partida = __decorate([
     (0, typeorm_1.Entity)("partida")
 ], Partida);

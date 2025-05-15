@@ -25,6 +25,7 @@ exports.Usuario = void 0;
 const typeorm_1 = require("typeorm");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const Partida_1 = require("./Partida");
+const PartidaUsuario_1 = require("./PartidaUsuario");
 let Usuario = class Usuario {
     constructor() {
         this.posicao = false;
@@ -82,6 +83,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => Partida_1.Partida, (partida) => partida.usuario),
     __metadata("design:type", Array)
 ], Usuario.prototype, "partidas", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => PartidaUsuario_1.PartidaUsuario, (partidaUsuario) => partidaUsuario.usuario),
+    __metadata("design:type", Array)
+], Usuario.prototype, "partidaUsuarios", void 0);
 exports.Usuario = Usuario = __decorate([
     (0, typeorm_1.Entity)()
 ], Usuario);

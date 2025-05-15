@@ -1,0 +1,625 @@
+type: collection.insomnia.rest/5.0
+name: TCC
+meta:
+  id: wrk_75151627d97b47ebbc8c47f89bebf039
+  created: 1747344678833
+  modified: 1747344678833
+collection:
+  - name: Usuario
+    meta:
+      id: fld_47169c8f5b304e8da59ebf32765384d8
+      created: 1746024887341
+      modified: 1746024887341
+      sortKey: -1746024887341
+    children:
+      - url: http://localhost:3000/usuarios/
+        name: get usuarios
+        meta:
+          id: req_b25fb13114c64e08a4f6e964073a2721
+          created: 1742865451050
+          modified: 1746034507018
+          isPrivate: false
+          sortKey: -1746024892225
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/10.3.1
+        authentication:
+          type: bearer
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc0NjAzNDQ5MywiZXhwIjoxNzQ2MDM4MDkzfQ.VLaEotxMcLv04l_pl_xd6HTPBzWuQJfy5qgqC3CyTdY
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/usuarios/
+        name: create usuarios
+        meta:
+          id: req_8d978cc518a24f43b24d4fa8c537b8a7
+          created: 1743121519536
+          modified: 1746027503564
+          isPrivate: false
+          sortKey: -1746024892125
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"nome": "pedro",
+            	"email": "pedro@gmail.com",
+            	"senha": "senha"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.0.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/usuarios/1
+        name: get by id usuarios
+        meta:
+          id: req_17fa07c6136b43c9925e1513c267c5e6
+          created: 1743124441626
+          modified: 1746027259053
+          isPrivate: false
+          sortKey: -1746024892325
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.1
+        authentication:
+          type: bearer
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImlhdCI6MTc0MzEyNDM0NCwiZXhwIjoxNzQzMTI3OTQ0fQ.bsIR_bf8pFHWS2PMwpJqttfRffR2u9m5VNaYTeRE9Dk
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/usuarios/2
+        name: delete usuarios
+        meta:
+          id: req_cfccbdf17db84ebf87cc299236c85829
+          created: 1743124478522
+          modified: 1746027671209
+          isPrivate: false
+          sortKey: -1746024892425
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.1
+        authentication:
+          type: bearer
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImlhdCI6MTc0NjAyNzQzMiwiZXhwIjoxNzQ2MDMxMDMyfQ.Dc_muUQKMWdiaqGlE-kQhJK_gH1WFpAGp_B436oIqrg
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/usuarios/1
+        name: update usuario
+        meta:
+          id: req_1280eb949cb64d64bf752e080f13ac02
+          created: 1746027234606
+          modified: 1746027321839
+          isPrivate: false
+          sortKey: -1746027234606
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"nome": "pedro3",
+            	"email": "pedro3@gmail.com",
+            	"senha": "senha3"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: TipoPartida
+    meta:
+      id: fld_ed7c564e8f914414909e61b2d54b79fd
+      created: 1746024952929
+      modified: 1746024952929
+      sortKey: -1746024887291
+    children:
+      - url: http://localhost:3000/tPartida
+        name: get tPartida
+        meta:
+          id: req_bb711e0b97b84a58987d23723619ade3
+          created: 1746024952944
+          modified: 1746025561557
+          isPrivate: false
+          sortKey: -1746024892225
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/10.3.1
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/tPartida
+        name: create tPartida
+        meta:
+          id: req_e278cab2f89d47388571b61ae99d18a3
+          created: 1746024952965
+          modified: 1746025526680
+          isPrivate: false
+          sortKey: -1746024892125
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"nomeTipoPartida": "society",
+            	"quantidadeJogadores": 7
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.0.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/tPartida/1
+        name: get by id tPartida
+        meta:
+          id: req_92124e59f42c430a9ae1fd8e4ef29b63
+          created: 1746024952983
+          modified: 1746025570743
+          isPrivate: false
+          sortKey: -1746024892325
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.1
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/tPartida/2
+        name: delete tPartida
+        meta:
+          id: req_7497d520f7a04646a033535230339560
+          created: 1746024952997
+          modified: 1746027711244
+          isPrivate: false
+          sortKey: -1746024892425
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.1
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/tPartida/1
+        name: update tPartida
+        meta:
+          id: req_fa16692167c44a8d99c55105e03d0a17
+          created: 1746025368669
+          modified: 1746025637905
+          isPrivate: false
+          sortKey: -1746024892525
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"nomeTipoPartida": "campo",
+            	"quantidadeJogadores": 11
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Partida
+    meta:
+      id: fld_0a12a19d995445c1a7a4fc92091144ef
+      created: 1746025688095
+      modified: 1746025688095
+      sortKey: -1746024887241
+    children:
+      - url: http://localhost:3000/meusrachas
+        name: get Partida
+        meta:
+          id: req_d6cc7533e0804730aed9156b8d73380b
+          created: 1746025688107
+          modified: 1746038899755
+          isPrivate: false
+          sortKey: -1746024892225
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/10.3.1
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/meusrachas
+        name: create Partida
+        meta:
+          id: req_e71dfe0fe2694d58a0385e525606c041
+          created: 1746025688123
+          modified: 1746038870179
+          isPrivate: false
+          sortKey: -1746024892125
+        method: POST
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "tipo": 1,
+              "data": "2025-05-10",
+              "hora": "15:30",
+              "time": "Time A",
+              "usuario_id": 1,
+            	"tipoPartida_id": 1,
+            	"local_id": 1
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.0.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/meusrachas/4
+        name: get by id Partida
+        meta:
+          id: req_a63dc3ee3019491bb80b449745e7fb7e
+          created: 1746025688139
+          modified: 1746038981861
+          isPrivate: false
+          sortKey: -1746024892325
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.1
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/meusrachas/4
+        name: delete Partida
+        meta:
+          id: req_6a5a5b574e6d43ecb4f327c94d5f1d25
+          created: 1746025688154
+          modified: 1746039021344
+          isPrivate: false
+          sortKey: -1746024892425
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.1
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/meusrachas/4
+        name: updatePartida
+        meta:
+          id: req_d2c694492cda487f9c0f8d65a6ec98f3
+          created: 1746025688170
+          modified: 1746039009589
+          isPrivate: false
+          sortKey: -1746024892525
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "tipo": 1,
+              "data": "2025-05-10",
+              "hora": "19:00",
+              "time": "Time A",
+              "usuario_id": 1,
+            	"tipoPartida_id": 1,
+            	"local_id": 1
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: create Local
+    meta:
+      id: fld_9b3b4f84c7b34c2ba9e1b526726a2308
+      created: 1746037393983
+      modified: 1746037393983
+      sortKey: -1746037393983
+    children:
+      - url: http://localhost:3000/local
+        name: create Local
+        meta:
+          id: req_45204b529d454ff6b206bbc00f2b035f
+          created: 1746037401671
+          modified: 1746038743020
+          isPrivate: false
+          sortKey: -1746037401671
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"nome": "fanaticos",
+            	"cidade": "sjc"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Partida Usuario
+    meta:
+      id: fld_13b422690bbb4350bc946c5d631d9949
+      created: 1747344814881
+      modified: 1747344814881
+      sortKey: -1746024887316
+    children:
+      - url: http://localhost:3000/partidaUsuario
+        name: get Partida Usuario
+        meta:
+          id: req_1a643e9b2f2f4252bd10e4d4d31844f5
+          created: 1747344814884
+          modified: 1747347364943
+          isPrivate: false
+          sortKey: -1746024892225
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/10.3.1
+        authentication:
+          type: bearer
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc0NjAzNDQ5MywiZXhwIjoxNzQ2MDM4MDkzfQ.VLaEotxMcLv04l_pl_xd6HTPBzWuQJfy5qgqC3CyTdY
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/partidaUsuario/
+        name: create Partida Usuario
+        meta:
+          id: req_b06a490d5edc42ae890157d12b835a58
+          created: 1747344814887
+          modified: 1747347159083
+          isPrivate: false
+          sortKey: -1746024892125
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"confirmado": false
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.0.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/partidaUsuario/4
+        name: get by id Partida Usuario
+        meta:
+          id: req_d36069f71fe242ffa273954263a75c7d
+          created: 1747344814890
+          modified: 1747347345894
+          isPrivate: false
+          sortKey: -1746024892325
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.1
+        authentication:
+          type: bearer
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImlhdCI6MTc0MzEyNDM0NCwiZXhwIjoxNzQzMTI3OTQ0fQ.bsIR_bf8pFHWS2PMwpJqttfRffR2u9m5VNaYTeRE9Dk
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/partidaUsuario/3
+        name: delete Partida Usuario
+        meta:
+          id: req_edd1c9afc5f74ac1b7d692c0b5ba9c71
+          created: 1747344814893
+          modified: 1747347333918
+          isPrivate: false
+          sortKey: -1746024892425
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.1
+        authentication:
+          type: bearer
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImlhdCI6MTc0NjAyNzQzMiwiZXhwIjoxNzQ2MDMxMDMyfQ.Dc_muUQKMWdiaqGlE-kQhJK_gH1WFpAGp_B436oIqrg
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/partidaUsuario/4
+        name: update Partida Usuario
+        meta:
+          id: req_c3aaa54c25ca4ea99a5fba4d889b68fb
+          created: 1747344814897
+          modified: 1747347321177
+          isPrivate: false
+          sortKey: -1746027234606
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"confirmado": true
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - url: http://localhost:3000/login
+    name: Login
+    meta:
+      id: req_5beb1d80e4814ddd97675514f97ce30b
+      created: 1743122579319
+      modified: 1746034491481
+      isPrivate: false
+      sortKey: -1742865450950
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"email": "pedro@gmail.com",
+        	"senha":"senha"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.0.1
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_bd92ff32de5f45ba97af962c31963fe0
+    created: 1742865443086
+    modified: 1742865443086
+environments:
+  name: Base Environment
+  meta:
+    id: env_387d4ef7995a49cda75f5ea311287ee9
+    created: 1715971906859
+    modified: 1742865442994
+    isPrivate: false

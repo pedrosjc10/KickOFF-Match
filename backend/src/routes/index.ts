@@ -5,6 +5,7 @@ import usuarioRouter from "./usuarioRoute";
 import tPartidarouter from "./tipoPartidaRoute";
 import partidarouter from "./partidaRoute";
 import localrouter from "./localRoute";
+import partidaUsuarioRouter from "./partidaUsuarioRoute";
 // import userRouter from "./userRoute"; etc.
 
 const routes = Router();
@@ -14,6 +15,7 @@ routes.use("/usuarios", usuarioRouter);
 routes.use("/tPartida", tPartidarouter);
 routes.use("/meusrachas", partidarouter);
 routes.use("/local", localrouter);
+routes.use("/partidaUsuario", partidaUsuarioRouter);
 
 
 export default routes;

@@ -4,11 +4,13 @@ import {
   Column, 
   BaseEntity, 
   ManyToOne,
-  JoinColumn
+  JoinColumn,
+  OneToMany
 } from "typeorm";
 import { Local } from "./Local"; 
 import { Usuario } from "./Usuario"; 
 import { TipoPartida } from "./TipoPartida"; 
+import { PartidaUsuario } from "./PartidaUsuario";
 
 @Entity("partida")
 export class Partida extends BaseEntity {
@@ -47,4 +49,7 @@ export class Partida extends BaseEntity {
   })
   @JoinColumn({ name: "tipoPartida_idtipoPartida" })
   tipoPartida!: TipoPartida;
+
+  @OneToMany(() => PartidaUsuario, (partidaUsuario) => partidaUsuario.partida)
+partidaUsuarios!: PartidaUsuario[];
 }

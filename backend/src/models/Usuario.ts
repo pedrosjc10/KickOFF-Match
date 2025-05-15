@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, BeforeUpdate, OneToMany } from "typeorm";
 import bcrypt from "bcrypt";
 import { Partida } from "./Partida";
+import { PartidaUsuario } from "./PartidaUsuario";
 
 @Entity()
 export class Usuario {
@@ -38,4 +39,8 @@ export class Usuario {
 
   @OneToMany(() => Partida, (partida) => partida.usuario)
   partidas!: Partida[];
+  
+  @OneToMany(() => PartidaUsuario, (partidaUsuario) => partidaUsuario.usuario)
+partidaUsuarios!: PartidaUsuario[];
+
 }
