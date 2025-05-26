@@ -26,12 +26,6 @@ export class Partida extends BaseEntity {
   @Column({ type: "time" })
   hora!: string;
 
-  @Column({ type: "varchar", length: 100 })
-  time!: string;
-
-  @Column({ type: "varchar", length: 45 })
-  placar!: string;
-
   @ManyToOne(() => Local, (local) => local.partidas, {
     onDelete: "CASCADE", 
   })

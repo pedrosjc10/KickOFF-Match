@@ -28,7 +28,6 @@ export class PartidaController {
         data,
         hora,
         local,
-        usuario,
         tipoPartida,
       });
 
@@ -74,11 +73,10 @@ export class PartidaController {
   static async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { tipo, data, hora, local_id, usuario_id, tipoPartida_idtipoPartida } = req.body;
+      const { tipo, data, hora, local_id, tipoPartida_idtipoPartida } = req.body;
 
       const partidaRepo = AppDataSource.getRepository(Partida);
       const localRepo = AppDataSource.getRepository(Local);
-      const usuarioRepo = AppDataSource.getRepository(Usuario);
       const tipoPartidaRepo = AppDataSource.getRepository(TipoPartida);
 
       const partida = await partidaRepo.findOneBy({ id: Number(id) });
@@ -87,10 +85,9 @@ export class PartidaController {
       }
 
       const local = await localRepo.findOneBy({ id: local_id });
-      const usuario = await usuarioRepo.findOneBy({ id: usuario_id });
       const tipoPartida = await tipoPartidaRepo.findOneBy({ idtipoPartida: tipoPartida_idtipoPartida });
 
-      if (!local || !usuario || !tipoPartida) {
+      if (!local || !tipoPartida) {
         return res.status(400).json({ error: "Local, Usuário ou Tipo de Partida inválidos." });
       }
 
