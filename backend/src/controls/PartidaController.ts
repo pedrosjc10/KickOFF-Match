@@ -8,7 +8,7 @@ import { TipoPartida } from "../models/TipoPartida";
 export class PartidaController {
   static async create(req: Request, res: Response) {
     try {
-      const { tipo, data, hora, time, local_id, usuario_id, tipoPartida_id } = req.body;
+      const { tipo, data, hora, local_id, usuario_id, tipoPartida_id } = req.body;
 
       const partidaRepo = AppDataSource.getRepository(Partida);
       const localRepo = AppDataSource.getRepository(Local);
@@ -27,7 +27,6 @@ export class PartidaController {
         tipo,
         data,
         hora,
-        time,
         local,
         usuario,
         tipoPartida,
@@ -75,7 +74,7 @@ export class PartidaController {
   static async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { tipo, data, hora, time, local_id, usuario_id, tipoPartida_idtipoPartida } = req.body;
+      const { tipo, data, hora, local_id, usuario_id, tipoPartida_idtipoPartida } = req.body;
 
       const partidaRepo = AppDataSource.getRepository(Partida);
       const localRepo = AppDataSource.getRepository(Local);
@@ -98,9 +97,7 @@ export class PartidaController {
       partida.tipo = tipo;
       partida.data = data;
       partida.hora = hora;
-      partida.time = time;
       partida.local = local;
-      partida.usuario = usuario;
       partida.tipoPartida = tipoPartida;
 
       const partidaAtualizada = await partidaRepo.save(partida);
