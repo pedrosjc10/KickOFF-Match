@@ -1,0 +1,36 @@
+Componetes
+usuario->tipo (jogador, organizador)
+	id
+	->nome
+	->cpf
+	->Senha
+	->foto
+	->overal
+	->dataNascimento
+
+partida-> tipo (publicas,privada) 
+	->id
+	-> data
+	-> hora
+	-> local.id
+	-> qtd Jogadores
+	-> nomeTime[]
+	-> placar[]
+local
+	->id	
+	->nome
+	->endereco
+	->tipo
+	->modalidades
+
+jogadores_partidas
+partida.id
+usuario.id
+ 	
+
+
+
+
+
+	
+			
