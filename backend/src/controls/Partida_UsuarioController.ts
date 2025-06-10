@@ -2,24 +2,41 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../config/database";
 import { PartidaUsuario } from "../models/PartidaUsuario";
+import { Usuario } from "../models/Usuario";
+import { Partida } from "../models/Partida";
 
 export class PartidaUsuarioController {
   static async create(req: Request, res: Response) {
     try {
-      const { confirmado } = req.body;
-      const repo = AppDataSource.getRepository(PartidaUsuario);
+      const { confirmado, organizador, jog_linha, usuario_id, partida_id } = req.body;
 
-      const novaAssociacao = repo.create({
-        confirmado
-      });
+      const usuarioRepo = AppDataSource.getRepository(Usuario);
+      const partidaRepo = AppDataSource.getRepository(Partida);
+      const partidaUsuarioRepo = AppDataSource.getRepository(PartidaUsuario);
 
-      const resultado = await repo.save(novaAssociacao);
+      const usuario = await usuarioRepo.findOneBy({ id: usuario_id });
+      const partida = await partidaRepo.findOneBy({ id: partida_id });
+
+      if (!usuario || !partida) {
+        return res.status(400).json({ error: "Usuário ou Partida não encontrados." });
+      }
+
+      const novaAssociacao = partidaUsuarioRepo.create({
+        confirmado,
+        organizador,
+        jog_linha,
+        usuario,
+        partida
+        });
+
+      const resultado = await partidaUsuarioRepo.save(novaAssociacao);
       return res.status(201).json(resultado);
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "Erro ao criar vínculo entre partida e usuário" });
     }
   }
+
 
   static async getAll(req: Request, res: Response) {
     try {

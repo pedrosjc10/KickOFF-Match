@@ -2,24 +2,21 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../config/database";
 import { Partida } from "../models/Partida";
 import { Local } from "../models/Local";
-import { Usuario } from "../models/Usuario";
 import { TipoPartida } from "../models/TipoPartida";
 
 export class PartidaController {
   static async create(req: Request, res: Response) {
     try {
-      const { tipo, data, hora, local_id, usuario_id, tipoPartida_id } = req.body;
+      const { tipo, data, hora, nome, local_id, tipoPartida_id } = req.body;
 
       const partidaRepo = AppDataSource.getRepository(Partida);
       const localRepo = AppDataSource.getRepository(Local);
-      const usuarioRepo = AppDataSource.getRepository(Usuario);
       const tipoPartidaRepo = AppDataSource.getRepository(TipoPartida);
 
       const local = await localRepo.findOneBy({ id: local_id });
-      const usuario = await usuarioRepo.findOneBy({ id: usuario_id });
       const tipoPartida = await tipoPartidaRepo.findOneBy({ idtipoPartida: tipoPartida_id });
 
-      if (!local || !usuario || !tipoPartida) {
+      if (!local  || !tipoPartida) {
         return res.status(400).json({ error: "Local, Usuário ou Tipo de Partida não encontrados." });
       }
 
@@ -27,6 +24,7 @@ export class PartidaController {
         tipo,
         data,
         hora,
+        nome,
         local,
         tipoPartida,
       });
@@ -42,7 +40,7 @@ export class PartidaController {
   static async getAll(req: Request, res: Response) {
     try {
       const repo = AppDataSource.getRepository(Partida);
-      const partidas = await repo.find({ relations: ["local", "usuario", "tipoPartida"] });
+      const partidas = await repo.find({ relations: ["local", "tipoPartida"] });
       return res.json(partidas);
     } catch (error) {
       console.error(error);
@@ -56,7 +54,7 @@ export class PartidaController {
       const repo = AppDataSource.getRepository(Partida);
       const partida = await repo.findOne({
         where: { id: Number(id) },
-        relations: ["local", "usuario", "tipoPartida"]
+        relations: ["local", "tipoPartida"]
       });
 
       if (!partida) {
@@ -73,7 +71,7 @@ export class PartidaController {
   static async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { tipo, data, hora, local_id, tipoPartida_idtipoPartida } = req.body;
+      const { tipo, data, hora, nome, local_id, tipoPartida_idtipoPartida } = req.body;
 
       const partidaRepo = AppDataSource.getRepository(Partida);
       const localRepo = AppDataSource.getRepository(Local);
@@ -88,7 +86,7 @@ export class PartidaController {
       const tipoPartida = await tipoPartidaRepo.findOneBy({ idtipoPartida: tipoPartida_idtipoPartida });
 
       if (!local || !tipoPartida) {
-        return res.status(400).json({ error: "Local, Usuário ou Tipo de Partida inválidos." });
+        return res.status(400).json({ error: "Local ou Tipo de Partida inválidos." });
       }
 
       partida.tipo = tipo;
@@ -96,6 +94,7 @@ export class PartidaController {
       partida.hora = hora;
       partida.local = local;
       partida.tipoPartida = tipoPartida;
+      partida.nome = nome;
 
       const partidaAtualizada = await partidaRepo.save(partida);
       return res.json(partidaAtualizada);
@@ -126,4 +125,23 @@ export class PartidaController {
       return res.status(500).json({ error: "Erro ao deletar partida" });
     }
   }
+
+    static async getMeusRachas(req: Request, res: Response) {
+    try {
+      const { usuarioId } = req.params;
+      const partidas = await AppDataSource
+        .getRepository(Partida)
+        .createQueryBuilder("partida")
+        .leftJoinAndSelect("partida.partidaUsuarios", "pu")
+        .leftJoinAndSelect("partida.local", "local")
+        .where("pu.usuario.id = :usuarioId", { usuarioId })
+        .getMany();
+
+      return res.json(partidas);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro ao buscar rachas que participa" });
+    }
+  }
+
 }

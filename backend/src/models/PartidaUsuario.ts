@@ -12,6 +12,9 @@ export class PartidaUsuario {
 
   @Column()
   organizador!: boolean;
+  
+  @Column()
+  jog_linha!: boolean;
 
   @ManyToOne(() => Partida, (partida) => partida.partidaUsuarios, { onDelete: 'CASCADE' })
   partida!: Partida;

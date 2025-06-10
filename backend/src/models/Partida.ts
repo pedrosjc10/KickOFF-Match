@@ -8,7 +8,6 @@ import {
   OneToMany
 } from "typeorm";
 import { Local } from "./Local"; 
-import { Usuario } from "./Usuario"; 
 import { TipoPartida } from "./TipoPartida"; 
 import { PartidaUsuario } from "./PartidaUsuario";
 
@@ -26,17 +25,14 @@ export class Partida extends BaseEntity {
   @Column({ type: "time" })
   hora!: string;
 
+  @Column()
+  nome!: string;
+
   @ManyToOne(() => Local, (local) => local.partidas, {
     onDelete: "CASCADE", 
   })
   @JoinColumn({ name: "local_id" })
   local!: Local;
-
-  @ManyToOne(() => Usuario, (usuario) => usuario.partidas, {
-    onDelete: "CASCADE", 
-  })
-  @JoinColumn({ name: "usuario_id" })
-  usuario!: Usuario;
 
   @ManyToOne(() => TipoPartida, (tipoPartida) => tipoPartida.partidas, {
     onDelete: "CASCADE", 
