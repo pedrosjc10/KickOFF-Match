@@ -128,7 +128,17 @@ export class PartidaController {
 
     static async getMeusRachas(req: Request, res: Response) {
     try {
-      const { usuarioId } = req.params;
+      const usuarioId = Number(req.usuario?.id);
+
+      if (!usuarioId) {
+        return res.status(401).json({ error: "Usuário não autenticado." });
+      }
+
+      if (isNaN(usuarioId)) {
+        return res.status(400).json({ error: "ID de usuário inválido" });
+      }
+
+    
       const partidas = await AppDataSource
         .getRepository(Partida)
         .createQueryBuilder("partida")

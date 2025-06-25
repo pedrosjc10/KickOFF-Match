@@ -15,7 +15,7 @@ const Login: React.FC = () => {
 
     try {
       await login(email, senha);
-      navigate('/criarrachas');
+      navigate('/meusrachas');
     } catch (error) {
       setError('Email ou senha incorretos!');
     }
