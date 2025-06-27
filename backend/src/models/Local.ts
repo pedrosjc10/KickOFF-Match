@@ -26,8 +26,7 @@ export class Local extends BaseEntity {
 
   @Column()
   cidade!: string;
-
-  // Relação inversa com Partida
+  
   @OneToMany(() => Partida, (partida) => partida.local)
   partidas!: Partida[];
 }

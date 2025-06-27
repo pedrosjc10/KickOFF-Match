@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../api/api';
 
+interface PartidaUsuario {
+  confirmado: boolean;
+  organizador: boolean;
+  jog_linha: boolean;
+}
+
+interface Local {
+  id: number;
+  nome: string;
+}
+
 interface Racha {
   id: number;
   nome: string;
-  local: string;
-  diaSemana: string;
-  horarioInicio: string;
-  duracao: string;
-  vagas: number;
-  privado: string;
+  data: string;
+  hora: string;
+  local: Local;
+  partidausuarios: PartidaUsuario[];
 }
 
 const MeusRachas: React.FC = () => {
@@ -18,7 +27,7 @@ const MeusRachas: React.FC = () => {
   useEffect(() => {
     const fetchRachas = async () => {
       try {
-        const response = await axios.get('/meusrachas/participando');
+        const response = await axios.get('/meusrachas/participando/${}');
         setRachas(response.data);
       } catch (error) {
         console.error('Erro ao buscar rachas que participa:', error);
@@ -35,11 +44,19 @@ const MeusRachas: React.FC = () => {
         <p>Você ainda não participa de nenhum racha.</p>
       ) : (
         <ul>
-          {rachas.map((racha) => (
-            <li key={racha.id}>
-              <strong>{racha.nome}</strong> - {racha.diaSemana} às {racha.horarioInicio} em {racha.local}
-            </li>
-          ))}
+          {rachas.map((racha) => {
+            const info = racha.partidausuarios[0]; // deve ser sempre 1 pra esse usuário
+            return (
+              <li key={racha.id}>
+                <strong>{racha.nome}</strong> - {racha.data} às {racha.hora} em {racha.local?.nome || 'Local não informado'}
+                <ul>
+                  <li>Confirmado: {info?.confirmado ? 'Sim' : 'Não'}</li>
+                  <li>Organizador: {info?.organizador ? 'Sim' : 'Não'}</li>
+                  <li>Jogador de linha: {info?.jog_linha ? 'Sim' : 'Não'}</li>
+                </ul>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
