@@ -36,8 +36,12 @@ export class LoginController {
       );
 
       return res.json({
-        message: "Login bem-sucedido",
         token,
+        usuario: {
+          id: usuario.id,
+          nome: usuario.nome,
+          email: usuario.email
+        }
       });
     } catch (error) {
       console.error("Erro no login:", error);

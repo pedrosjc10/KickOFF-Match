@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../services/authServices';
+import { useUserStore } from '../stores/userStore';
 import '../styles/Login.css';
 
 const Login: React.FC = () => {
@@ -8,15 +9,20 @@ const Login: React.FC = () => {
   const [senha, setSenha] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { setUsuario } = useUserStore();
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     setError('');
 
     try {
-      await login(email, senha);
+      const { usuario, token } = await login(email, senha);
+      setUsuario({ id: usuario.id, nome: usuario.nome, email: usuario.email });
+
+
       navigate('/meusrachas');
     } catch (error) {
+      console.error('Erro no login:', error);
       setError('Email ou senha incorretos!');
     }
   };

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../api/api";
+import { cadastrarUsuario } from "../services/usuarioService";
 import "../styles/Cadastro.css";
 
 const Cadastro: React.FC = () => {
@@ -13,7 +13,7 @@ const Cadastro: React.FC = () => {
     e.preventDefault();
 
     try {
-      await axios.post("/usuarios", { nome, email, senha });
+      await cadastrarUsuario({ nome, email, senha });
       alert("Cadastro realizado com sucesso!");
       navigate("/login");
     } catch (error) {

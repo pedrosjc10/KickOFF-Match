@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import axios from '../api/api';
+import { buscarRachasQueParticipo } from '../services/rachaService';
+import { useUserStore } from '../stores/userStore';
+import '../styles/MeusRachas.css';
 
 interface PartidaUsuario {
   confirmado: boolean;
@@ -10,6 +12,7 @@ interface PartidaUsuario {
 interface Local {
   id: number;
   nome: string;
+  logradouro?: string;
 }
 
 interface Racha {
@@ -23,41 +26,47 @@ interface Racha {
 
 const MeusRachas: React.FC = () => {
   const [rachas, setRachas] = useState<Racha[]>([]);
+  const { usuario } = useUserStore();
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchRachas = async () => {
+      if (!usuario?.id) return;
       try {
-        const response = await axios.get('/meusrachas/participando/${}');
-        setRachas(response.data);
+        const data = await buscarRachasQueParticipo(usuario?.id);
+        setRachas(data);
+        setLoading(false);
       } catch (error) {
         console.error('Erro ao buscar rachas que participa:', error);
       }
     };
 
     fetchRachas();
-  }, []);
+  }, [usuario]);
 
   return (
-    <div className="rachas-container">
-      <h1>Rachas que participo</h1>
-      {rachas.length === 0 ? (
-        <p>Você ainda não participa de nenhum racha.</p>
+    <div className="meus-rachas-container">
+      <h1>MEUS RACHAS</h1>
+      {loading ? (
+        <p className="loading">Carregando...</p>
+      ) : rachas.length === 0 ? (
+        <p className="empty">Você ainda não participa de nenhum racha.</p>
       ) : (
-        <ul>
-          {rachas.map((racha) => {
-            const info = racha.partidausuarios[0]; // deve ser sempre 1 pra esse usuário
-            return (
-              <li key={racha.id}>
-                <strong>{racha.nome}</strong> - {racha.data} às {racha.hora} em {racha.local?.nome || 'Local não informado'}
-                <ul>
-                  <li>Confirmado: {info?.confirmado ? 'Sim' : 'Não'}</li>
-                  <li>Organizador: {info?.organizador ? 'Sim' : 'Não'}</li>
-                  <li>Jogador de linha: {info?.jog_linha ? 'Sim' : 'Não'}</li>
-                </ul>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="racha-list">
+          {rachas.map((racha) => (
+            <div className="racha-card" key={racha.id}>
+              <div className="racha-info">
+                <span className="racha-nome">{racha.nome.toUpperCase()}</span>
+                <span className="racha-local">{racha.local?.nome}</span>
+                <span className="racha-endereco">{racha.local && racha.local.logradouro ? racha.local.logradouro : 'Endereço não informado'}</span>
+              </div>
+              <div className="racha-icons">
+                <span className="icon">✔️</span>
+                <span className="icon">⚙️</span>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

@@ -3,17 +3,22 @@ import Login from '../pages/Login';
 import Cadastro from '../pages/Cadastro';
 import CriarRacha from '../pages/CriarRachas';
 import MeusRachas from '../pages/MeusRachas';
+import AuthLoader from '../pages/AuthLoader';
+import ProtectedRoute from '../pages/ProtectedRoute';
 
 const AppRoutes = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/usuarios" element={<Cadastro />} />
-        <Route path="/criarrachas" element={<CriarRacha />} />
-        <Route path="/meusrachas" element={<MeusRachas />} />
-      </Routes>
-    </BrowserRouter>
+    <ProtectedRoute>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<AuthLoader />} />
+          <Route path="/login" element={<Login />}  />
+          <Route path="/usuarios" element={<Cadastro />} />
+          <Route path="/criarrachas" element={<CriarRacha />} />
+          <Route path="/meusrachas" element={<MeusRachas />} />
+        </Routes>
+      </BrowserRouter>
+    </ProtectedRoute>
   );
 };
 

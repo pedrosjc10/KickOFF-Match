@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { criarPartida } from "../services/partidaService";
 import "../styles/CriarRacha.css";
 
 const CriarRacha: React.FC = () => {
@@ -12,10 +13,9 @@ const CriarRacha: React.FC = () => {
   const [privado, setPrivado] = useState("privado");
   const [organizador, setOrganizador] = useState(false);
 
-
   const navigate = useNavigate();
 
-  const handleCriar = (e: React.FormEvent) => {
+  const handleCriar = async (e: React.FormEvent) => {
     e.preventDefault();
     setOrganizador(true);
 
@@ -30,10 +30,14 @@ const CriarRacha: React.FC = () => {
       organizador: true,
     };
 
-    console.log("Partida criada:", novaPartida);
-    
-    alert("Racha criado com sucesso!");
-    navigate("/meusrachas");
+    try {
+      await criarPartida(novaPartida);
+      alert("Racha criado com sucesso!");
+      navigate("/meusrachas");
+    } catch (error) {
+      alert("Erro ao criar racha.");
+      console.error(error);
+    }
   };
 
   return (
