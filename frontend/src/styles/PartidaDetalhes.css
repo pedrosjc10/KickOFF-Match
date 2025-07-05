@@ -1,0 +1,88 @@
+/* src/styles/PartidaDetalhes.css */
+.detalhes-container {
+  width: 390px;
+  height: 844px;
+  padding: 16px;
+  margin: 0 auto;
+  overflow-y: auto;
+  font-family: sans-serif;
+  background: #f9f9f9;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.detalhes-nome {
+  font-size: 24px;
+  margin: 8px 0;
+}
+
+.detalhes-info,
+.detalhes-loc,
+.detalhes-end {
+  font-size: 16px;
+  margin: 4px 0;
+}
+
+.detalhes-section {
+  margin: 16px 0;
+}
+
+.detalhes-section h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.detalhes-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.detalhes-section li {
+  margin-bottom: 4px;
+}
+
+.time-group {
+  margin-top: 8px;
+  padding: 8px;
+  background: #fff;
+  border-radius: 6px;
+}
+
+.detalhes-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.detalhes-actions label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.detalhes-actions button {
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.detalhes-actions button:not(.sort-btn) {
+  background: #4caf50;
+  color: #fff;
+}
+
+.sort-btn {
+  background: #2196f3;
+  color: #fff;
+}

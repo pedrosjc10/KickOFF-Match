@@ -49,24 +49,47 @@ export class PartidaController {
   }
 
   static async getById(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const repo = AppDataSource.getRepository(Partida);
-      const partida = await repo.findOne({
-        where: { id: Number(id) },
-        relations: ["local", "tipoPartida"]
-      });
+  try {
+    const { id } = req.params;
+    const repo = AppDataSource.getRepository(Partida);
 
-      if (!partida) {
-        return res.status(404).json({ error: "Partida não encontrada" });
-      }
+    const partida = await repo.findOne({
+      where: { id: Number(id) },
+      relations: ["local", "tipoPartida", "partidaUsuarios", "partidaUsuarios.usuario"]
+    });
 
-      return res.json(partida);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Erro ao buscar partida" });
+    if (!partida) {
+      return res.status(404).json({ error: "Partida não encontrada" });
     }
+
+    // Transformar partidaUsuarios em um array de jogadores
+    const jogadores = partida.partidaUsuarios.map(pu => ({
+      id: pu.usuario.id,
+      nome: pu.usuario.nome,
+      confirmado: pu.confirmado,
+      organizador: pu.organizador,
+      jog_linha: pu.jog_linha
+    }));
+
+    // Montar objeto final
+    const partidaDetalhada = {
+      id: partida.id,
+      nome: partida.nome,
+      data: partida.data,
+      hora: partida.hora,
+      local: {
+        nome: partida.local.nome,
+        endereco: `${partida.local.logradouro ?? ''} ${partida.local.numero ?? ''}`.trim()
+      },
+      jogadores
+    };
+
+    return res.json(partidaDetalhada);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Erro ao buscar partida" });
   }
+}
 
   static async update(req: Request, res: Response) {
     try {

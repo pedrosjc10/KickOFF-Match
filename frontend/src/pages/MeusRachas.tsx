@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { buscarRachasQueParticipo } from '../services/rachaService';
+import { useNavigate } from 'react-router-dom'; // ⬅️ IMPORTANTE
+import { buscarRachasQueParticipo } from '../services/partidaService';
 import { useUserStore } from '../stores/userStore';
 import '../styles/MeusRachas.css';
 
@@ -28,6 +29,7 @@ const MeusRachas: React.FC = () => {
   const [rachas, setRachas] = useState<Racha[]>([]);
   const { usuario } = useUserStore();
   const [loading, setLoading] = useState<boolean>(true);
+  const navigate = useNavigate(); // ⬅️ Aqui
 
   useEffect(() => {
     const fetchRachas = async () => {
@@ -54,15 +56,18 @@ const MeusRachas: React.FC = () => {
       ) : (
         <div className="racha-list">
           {rachas.map((racha) => (
-            <div className="racha-card" key={racha.id}>
+            <div
+              className="racha-card"
+              key={racha.id}
+              onClick={() => navigate(`/partida/${racha.id}`)} // ⬅️ AQUI muda de rota
+            >
               <div className="racha-info">
                 <span className="racha-nome">{racha.nome.toUpperCase()}</span>
                 <span className="racha-local">{racha.local?.nome}</span>
-                <span className="racha-endereco">{racha.local && racha.local.logradouro ? racha.local.logradouro : 'Endereço não informado'}</span>
+                <span className="racha-endereco">{racha.local?.logradouro || 'Endereço não informado'}</span>
               </div>
               <div className="racha-icons">
                 <span className="icon">✔️</span>
-                <span className="icon">⚙️</span>
               </div>
             </div>
           ))}

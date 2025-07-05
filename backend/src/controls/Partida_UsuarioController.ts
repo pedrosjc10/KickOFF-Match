@@ -107,4 +107,30 @@ export class PartidaUsuarioController {
       return res.status(500).json({ error: "Erro ao deletar" });
     }
   }
+
+  static async getByUsuarioAndPartida(req: Request, res: Response) {
+  try {
+    const { usuarioId, partidaId } = req.params;
+
+    const repo = AppDataSource.getRepository(PartidaUsuario);
+
+    const registro = await repo.findOne({
+      where: {
+        usuario: { id: Number(usuarioId) },
+        partida: { id: Number(partidaId) },
+      },
+      relations: ["partida", "usuario"]
+    });
+
+    if (!registro) {
+      return res.status(404).json({ error: "Relação não encontrada" });
+    }
+
+    return res.json(registro);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Erro ao buscar relação" });
+  }
+}
+
 }

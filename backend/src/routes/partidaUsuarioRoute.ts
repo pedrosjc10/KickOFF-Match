@@ -9,5 +9,6 @@ partidaUsuarioRouter.get("/",  PartidaUsuarioController.getAll);
 partidaUsuarioRouter.get("/:id",  PartidaUsuarioController.getById);
 partidaUsuarioRouter.put("/:id",  PartidaUsuarioController.update);
 partidaUsuarioRouter.delete("/:id", PartidaUsuarioController.delete);
+partidaUsuarioRouter.get('/:usuarioId/:partidaId', PartidaUsuarioController.getByUsuarioAndPartida);
 
 export default partidaUsuarioRouter;
