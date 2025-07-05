@@ -1,27 +1,38 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
+import { config } from "dotenv";
 import { Usuario } from "../models/Usuario";
 import { Partida } from "../models/Partida";
 import { Local } from "../models/Local";
 import { TipoPartida } from "../models/TipoPartida";
 import { PartidaUsuario } from "../models/PartidaUsuario";
 
-// Configuração da conexão com o banco de dados
+// Carrega variáveis do .env (funciona localmente também)
+config();
+
+// Usa DATABASE_URL se existir (produção/Railway), senão usa local
+const isProduction = !!process.env.DATABASE_URL;
+
 export const AppDataSource = new DataSource({
   type: "mysql",
-  host: "localhost", // Alterar se estiver em produção
-  port: 3306,
-  username: "root", // Altere conforme sua configuração
-  password: "", // Altere conforme sua configuração
-  database: "tcc2", // Nome do seu banco de dados
-  synchronize: false, // Sincroniza automaticamente as tabelas (usar com cuidado em produção)
+  ...(isProduction
+    ? {
+        url: process.env.DATABASE_URL,
+      }
+    : {
+        host: "localhost",
+        port: 3306,
+        username: "root",
+        password: "",
+        database: "tcc2",
+      }),
+  synchronize: false,
   logging: false,
   entities: [Usuario, Partida, Local, TipoPartida, PartidaUsuario],
-  migrations: ["src/migrations/*.ts"],
+  migrations: ["dist/migrations/*.js"], // Use dist/ em produção
   subscribers: [],
 });
 
-// Função para iniciar a conexão com o banco de dados
 export const initializeDatabase = async () => {
   try {
     await AppDataSource.initialize();
