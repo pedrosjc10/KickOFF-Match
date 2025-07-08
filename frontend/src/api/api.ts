@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getToken } from '../services/authServices';
 
 const api = axios.create({
-  baseURL: 'hhtps://tcc.railway.internal', // Altere se necessário
+  baseURL: 'https://tcc.railway.internal',
 });
 
 api.interceptors.request.use(
