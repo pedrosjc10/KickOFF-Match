@@ -1,32 +1,31 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { criarPartida } from "../services/partidaService";
+import { criarPartida, NovaPartida } from "../services/partidaService";
 import "../styles/CriarRacha.css";
 
 const CriarRacha: React.FC = () => {
-  const [nome, setNome] = useState("");
-  const [local, setLocal] = useState("");
-  const [diaSemana, setDiaSemana] = useState("");
-  const [horarioInicio, setHorarioInicio] = useState("");
-  const [duracao, setDuracao] = useState("");
-  const [vagas, setVagas] = useState("");
-  const [privado, setPrivado] = useState("privado");
-  const [organizador, setOrganizador] = useState(false);
+  const [form, setForm] = useState<Omit<NovaPartida, "organizador">>({
+    nome: "",
+    local: "",
+    diaSemana: "",
+    horarioInicio: "",
+    duracao: "",
+    vagas: "",
+    privado: "privado",
+  });
 
   const navigate = useNavigate();
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleCriar = async (e: React.FormEvent) => {
     e.preventDefault();
-    setOrganizador(true);
 
-    const novaPartida = {
-      nome,
-      local,
-      diaSemana,
-      horarioInicio,
-      duracao,
-      vagas,
-      privado,
+    const novaPartida: NovaPartida = {
+      ...form,
       organizador: true,
     };
 
@@ -47,70 +46,33 @@ const CriarRacha: React.FC = () => {
           CRIAR<br />RACHA
         </h1>
         <form onSubmit={handleCriar} className="criarracha-form">
-          <label className="criarracha-label">Nome do Racha</label>
-          <input
-            type="text"
-            placeholder="Fut quinta"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            className="criarracha-input"
-            required
-          />
-
-          <label className="criarracha-label">Nome do local ou endereço</label>
-          <input
-            type="text"
-            placeholder="Society FC"
-            value={local}
-            onChange={(e) => setLocal(e.target.value)}
-            className="criarracha-input"
-            required
-          />
-
-          <label className="criarracha-label">Dia da semana</label>
-          <input
-            type="text"
-            placeholder="Quinta"
-            value={diaSemana}
-            onChange={(e) => setDiaSemana(e.target.value)}
-            className="criarracha-input"
-            required
-          />
-
-          <label className="criarracha-label">Horário de início</label>
-          <input
-            type="text"
-            placeholder="21h"
-            value={horarioInicio}
-            onChange={(e) => setHorarioInicio(e.target.value)}
-            className="criarracha-input"
-            required
-          />
-
-          <label className="criarracha-label">Duração</label>
-          <input
-            type="text"
-            placeholder="1h"
-            value={duracao}
-            onChange={(e) => setDuracao(e.target.value)}
-            className="criarracha-input"
-            required
-          />
-
-          <label className="criarracha-label">Número de vagas</label>
-          <input
-            type="number"
-            placeholder="30"
-            value={vagas}
-            onChange={(e) => setVagas(e.target.value)}
-            className="criarracha-input"
-            required
-          />
+          {[
+            { label: "Nome do Racha", name: "nome", placeholder: "Fut quinta" },
+            { label: "Nome do local ou endereço", name: "local", placeholder: "Society FC" },
+            { label: "Dia da semana", name: "diaSemana", placeholder: "Quinta" },
+            { label: "Horário de início", name: "horarioInicio", placeholder: "21h" },
+            { label: "Duração", name: "duracao", placeholder: "1h" },
+            { label: "Número de vagas", name: "vagas", placeholder: "30", type: "number" },
+          ].map(({ label, name, placeholder, type = "text" }) => (
+            <React.Fragment key={name}>
+              <label className="criarracha-label">{label}</label>
+              <input
+                type={type}
+                name={name}
+                placeholder={placeholder}
+                value={(form as any)[name]}
+                onChange={handleChange}
+                className="criarracha-input"
+                required
+              />
+            </React.Fragment>
+          ))}
 
           <label className="criarracha-label">Privacidade</label>
           <select
-            value={privado}
-            onChange={(e) => setPrivado(e.target.value)}
+            name="privado"
+            value={form.privado}
+            onChange={handleChange}
             className="criarracha-input"
             required
           >

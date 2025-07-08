@@ -1,6 +1,6 @@
 import api from "../api/api";
 
-interface NovaPartida {
+export interface NovaPartida {
   nome: string;
   local: string;
   diaSemana: string;
@@ -10,6 +10,7 @@ interface NovaPartida {
   privado: string;
   organizador: boolean;
 }
+
 
 export interface Jogador {
   id: number;

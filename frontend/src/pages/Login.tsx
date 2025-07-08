@@ -16,7 +16,7 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      const { usuario, token } = await login(email, senha);
+      const { usuario } = await login(email, senha);
       setUsuario({ id: usuario.id, nome: usuario.nome, email: usuario.email });
 
 
