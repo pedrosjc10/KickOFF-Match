@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getToken } from '../services/authServices';
 
 const api = axios.create({
-  baseURL: 'https://tcc..up.railway.app',
+  baseURL: 'https://tcc-production-d707.up.railway.app',
 });
 
 api.interceptors.request.use(
