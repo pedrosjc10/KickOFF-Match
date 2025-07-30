@@ -9,18 +9,39 @@ import PartidaDetalhes from '../pages/PartidaDetalhes';
 
 const AppRoutes = () => {
   return (
-    <ProtectedRoute>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<AuthLoader />} />
-          <Route path="/partida/:id" element={<PartidaDetalhes />} />
-          <Route path="/login" element={<Login />}  />
-          <Route path="/usuarios" element={<Cadastro />} />
-          <Route path="/criarrachas" element={<CriarRacha />} />
-          <Route path="/meusrachas" element={<MeusRachas />} />
-        </Routes>
-      </BrowserRouter>
-    </ProtectedRoute>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<AuthLoader />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/usuarios" element={<Cadastro />} />
+
+        {/* rotas protegidas */}
+        <Route
+          path="/criarrachas"
+          element={
+            <ProtectedRoute>
+              <CriarRacha />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/meusrachas"
+          element={
+            <ProtectedRoute>
+              <MeusRachas />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/partida/:id"
+          element={
+            <ProtectedRoute>
+              <PartidaDetalhes />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 };
 
