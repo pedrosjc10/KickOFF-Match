@@ -1,7 +1,7 @@
 // src/pages/PublicRachas.tsx
 import React, { useEffect, useState } from "react";
 import { buscarPartidasPublicas, PartidaDetalhes } from "../services/partidaService";
-import "../styles/PublicRachas.css";
+import "../styles/PartidasPublicas.css";
 
 const PublicRachas: React.FC = () => {
   const [rachas, setRachas] = useState<PartidaDetalhes[]>([]);
