@@ -29,7 +29,7 @@ export const AppDataSource = new DataSource({
   synchronize: false,
   logging: false,
   entities: [Usuario, Partida, Local, TipoPartida, PartidaUsuario],
-  migrations: ["dist/migrations/*.js"], // Use dist/ em produção
+  migrations: [__dirname + "/../migrations/*.js"], // Use dist/ em produção
   subscribers: [],
 });
 
