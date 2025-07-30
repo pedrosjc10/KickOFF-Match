@@ -1,0 +1,31 @@
+.public-rachas-container {
+  width: 390px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+.public-rachas-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.public-racha-card {
+  background: #e0e7ff;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.public-racha-card h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+.public-racha-card p {
+  margin: 2px 0;
+  font-size: 14px;
+}
+.public-loading {
+  text-align: center;
+  padding: 20px;
+}

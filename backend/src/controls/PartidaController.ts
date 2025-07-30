@@ -177,4 +177,18 @@ export class PartidaController {
     }
   }
 
+  static async getPublicas(req: Request, res: Response) {
+    try {
+      const repo = AppDataSource.getRepository(Partida);
+      const publicas = await repo.find({
+        where: { tipo : 1 },
+        relations: ["local", "tipoPartida"]
+      });
+      return res.json(publicas);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro ao buscar partidas públicas" });
+    }
+  }
+
 }

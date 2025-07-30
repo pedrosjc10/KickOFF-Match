@@ -10,6 +10,7 @@ partidarouter.get("/:id", authMiddleware, PartidaController.getById);
 partidarouter.put("/:id", authMiddleware,PartidaController.update);
 partidarouter.delete("/:id", authMiddleware, PartidaController.delete);
 partidarouter.get("/participando/:usuarioId", authMiddleware, PartidaController.getMeusRachas);
+partidarouter.get("/publicas",authMiddleware, PartidaController.getPublicas);
 
 
 export default partidarouter;
