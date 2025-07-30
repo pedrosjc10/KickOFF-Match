@@ -1,4 +1,5 @@
-import { JSX, useEffect, useState } from 'react';
+// src/components/ProtectedRoute.tsx
+import React, { JSX, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { getToken } from '../services/authServices';
 import { useUserStore } from '../stores/userStore';
@@ -8,33 +9,25 @@ interface Props {
   children: JSX.Element;
 }
 
-const ProtectedRoute = ({ children }: Props) => {
+const ProtectedRoute: React.FC<Props> = ({ children }) => {
   const { usuario, setUsuario } = useUserStore();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
     const token = getToken();
-    if (!token) {
-      setIsAuthenticated(false);
-      setIsLoading(false);
-      return;
-    }
+    if (!token) return;
+
 
     const userId = localStorage.getItem('userId');
     if (!usuario && userId) {
-      getUserById(userId).then((response) => {
-        setUsuario(response);
-      });
+        getUserById(userId)
+        .then (response => {
+          setUsuario(response);
+        })
     }
-
-    setIsAuthenticated(true);
-    setIsLoading(false);
   }, [usuario, setUsuario]);
 
-  if (isLoading) return null; // ou um loading spinner se preferir
-
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  const token = getToken();
+  if (!token) return <Navigate to="/login" replace />;
 
   return children;
 };
