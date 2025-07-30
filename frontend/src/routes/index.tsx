@@ -43,7 +43,7 @@ const AppRoutes = () => {
         />
 
         <Route
-          path="/partida/:id"
+          path="/publicas"
           element={
             <ProtectedRoute>
               <PartidasPublicas />
