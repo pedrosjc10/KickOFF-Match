@@ -1,20 +1,44 @@
 {
-  "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./src",
-    "typeRoots": ["./node_modules/@types", "./types"],
-    "outDir": "./lib",
-    "sourceMap": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noEmitOnError": true,
-    "strictNullChecks": true,
-    "noUnusedLocals": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
-  },
-  "compileOnSave": true,
-  "include": ["src/**/*", "types"],
-  "exclude": ["**/*.spec.ts"]
+    /* Configurações básicas */
+    "target": "ES2016",                       /* Especifica a versão do ECMAScript para o código de saída. */
+    "lib": ["ES2016", "ES2017", "DOM"],      /* Lista de arquivos de biblioteca a serem incluídos na compilação. O "DOM" é útil para frameworks como o express que usam Request/Response */
+    "module": "commonjs",                     /* Especifica o sistema de módulos para o código de saída. */
+    "rootDir": "./src",                       /* Especifica a pasta raiz dos arquivos de entrada. */
+    "outDir": "./lib",                        /* Redireciona a estrutura de saída para o diretório. */
+    "strict": true,                           /* Habilita todos as checagens estritas de tipo. */
+    "esModuleInterop": true,                  /* Permite a interoperabilidade entre módulos CommonJS e ES. */
+    "sourceMap": true,                        /* Emite um arquivo .map correspondente. */
 
+    /* Configurações avançadas */
+    "forceConsistentCasingInFileNames": true, /* Garante que os nomes de arquivos são consistentes. */
+    "resolveJsonModule": true,                /* Inclui módulos com extensão '.json'. */
+
+    /* Regras de checagem estritas */
+    "noImplicitAny": true,                    /* Erro em expressões e declarações com tipo 'any' implícito. */
+    "noImplicitReturns": true,                /* Erro se nem todos os caminhos do código retornam um valor. */
+    "noUnusedLocals": true,                   /* Erro em variáveis locais não utilizadas. */
+    "strictNullChecks": true,                 /* Habilita checagens estritas de nulo. */
+
+    /* Configurações para decorators */
+    "experimentalDecorators": true,           /* Habilita o suporte para decorators ES7. */
+    "emitDecoratorMetadata": true,            /* Emite metadados para decorators. */
+
+    /* Suporte a módulos Node.js e tipos */
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ],
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "src/**/*",
+    "types"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
 }
