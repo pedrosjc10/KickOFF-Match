@@ -7,28 +7,32 @@ import { Local } from "../models/Local";
 import { TipoPartida } from "../models/TipoPartida";
 import { PartidaUsuario } from "../models/PartidaUsuario";
 
+// Carrega variáveis do .env (funciona localmente)
 config();
 
+// Verifica se a variável de ambiente DATABASE_URL existe
+// Essa variável de ambiente deve ser configurada no painel do Render
 const isProduction = !!process.env.DATABASE_URL;
 
 export const AppDataSource = new DataSource({
-  // 1. MUDOU AQUI: O tipo agora é 'postgres'
-  type: "postgres", 
+  // O tipo do banco de dados agora é 'postgres'
+  type: "postgres",
 
   ...(isProduction
     ? {
-        url: "postgresql://postgres:joaovitor34@db.oandgpdpjwklzudprxvf.supabase.co:5432/postgres",
-        // 2. ADICIONOU AQUI: Supabase e outros provedores cloud exigem SSL
+        // Usa a variável de ambiente DATABASE_URL em produção
+        url: process.env.DATABASE_URL,
+        // Adiciona a configuração SSL necessária para conexão com o Supabase/Render
         ssl: {
-          rejectUnauthorized: false, // Necessário para alguns ambientes como Render/Heroku
+          rejectUnauthorized: false,
         },
       }
     : {
         // Configuração para seu ambiente local, se você usar Postgres localmente
         host: "localhost",
-        port: 5432, // Porta padrão do Postgres
-        username: "postgres", // Usuário padrão do Postgres
-        password: "sua_senha_local", // Sua senha do Postgres local
+        port: 5432,
+        username: "postgres",
+        password: "sua_senha_local", // <- Altere para sua senha local
         database: "tcc2",
       }),
       
