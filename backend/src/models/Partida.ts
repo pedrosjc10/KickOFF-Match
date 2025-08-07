@@ -16,7 +16,7 @@ export class Partida extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: "tinyint" })
+  @Column({ type: "boolean" })
   tipo!: number;
 
   @Column({ type: "date" })
