@@ -3,7 +3,7 @@ import { Partida } from "./Partida";
 
 @Entity("tipopartida")
 export class TipoPartida extends BaseEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'idtipopartida' }) // <-- Correção: Especifica o nome real da coluna no banco
   idtipoPartida!: number;
 
   @Column()
