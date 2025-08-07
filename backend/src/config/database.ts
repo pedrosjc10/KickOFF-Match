@@ -17,7 +17,7 @@ export const AppDataSource = new DataSource({
 
   ...(isProduction
     ? {
-        url: process.env.DATABASE_URL,
+        url: "postgresql://postgres:joaovitor34@db.oandgpdpjwklzudprxvf.supabase.co:5432/postgres",
         // 2. ADICIONOU AQUI: Supabase e outros provedores cloud exigem SSL
         ssl: {
           rejectUnauthorized: false, // Necessário para alguns ambientes como Render/Heroku
