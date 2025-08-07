@@ -1,45 +1,36 @@
-import { 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  Column, 
-  BaseEntity, 
-  ManyToOne,
-  JoinColumn,
-  OneToMany
-} from "typeorm";
-import { Local } from "./Local"; 
-import { TipoPartida } from "./TipoPartida"; 
-import { PartidaUsuario } from "./PartidaUsuario";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from "typeorm";
+import { TipoPartida } from "./TipoPartida";
+import { Local } from "./Local"; // Importe a entidade Local
+import { PartidaUsuario } from "./PartidaUsuario"; // Importe a entidade de relacionamento
 
-@Entity("partida")
-export class Partida extends BaseEntity {
+@Entity("partida") // Nome da tabela no banco
+export class Partida {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: "boolean" })
+  @Column({ type: "smallint" }) // Tipo corrigido para ser compatível com PostgreSQL
   tipo!: number;
 
-  @Column({ type: "date" })
+  @Column()
   data!: Date;
 
-  @Column({ type: "time" })
+  @Column()
   hora!: string;
 
   @Column()
   nome!: string;
 
-  @ManyToOne(() => Local, (local) => local.partidas, {
-    onDelete: "CASCADE", 
-  })
-  @JoinColumn({ name: "local_id" })
-  local!: Local;
-
-  @ManyToOne(() => TipoPartida, (tipoPartida) => tipoPartida.partidas, {
-    onDelete: "CASCADE", 
-  })
-  @JoinColumn({ name: "tipoPartida_idtipoPartida" })
+  // Relacionamento com a entidade TipoPartida
+  @ManyToOne(() => TipoPartida)
+  @JoinColumn({ name: 'tipopartida_idtipopartida' }) // <-- Correção: Especifique o nome da coluna de chave estrangeira
   tipoPartida!: TipoPartida;
 
-  @OneToMany(() => PartidaUsuario, (partidaUsuario) => partidaUsuario.partida)
-partidaUsuarios!: PartidaUsuario[];
+  // Relacionamento com a entidade Local
+  @ManyToOne(() => Local)
+  @JoinColumn({ name: 'local_id' }) // <-- Correção: Especifique a chave estrangeira para Local
+  local!: Local;
+
+  // Relacionamento com a tabela de junção PartidaUsuario
+  @OneToMany(() => PartidaUsuario, partidaUsuario => partidaUsuario.partida)
+  partidaUsuarios!: PartidaUsuario[];
 }
