@@ -7,36 +7,42 @@ import { Local } from "../models/Local";
 import { TipoPartida } from "../models/TipoPartida";
 import { PartidaUsuario } from "../models/PartidaUsuario";
 
-// Carrega variáveis do .env (funciona localmente também)
 config();
 
-// Usa DATABASE_URL se existir (produção/Railway), senão usa local
 const isProduction = !!process.env.DATABASE_URL;
 
 export const AppDataSource = new DataSource({
-  type: "mysql",
+  // 1. MUDOU AQUI: O tipo agora é 'postgres'
+  type: "postgres", 
+
   ...(isProduction
     ? {
         url: process.env.DATABASE_URL,
+        // 2. ADICIONOU AQUI: Supabase e outros provedores cloud exigem SSL
+        ssl: {
+          rejectUnauthorized: false, // Necessário para alguns ambientes como Render/Heroku
+        },
       }
     : {
+        // Configuração para seu ambiente local, se você usar Postgres localmente
         host: "localhost",
-        port: 3306,
-        username: "root",
-        password: "",
+        port: 5432, // Porta padrão do Postgres
+        username: "postgres", // Usuário padrão do Postgres
+        password: "sua_senha_local", // Sua senha do Postgres local
         database: "tcc2",
       }),
+      
   synchronize: false,
   logging: false,
   entities: [Usuario, Partida, Local, TipoPartida, PartidaUsuario],
-  migrations: [__dirname + "/../migrations/*.js"], // Use dist/ em produção
+  migrations: [__dirname + "/../migrations/*.js"],
   subscribers: [],
 });
 
 export const initializeDatabase = async () => {
   try {
     await AppDataSource.initialize();
-    console.log("Conexão com o banco de dados estabelecida!");
+    console.log("Conexão com o banco de dados (PostgreSQL) estabelecida!");
   } catch (error) {
     console.error("Erro ao conectar no banco de dados:", error);
   }
