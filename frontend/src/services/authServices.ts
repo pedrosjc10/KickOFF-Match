@@ -1,7 +1,7 @@
 // src/services/authServices.ts
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000'; // ajuste se necessário
+const API_URL = process.env.REACT_APP_API_URL; // ajuste se necessário
 
 interface LoginResponse {
   token: string;
