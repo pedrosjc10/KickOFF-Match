@@ -4,6 +4,7 @@ interface NovoUsuario {
   nome: string;
   email: string;
   senha: string;
+  cpf: string;
 }
 
 export const cadastrarUsuario = async (usuario: NovoUsuario) => {
