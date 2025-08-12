@@ -1,4 +1,4 @@
-import axios from "../api/api";
+import api from "../api/api";
 
 interface NovoUsuario {
   nome: string;
@@ -8,10 +8,10 @@ interface NovoUsuario {
 }
 
 export const cadastrarUsuario = async (usuario: NovoUsuario) => {
-  const response = await axios.post('/usuarios', usuario);
+  const response = await api.post('/usuarios', usuario);
   return response.data;
 };
 export const getUserById = async (userId: string) => {
-  const response = await axios.get(`/usuarios/${userId}`);
+  const response = await api.get(`/usuarios/${userId}`);
   return response.data;
 };

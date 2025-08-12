@@ -1,7 +1,5 @@
 // src/services/authServices.ts
-import axios from 'axios';
-
-const API_URL = process.env.REACT_APP_API_URL; // ajuste se necessário
+import api from '../api/api';
 
 interface LoginResponse {
   token: string;
@@ -14,7 +12,7 @@ interface LoginResponse {
 
 export const login = async (email: string, senha: string): Promise<LoginResponse> => {
   try {
-    const response = await axios.post(`${API_URL}/login`, { email, senha }); 
+    const response = await api.post(`/login`, { email, senha }); 
     const data = response.data;
 
     if (!data.token || !data.usuario){
