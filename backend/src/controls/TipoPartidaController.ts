@@ -57,8 +57,8 @@ export class TipoPartidaController {
         return res.status(404).json({ error: "Tipo de partida não encontrado" });
       }
 
-      tipoPartida.nomeTipoPartida = nomeTipoPartida;
-      tipoPartida.quantidadeJogadores = quantidadeJogadores;
+      tipoPartida.nomeTipoPartida = nomeTipoPartida ?? tipoPartida.nomeTipoPartida;
+      tipoPartida.quantidadeJogadores = quantidadeJogadores ?? tipoPartida.quantidadeJogadores;
 
       const tipoPartidaAtualizada = await repo.save(tipoPartida);
       return res.json(tipoPartidaAtualizada);

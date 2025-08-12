@@ -1,0 +1,62 @@
+.criarlocal-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f3f4f6;
+}
+
+.criarlocal-card {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 400px;
+}
+
+.criarlocal-title {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.criarlocal-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.criarlocal-label {
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.criarlocal-input {
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}
+
+.criarlocal-button {
+  background-color: #3182ce;
+  color: white;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.criarlocal-button:hover {
+  background-color: #2563eb;
+}
+
+.criarlocal-message {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 1rem;
+  color: #38a169;
+}

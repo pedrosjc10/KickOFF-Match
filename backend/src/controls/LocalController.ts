@@ -6,7 +6,7 @@ import { Local } from "../models/Local";
 export class LocalController {
   static async create(req: Request, res: Response) {
     try {
-      const { nome, cidade } = req.body;
+      const { nome, cidade, tipo, modalidade, cep, logradouro, numero } = req.body;
       const repo = AppDataSource.getRepository(Local);
 
       const localExistente = await repo.findOne({ where: { nome, cidade } });
@@ -14,7 +14,7 @@ export class LocalController {
         return res.status(400).json({ error: "Local já cadastrado" });
       }
 
-      const novoLocal = repo.create({ nome, cidade });
+      const novoLocal = repo.create({ nome, cidade, tipo, modalidade, cep, logradouro, numero });
       const localCriado = await repo.save(novoLocal);
       return res.status(201).json(localCriado);
 
@@ -53,7 +53,7 @@ export class LocalController {
   static async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { nome, cidade } = req.body;
+      const { nome, cidade, tipo, modalidade, cep, logradouro, numero } = req.body;
       const repo = AppDataSource.getRepository(Local);
 
       const local = await repo.findOne({ where: { id: Number(id) } });
@@ -63,6 +63,11 @@ export class LocalController {
 
       local.nome = nome ?? local.nome;
       local.cidade = cidade ?? local.cidade;
+      local.tipo = tipo ?? local.tipo;
+      local.modalidade = modalidade ?? local.modalidade;
+      local.cep = cep ?? local.cep;
+      local.logradouro = logradouro ?? local.logradouro;
+      local.numero = numero ?? local.numero;
 
       const localAtualizado = await repo.save(local);
       return res.json(localAtualizado);

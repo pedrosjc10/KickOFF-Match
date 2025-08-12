@@ -7,6 +7,8 @@ import AuthLoader from '../pages/AuthLoader';
 import ProtectedRoute from '../pages/ProtectedRoute';
 import PartidaDetalhes from '../pages/PartidaDetalhes';
 import PartidasPublicas from '../pages/PartidasPublicas';
+import CreateLocal from '../pages/CreateLocal';
+import CreateTipoPartida from '../pages/CreateTipoPartida';
 
 const AppRoutes = () => {
   return (
@@ -17,6 +19,22 @@ const AppRoutes = () => {
         <Route path="/usuarios" element={<Cadastro />} />
 
         {/* rotas protegidas */}
+        <Route
+          path="/criar-local"
+          element={
+            <ProtectedRoute>
+              <CreateLocal />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/criar-tipo-partida"
+          element={
+            <ProtectedRoute>
+              <CreateTipoPartida />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/criarrachas"
           element={
@@ -41,7 +59,6 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/publicas"
           element={
