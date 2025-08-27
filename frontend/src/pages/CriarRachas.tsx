@@ -115,7 +115,7 @@ const CriarRacha: React.FC = () => {
           >
             <option value={0}>Selecione um tipo</option>
             {tiposPartida.map(tp => (
-              <option key={tp.id} value={tp.id}>{tp.nome}</option>
+              <option key={tp.idtipoPartida} value={tp.idtipoPartida}>{tp.nomeTipoPartida}</option>
             ))}
           </select>
 
