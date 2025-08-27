@@ -6,6 +6,12 @@ const CreateTipoPartida: React.FC = () => {
     nomeTipoPartida: '',
     quantidadeJogadores: ''
   });
+
+  const isFormValid =
+    form.nomeTipoPartida.trim().length > 0 &&
+    form.quantidadeJogadores.trim().length > 0 &&
+    !isNaN(Number(form.quantidadeJogadores)) &&
+    Number(form.quantidadeJogadores) > 0;
   const [message, setMessage] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -14,11 +20,14 @@ const CreateTipoPartida: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isFormValid) {
+      setMessage('Preencha todos os campos corretamente.');
+      return;
+    }
     try {
-      // Usando o service
       await import('../services/tipoPartidaService').then(({ createTipoPartida }) =>
         createTipoPartida({
-          nometipopartida: form.nomeTipoPartida,
+          nometipopartida: form.nomeTipoPartida.trim(),
           quantidadejogadores: Number(form.quantidadeJogadores)
         })
       );
@@ -38,7 +47,7 @@ const CreateTipoPartida: React.FC = () => {
           <input className="criartipopartida-input" name="nomeTipoPartida" placeholder="Nome do Tipo" value={form.nomeTipoPartida} onChange={handleChange} required />
           <label className="criartipopartida-label" htmlFor="quantidadeJogadores">Quantidade de Jogadores</label>
           <input className="criartipopartida-input" name="quantidadeJogadores" type="number" placeholder="Quantidade de Jogadores" value={form.quantidadeJogadores} onChange={handleChange} required />
-          <button className="criartipopartida-button" type="submit">Cadastrar</button>
+          <button className="criartipopartida-button" type="submit" disabled={!isFormValid}>Cadastrar</button>
         </form>
         {message && <p className="criartipopartida-message">{message}</p>}
       </div>
