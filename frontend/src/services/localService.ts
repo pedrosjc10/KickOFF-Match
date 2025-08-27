@@ -10,11 +10,11 @@ export const createLocal = async (data: {
   logradouro: string;
   numero: string;
 }) => {
-  const response = await api.post('/api/local', data); // Ajuste a rota se necessário
+  const response = await api.post('/local', data); // Ajuste a rota se necessário
   return response.data;
 };
 
 export const getLocais = async () => {
-  const response = await api.get('/api/local');
+  const response = await api.get('/local');
   return response.data;
 };
