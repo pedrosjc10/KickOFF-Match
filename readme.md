@@ -51,7 +51,9 @@ npm start
 
 ## Autores
 Pedro Dias de Oliveira
+
 Joao Vitor Soares de Moraes
+
 Lucas Henrique Toledo Bispo
+
 Helio Esperidiao
-/*******  8a09d622-231c-43e2-a59c-1308c4708c48  *******/
