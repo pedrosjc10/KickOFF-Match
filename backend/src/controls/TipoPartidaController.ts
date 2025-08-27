@@ -4,19 +4,24 @@ import { TipoPartida } from "../models/TipoPartida";
 
 export class TipoPartidaController {
   static async create(req: Request, res: Response) {
-    try {
-      const { nomeTipoPartida, quantidadeJogadores } = req.body;
-      const repo = AppDataSource.getRepository(TipoPartida);
+  try {
+    console.log("Body recebido:", req.body);
+    const { nomeTipoPartida, quantidadeJogadores } = req.body;
 
-      const novaTipoPartida = repo.create({ nomeTipoPartida, quantidadeJogadores });
-      const tipoPartidaCriada = await repo.save(novaTipoPartida);
-
-      return res.status(201).json(tipoPartidaCriada);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Erro ao criar tipo de partida" });
+    if (!nomeTipoPartida || !quantidadeJogadores) {
+      return res.status(400).json({ error: "Campos nomeTipoPartida e quantidadeJogadores são obrigatórios" });
     }
+
+    const repo = AppDataSource.getRepository(TipoPartida);
+    const novaTipoPartida = repo.create({ nomeTipoPartida, quantidadeJogadores });
+    const tipoPartidaCriada = await repo.save(novaTipoPartida);
+
+    return res.status(201).json(tipoPartidaCriada);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Erro ao criar tipo de partida" });
   }
+}
 
   static async getAll(req: Request, res: Response) {
     try {
