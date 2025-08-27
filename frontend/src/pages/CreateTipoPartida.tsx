@@ -17,10 +17,7 @@ const CreateTipoPartida: React.FC = () => {
     try {
       // Usando o service
       await import('../services/tipoPartidaService').then(({ createTipoPartida }) =>
-        createTipoPartida({
-          nomeTipoPartida: form.nomeTipoPartida,
-          quantidadeJogadores: Number(form.quantidadeJogadores)
-        })
+        createTipoPartida()
       );
       setMessage('Tipo de partida cadastrado com sucesso!');
       setForm({ nomeTipoPartida: '', quantidadeJogadores: '' });

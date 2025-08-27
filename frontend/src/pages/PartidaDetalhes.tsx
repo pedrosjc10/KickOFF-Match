@@ -72,8 +72,20 @@ const PartidaDetalhesPage: React.FC = () => {
       <button className="back-btn" onClick={() => navigate(-1)}>← Voltar</button>
       <h2 className="detalhes-nome">{detalhes.nome}</h2>
       <p className="detalhes-info">{detalhes.data} | {detalhes.hora}</p>
-      <p className="detalhes-loc">{detalhes.local.nome}</p>
-      <p className="detalhes-end">{detalhes.local.endereco}</p>
+      {Array.isArray(detalhes.local) && detalhes.local.length > 0 ? (
+        <>
+          <p className="detalhes-loc">{detalhes.local[0].nome}</p>
+          <p className="detalhes-end">
+            {detalhes.local[0].logradouro} {detalhes.local[0].numero}
+            {detalhes.local[0].cidade ? `, ${detalhes.local[0].cidade}` : ''}
+            {detalhes.local[0].cep ? ` - CEP: ${detalhes.local[0].cep}` : ''}
+          </p>
+        </>
+      ) : (
+        <>
+          <p className="detalhes-loc">Local não informado</p>
+        </>
+      )}
 
       <div className="detalhes-section">
         <h3>Jogadores Confirmados</h3>
