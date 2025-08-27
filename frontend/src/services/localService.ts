@@ -1,7 +1,7 @@
 import api from "../api/api";
 
-
-export const createLocal = async (data: {
+export interface NovoLocal {
+  id?: number;
   nome: string;
   cidade: string;
   tipo: string;
@@ -9,8 +9,10 @@ export const createLocal = async (data: {
   cep: string;
   logradouro: string;
   numero: string;
-}) => {
-  const response = await api.post('/local', data); // Ajuste a rota se necessário
+}
+
+export const createLocal = async (local: NovoLocal) => {
+  const response = await api.post('/local', local);
   return response.data;
 };
 

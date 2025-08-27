@@ -1,20 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { criarPartida, NovaPartida } from "../services/partidaService";
+import { getLocais, NovoLocal } from "../services/localService";
+import { getTiposPartida, TipoPartida } from "../services/tipoPartidaService";
 import "../styles/CriarRacha.css";
 
 const CriarRacha: React.FC = () => {
   const [form, setForm] = useState<Omit<NovaPartida, "organizador">>({
     nome: "",
-    local: "",
-    diaSemana: "",
-    horarioInicio: "",
-    duracao: "",
-    vagas: "",
-    privado: "privado",
+    tipo: "privado",
+    data: "",
+    hora: "",
+    local_id: 0,
+    tipoPartida_id: 0,
   });
 
+  const [locais, setLocais] = useState<NovoLocal[]>([]);
+  const [tiposPartida, setTiposPartida] = useState<TipoPartida[]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const locaisData = await getLocais();
+      setLocais(locaisData);
+
+      const tiposData = await getTiposPartida();
+      setTiposPartida(tiposData);
+    };
+    fetchData();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -46,32 +60,69 @@ const CriarRacha: React.FC = () => {
           CRIAR<br />RACHA
         </h1>
         <form onSubmit={handleCriar} className="criarracha-form">
-          {[
-            { label: "Nome do Racha", name: "nome", placeholder: "Fut quinta" },
-            { label: "Nome do local ou endereço", name: "local", placeholder: "Society FC" },
-            { label: "Dia da semana", name: "diaSemana", placeholder: "Quinta" },
-            { label: "Horário de início", name: "horarioInicio", placeholder: "21h" },
-            { label: "Duração", name: "duracao", placeholder: "1h" },
-            { label: "Número de vagas", name: "vagas", placeholder: "30", type: "number" },
-          ].map(({ label, name, placeholder, type = "text" }) => (
-            <React.Fragment key={name}>
-              <label className="criarracha-label">{label}</label>
-              <input
-                type={type}
-                name={name}
-                placeholder={placeholder}
-                value={(form as any)[name]}
-                onChange={handleChange}
-                className="criarracha-input"
-                required
-              />
-            </React.Fragment>
-          ))}
+          <label className="criarracha-label">Nome do Racha</label>
+          <input
+            type="text"
+            name="nome"
+            placeholder="Fut quinta"
+            value={form.nome}
+            onChange={handleChange}
+            className="criarracha-input"
+            required
+          />
+
+          <label className="criarracha-label">Data</label>
+          <input
+            type="date"
+            name="data"
+            value={form.data}
+            onChange={handleChange}
+            className="criarracha-input"
+            required
+          />
+
+          <label className="criarracha-label">Hora</label>
+          <input
+            type="time"
+            name="hora"
+            value={form.hora}
+            onChange={handleChange}
+            className="criarracha-input"
+            required
+          />
+
+          <label className="criarracha-label">Local</label>
+          <select
+            name="local_id"
+            value={form.local_id}
+            onChange={handleChange}
+            className="criarracha-input"
+            required
+          >
+            <option value={0}>Selecione um local</option>
+            {locais.map(local => (
+              <option key={local.id} value={local.id}>{local.nome}</option>
+            ))}
+          </select>
+
+          <label className="criarracha-label">Tipo de Partida</label>
+          <select
+            name="tipoPartida_id"
+            value={form.tipoPartida_id}
+            onChange={handleChange}
+            className="criarracha-input"
+            required
+          >
+            <option value={0}>Selecione um tipo</option>
+            {tiposPartida.map(tp => (
+              <option key={tp.id} value={tp.id}>{tp.nome}</option>
+            ))}
+          </select>
 
           <label className="criarracha-label">Privacidade</label>
           <select
-            name="privado"
-            value={form.privado}
+            name="tipo"
+            value={form.tipo}
             onChange={handleChange}
             className="criarracha-input"
             required

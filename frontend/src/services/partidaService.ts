@@ -1,16 +1,16 @@
 import api from "../api/api";
+import { NovoLocal } from "./localService";
 
+// Agora os campos batem com o backend
 export interface NovaPartida {
   nome: string;
-  local: string;
-  diaSemana: string;
-  horarioInicio: string;
-  duracao: string;
-  vagas: string;
-  privado: string;
+  tipo: "privado" | "publico";
+  data: string; // formato YYYY-MM-DD
+  hora: string; // formato HH:MM
+  local_id: number;
+  tipoPartida_id: number;
   organizador: boolean;
 }
-
 
 export interface Jogador {
   id: number;
@@ -25,28 +25,21 @@ export interface Time {
   jogadores: Jogador[];
 }
 
-export interface Local {
-  nome: string;
-  endereco: string;
-}
-
 export interface PartidaDetalhes {
   id: number;
   nome: string;
   data: string;
   hora: string;
-  local: Local;
+  tipo: string;
+  local?: NovoLocal[];
   jogadores?: Jogador[];
   times?: Time[];
 }
-
-
 
 export const criarPartida = async (novaPartida: NovaPartida) => {
   const response = await api.post('/meusrachas', novaPartida);
   return response.data;
 };
-
 
 export const buscarPartidasPublicas = async (): Promise<PartidaDetalhes[]> => {
   const response = await api.get<PartidaDetalhes[]>("/partidas/publicas");
@@ -65,11 +58,6 @@ export const confirmarPresenca = async (id: string, jog_linha: boolean) => {
   });
   return response.data;
 };
-
-/*export const sortearTimes = async (id: string) => {
-  const response = await api.post(`/partidas/${id}/sortear`);
-  return response.data;
-};8*/
 
 export const buscarRachasQueParticipo = async (userId: number) => {
   const response = await api.get(`/meusrachas/participando/${userId}`);
