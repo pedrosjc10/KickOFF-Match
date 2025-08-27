@@ -6,10 +6,10 @@ export class TipoPartida extends BaseEntity {
   @PrimaryGeneratedColumn({ name: 'idtipopartida' }) // <-- Correção: Especifica o nome real da coluna no banco
   idtipoPartida!: number;
 
-  @Column({name : 'nometipopartida'}) // <-- Correção: Especifica o nome real da coluna no banco
+  @Column({name : 'nomeTipoPartida'}) // <-- Correção: Especifica o nome real da coluna no banco
   nomeTipoPartida!: string;
 
-  @Column({ name: 'quantidadejogadores' }) // <-- Correção: Especifica o nome real da coluna no banco
+  @Column({ name: 'quantidadeJogadores' }) // <-- Correção: Especifica o nome real da coluna no banco
   quantidadeJogadores!: number;
 
   // Relação inversa com Partida
