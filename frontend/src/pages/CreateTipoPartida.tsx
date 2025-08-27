@@ -82,24 +82,6 @@ const CreateTipoPartida: React.FC = () => {
             required
           />
 
-          {/* Select para escolher tipo de partida */}
-          <label className="criartipopartida-label" htmlFor="tipoPartidaSelect">
-            Selecionar Tipo de Partida
-          </label>
-          <select
-            id="tipoPartidaSelect"
-            value={selectedTipo}
-            onChange={e => setSelectedTipo(Number(e.target.value))}
-            className="criartipopartida-input"
-          >
-            <option value={0}>Selecione um tipo</option>
-            {tiposPartida.map(tp => (
-              <option key={tp.idtipoPartida} value={tp.idtipoPartida}>
-                {tp.nomeTipoPartida}
-              </option>
-            ))}
-          </select>
-
           <button
             className="criartipopartida-button"
             type="submit"
