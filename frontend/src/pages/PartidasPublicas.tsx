@@ -29,7 +29,11 @@ const PublicRachas: React.FC = () => {
               <p>
                 {r.data}
               </p>
-              <p>{r.local.nome}</p>
+              {Array.isArray(r.local) && r.local.length > 0 ? (
+                <p>{r.local[0].nome}</p>
+              ) : (
+                <p>Local não informado</p>
+              )}
             </li>
           ))}
         </ul>
