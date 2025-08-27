@@ -1,12 +1,19 @@
 import api from '../api/api';
 
+
 export interface TipoPartida {
   id: number;
   nome: string;
+  quantidadeJogadores?: number;
 }
 
-export const createTipoPartida = async () => {
-  const response = await api.post('/tPartida');
+export interface NovoTipoPartida {
+  nometipopartida: string;
+  quantidadejogadores: number;
+}
+
+export const createTipoPartida = async (novoTipo: NovoTipoPartida) => {
+  const response = await api.post('/tPartida', novoTipo);
   return response.data;
 };
 
