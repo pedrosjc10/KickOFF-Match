@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/CreateTipoPartida.module.css';
-import { createTipoPartida } from '../services/tipoPartidaService';
+import { createTipoPartida, getTiposPartida, TipoPartida } from '../services/tipoPartidaService';
 
 const CreateTipoPartida: React.FC = () => {
   const [form, setForm] = useState({
@@ -8,21 +8,29 @@ const CreateTipoPartida: React.FC = () => {
     quantidadeJogadores: ''
   });
 
+  const [tiposPartida, setTiposPartida] = useState<TipoPartida[]>([]);
+  const [selectedTipo, setSelectedTipo] = useState<number>(0);
   const [message, setMessage] = useState('');
 
-  // Validação do formulário
+  // Pega os tipos de partida do backend
+  useEffect(() => {
+    const fetchTipos = async () => {
+      const dados = await getTiposPartida();
+      setTiposPartida(dados);
+    };
+    fetchTipos();
+  }, []);
+
   const isFormValid =
     form.nomeTipoPartida.trim().length > 0 &&
     form.quantidadeJogadores.trim().length > 0 &&
     !isNaN(Number(form.quantidadeJogadores)) &&
     Number(form.quantidadeJogadores) > 0;
 
-  // Atualiza o estado do form
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Envia o formulário pro backend
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -73,6 +81,24 @@ const CreateTipoPartida: React.FC = () => {
             onChange={handleChange}
             required
           />
+
+          {/* Select para escolher tipo de partida */}
+          <label className="criartipopartida-label" htmlFor="tipoPartidaSelect">
+            Selecionar Tipo de Partida
+          </label>
+          <select
+            id="tipoPartidaSelect"
+            value={selectedTipo}
+            onChange={e => setSelectedTipo(Number(e.target.value))}
+            className="criartipopartida-input"
+          >
+            <option value={0}>Selecione um tipo</option>
+            {tiposPartida.map(tp => (
+              <option key={tp.idtipoPartida} value={tp.idtipoPartida}>
+                {tp.nomeTipoPartida}
+              </option>
+            ))}
+          </select>
 
           <button
             className="criartipopartida-button"
