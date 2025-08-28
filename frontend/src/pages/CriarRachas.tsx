@@ -5,6 +5,8 @@ import { getLocais, NovoLocal } from "../services/localService";
 import { getTiposPartida, TipoPartida } from "../services/tipoPartidaService";
 import "../styles/CriarRacha.css";
 
+type TipoEnum = "privado" | "publico";
+
 const CriarRacha: React.FC = () => {
   const [form, setForm] = useState<Omit<NovaPartida, "organizador">>({
     nome: "",
@@ -32,7 +34,11 @@ const CriarRacha: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm(prev => ({
+      ...prev,
+      // Converte para número os campos de id, mantém string para os outros
+      [name]: name === "local_id" || name === "tipoPartida_id" ? Number(value) : value,
+    }));
   };
 
   const handleCriar = async (e: React.FormEvent) => {
