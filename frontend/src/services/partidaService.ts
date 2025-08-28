@@ -1,10 +1,12 @@
 import api from "../api/api";
 import { NovoLocal } from "./localService";
 
-// Agora os campos batem com o backend
+// Tipo do enum usado no backend
+export type TipoEnum = "privado" | "publico";
+
 export interface NovaPartida {
   nome: string;
-  tipo: "privado" | "publico";
+  tipo: TipoEnum; // continua string, mas agora batendo com o enum
   data: string; // formato YYYY-MM-DD
   hora: string; // formato HH:MM
   local_id: number;
@@ -30,27 +32,31 @@ export interface PartidaDetalhes {
   nome: string;
   data: string;
   hora: string;
-  tipo: string;
+  tipo: TipoEnum; // também string aqui, já que o transformer converte
   local?: NovoLocal[];
   jogadores?: Jogador[];
   times?: Time[];
 }
 
+// Cria nova partida
 export const criarPartida = async (novaPartida: NovaPartida) => {
   const response = await api.post('/meusrachas', novaPartida);
   return response.data;
 };
 
+// Buscar partidas públicas
 export const buscarPartidasPublicas = async (): Promise<PartidaDetalhes[]> => {
   const response = await api.get<PartidaDetalhes[]>("/partidas/publicas");
   return response.data;
 };
 
+// Buscar detalhes de uma partida
 export const buscarDetalhesPartida = async (id: string): Promise<PartidaDetalhes> => {
   const response = await api.get(`/meusrachas/${id}`);
   return response.data;
 };
 
+// Confirmar presença
 export const confirmarPresenca = async (id: string, jog_linha: boolean) => {
   const response = await api.put(`/partidaUsuario/${id}`, {
     jog_linha,
@@ -59,11 +65,13 @@ export const confirmarPresenca = async (id: string, jog_linha: boolean) => {
   return response.data;
 };
 
+// Buscar rachas que o usuário participa
 export const buscarRachasQueParticipo = async (userId: number) => {
   const response = await api.get(`/meusrachas/participando/${userId}`);
   return response.data;
 };
 
+// Buscar relação partida-usuario
 export const buscarRelacaoPartidaUsuario = async (usuarioId: number, partidaId: number) => {
   const response = await api.get(`/partidaUsuario/${usuarioId}/${partidaId}`);
   return response.data;
