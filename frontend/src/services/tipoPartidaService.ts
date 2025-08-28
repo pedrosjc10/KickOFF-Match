@@ -15,7 +15,7 @@ export interface NovoTipoPartida {
 
 // Cria um novo Tipo de Partida
 export const createTipoPartida = async (novoTipo: NovoTipoPartida) => {
-  const response = await api.post('/tipopartida', novoTipo, {
+  const response = await api.post('/tPartida', novoTipo, {
     headers: {
       'Content-Type': 'application/json', // garante que o backend receba JSON
     },
@@ -25,6 +25,6 @@ export const createTipoPartida = async (novoTipo: NovoTipoPartida) => {
 
 // Pega todos os Tipos de Partida
 export const getTiposPartida = async () => {
-  const response = await api.get('/tipopartida');
+  const response = await api.get('/tPartida');
   return response.data;
 };
