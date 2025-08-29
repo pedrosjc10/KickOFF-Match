@@ -114,3 +114,4 @@ export class PartidaController {
       return res.status(500).json({ error: "Erro ao buscar partidas públicas" });
     }
   }
+}
