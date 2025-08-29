@@ -38,7 +38,7 @@ export interface PartidaDetalhes {
   times?: Time[];
 }
 
-// Cria nova partida
+// Cria nova partidas
 export const criarPartida = async (novaPartida: NovaPartida) => {
   const response = await api.post('/meusrachas', novaPartida);
   return response.data;
@@ -46,7 +46,7 @@ export const criarPartida = async (novaPartida: NovaPartida) => {
 
 // Buscar partidas públicas
 export const buscarPartidasPublicas = async (): Promise<PartidaDetalhes[]> => {
-  const response = await api.get<PartidaDetalhes[]>("/partidas/publicas");
+  const response = await api.get<PartidaDetalhes[]>("/meusrachas/publicas");
   return response.data;
 };
 
