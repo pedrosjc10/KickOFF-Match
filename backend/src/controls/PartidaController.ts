@@ -12,10 +12,6 @@ static async create(req: Request, res: Response) {
   try {
     let { tipo, data, hora, nome, local_id, tipoPartida_id } = req.body;
 
-    // garante que seja string valida
-    const tipoStr: "privado" | "publico" =
-      tipo === "publico" ? "publico" : "privado";
-
     const partidaRepo = AppDataSource.getRepository(Partida);
     const localRepo = AppDataSource.getRepository(Local);
     const tipoPartidaRepo = AppDataSource.getRepository(TipoPartida);
@@ -34,7 +30,7 @@ static async create(req: Request, res: Response) {
 
     // cria a partida
     const novaPartida = partidaRepo.create({
-      tipo: tipoStr,
+      tipo,
       data,
       hora,
       nome,
@@ -179,13 +175,10 @@ static async create(req: Request, res: Response) {
     try {
       const repo = AppDataSource.getRepository(Partida);
 
-      const publicas = await repo
-        .createQueryBuilder("partida")
-        .leftJoinAndSelect("partida.local", "local")
-        .leftJoinAndSelect("partida.tipoPartida", "tipoPartida")
-        .where("partida.tipo = :tipo", { tipo: TipoEnum.PUBLICO }) // aqui passa número
-        .getMany();
-
+      const publicas = await repo.find({
+        where: { tipo: TipoEnum.PUBLICO}, 
+        relations: ["local", "tipoPartida"],
+      });
 
       return res.json(publicas);
     } catch (error) {

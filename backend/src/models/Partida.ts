@@ -24,7 +24,7 @@ export class Partida {
       },
     },
   })
-  tipo!: "privado" | "publico";
+  tipo!: TipoEnum;
 
   @Column()
   data!: Date;
