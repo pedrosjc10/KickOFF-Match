@@ -10,21 +10,27 @@ export class PartidaController {
     try {
       let { tipo, data, hora, nome, local_id, tipoPartida_id } = req.body;
 
-      const tipoNum = tipo === "publico" ? 1 : 0;
+      // garante que seja string valida
+      const tipoStr: "privado" | "publico" =
+        tipo === "publico" ? "publico" : "privado";
 
       const partidaRepo = AppDataSource.getRepository(Partida);
       const localRepo = AppDataSource.getRepository(Local);
       const tipoPartidaRepo = AppDataSource.getRepository(TipoPartida);
 
       const local = await localRepo.findOneBy({ id: local_id });
-      const tipoPartida = await tipoPartidaRepo.findOneBy({ idtipoPartida: tipoPartida_id });
+      const tipoPartida = await tipoPartidaRepo.findOneBy({
+        idtipoPartida: tipoPartida_id,
+      });
 
       if (!local || !tipoPartida) {
-        return res.status(400).json({ error: "Local ou Tipo de Partida não encontrados." });
+        return res
+          .status(400)
+          .json({ error: "Local ou Tipo de Partida não encontrados." });
       }
 
       const novaPartida = partidaRepo.create({
-        tipo: tipoNum,
+        tipo: tipoStr,
         data,
         hora,
         nome,
@@ -72,6 +78,49 @@ export class PartidaController {
     }
   }
 
+  static async update(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const partidaRepo = AppDataSource.getRepository(Partida);
+
+      const partida = await partidaRepo.findOneBy({ id: Number(id) });
+      if (!partida) {
+        return res.status(404).json({ error: "Partida não encontrada" });
+      }
+
+      let { tipo, ...dados } = req.body;
+      if (tipo) {
+        dados.tipo = tipo === "publico" ? "publico" : "privado";
+      }
+
+      partidaRepo.merge(partida, dados);
+      const atualizado = await partidaRepo.save(partida);
+
+      return res.json(atualizado);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro ao atualizar partida" });
+    }
+  }
+
+  static async delete(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const partidaRepo = AppDataSource.getRepository(Partida);
+
+      const resultado = await partidaRepo.delete(id);
+
+      if (resultado.affected === 0) {
+        return res.status(404).json({ error: "Partida não encontrada" });
+      }
+
+      return res.status(204).send();
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro ao deletar partida" });
+    }
+  }
+
   static async getMeusRachas(req: Request, res: Response) {
     try {
       const usuarioId = Number(req.usuario?.id);
@@ -84,8 +133,7 @@ export class PartidaController {
         return res.status(400).json({ error: "ID de usuário inválido" });
       }
 
-      const partidas = await AppDataSource
-        .getRepository(Partida)
+      const partidas = await AppDataSource.getRepository(Partida)
         .createQueryBuilder("partida")
         .leftJoinAndSelect("partida.partidaUsuarios", "pu")
         .leftJoinAndSelect("partida.local", "local")
@@ -95,7 +143,9 @@ export class PartidaController {
       return res.json(partidas);
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "Erro ao buscar rachas que participa" });
+      return res
+        .status(500)
+        .json({ error: "Erro ao buscar rachas que participa" });
     }
   }
 
@@ -104,7 +154,7 @@ export class PartidaController {
       const repo = AppDataSource.getRepository(Partida);
 
       const publicas = await repo.find({
-        where: { tipo: 1 },
+        where: { tipo: "publico" }, // agora string
         relations: ["local", "tipoPartida"],
       });
 
