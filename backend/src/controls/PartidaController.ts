@@ -1,7 +1,7 @@
 // src/controllers/PartidaController.ts
 import { Request, Response } from "express";
 import { AppDataSource } from "../config/database";
-import { Partida } from "../models/Partida";
+import { Partida, TipoEnum } from "../models/Partida";
 import { Local } from "../models/Local";
 import { TipoPartida } from "../models/TipoPartida";
 import { PartidaUsuario } from "../models/PartidaUsuario";
@@ -179,10 +179,13 @@ static async create(req: Request, res: Response) {
     try {
       const repo = AppDataSource.getRepository(Partida);
 
-      const publicas = await repo.find({
-        where: { tipo: "publico" }, // agora string
-        relations: ["local", "tipoPartida"],
-      });
+      const publicas = await repo
+        .createQueryBuilder("partida")
+        .leftJoinAndSelect("partida.local", "local")
+        .leftJoinAndSelect("partida.tipoPartida", "tipoPartida")
+        .where("partida.tipo = :tipo", { tipo: TipoEnum.PUBLICO }) // aqui passa número
+        .getMany();
+
 
       return res.json(publicas);
     } catch (error) {
