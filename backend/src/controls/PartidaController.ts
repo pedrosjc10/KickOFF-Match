@@ -4,47 +4,73 @@ import { AppDataSource } from "../config/database";
 import { Partida } from "../models/Partida";
 import { Local } from "../models/Local";
 import { TipoPartida } from "../models/TipoPartida";
+import { PartidaUsuario } from "../models/PartidaUsuario";
 
 export class PartidaController {
-  static async create(req: Request, res: Response) {
-    try {
-      let { tipo, data, hora, nome, local_id, tipoPartida_id } = req.body;
+  // src/controllers/PartidaController.ts
+static async create(req: Request, res: Response) {
+  try {
+    let { tipo, data, hora, nome, local_id, tipoPartida_id } = req.body;
 
-      // garante que seja string valida
-      const tipoStr: "privado" | "publico" =
-        tipo === "publico" ? "publico" : "privado";
+    // garante que seja string valida
+    const tipoStr: "privado" | "publico" =
+      tipo === "publico" ? "publico" : "privado";
 
-      const partidaRepo = AppDataSource.getRepository(Partida);
-      const localRepo = AppDataSource.getRepository(Local);
-      const tipoPartidaRepo = AppDataSource.getRepository(TipoPartida);
+    const partidaRepo = AppDataSource.getRepository(Partida);
+    const localRepo = AppDataSource.getRepository(Local);
+    const tipoPartidaRepo = AppDataSource.getRepository(TipoPartida);
+    const partidaUsuarioRepo = AppDataSource.getRepository(PartidaUsuario);
 
-      const local = await localRepo.findOneBy({ id: local_id });
-      const tipoPartida = await tipoPartidaRepo.findOneBy({
-        idtipoPartida: tipoPartida_id,
-      });
+    const local = await localRepo.findOneBy({ id: local_id });
+    const tipoPartida = await tipoPartidaRepo.findOneBy({
+      idtipoPartida: tipoPartida_id,
+    });
 
-      if (!local || !tipoPartida) {
-        return res
-          .status(400)
-          .json({ error: "Local ou Tipo de Partida não encontrados." });
-      }
-
-      const novaPartida = partidaRepo.create({
-        tipo: tipoStr,
-        data,
-        hora,
-        nome,
-        local,
-        tipoPartida,
-      });
-
-      const partidaCriada = await partidaRepo.save(novaPartida);
-      return res.status(201).json(partidaCriada);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Erro ao criar partida" });
+    if (!local || !tipoPartida) {
+      return res
+        .status(400)
+        .json({ error: "Local ou Tipo de Partida não encontrados." });
     }
+
+    // cria a partida
+    const novaPartida = partidaRepo.create({
+      tipo: tipoStr,
+      data,
+      hora,
+      nome,
+      local,
+      tipoPartida,
+    });
+
+    const partidaCriada = await partidaRepo.save(novaPartida);
+
+    // pega usuário logado
+    const usuarioId = req.usuario?.id;
+    if (!usuarioId) {
+      return res.status(401).json({ error: "Usuário não autenticado" });
+    }
+
+    // cria o relacionamento na tabela pivô (criador = organizador)
+    const novaRelacao = partidaUsuarioRepo.create({
+      confirmado: false,
+      organizador: true,
+      jog_linha: false, // pode ajustar conforme regra
+      usuario: { id: usuarioId } as any,
+      partida: partidaCriada,
+    });
+
+    await partidaUsuarioRepo.save(novaRelacao);
+
+    return res.status(201).json({
+      ...partidaCriada,
+      organizador: usuarioId,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Erro ao criar partida" });
   }
+}
+
 
   static async getAll(req: Request, res: Response) {
     try {
