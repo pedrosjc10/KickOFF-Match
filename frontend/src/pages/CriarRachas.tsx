@@ -52,6 +52,7 @@ const CriarRacha: React.FC = () => {
     try {
       await criarPartida(novaPartida);
       alert("Racha criado com sucesso!");
+      navigate(0);
       navigate("/meusrachas");
     } catch (error) {
       alert("Erro ao criar racha.");
