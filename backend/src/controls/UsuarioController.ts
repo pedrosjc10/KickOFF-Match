@@ -1,253 +1,104 @@
-// src/controllers/PartidaController.ts
 import { Request, Response } from "express";
-import { AppDataSource } from "../config/database";
-import { Partida } from "../models/Partida";
-import { Local } from "../models/Local";
-import { TipoPartida } from "../models/TipoPartida";
+import { AppDataSource } from "../config/database"; // Ajuste o caminho conforme necessário
+import { Usuario } from "../models/Usuario";
 
-export class PartidaController {
+export class UsuarioController {
   static async create(req: Request, res: Response) {
     try {
-      let { tipo, data, hora, nome, local_id, tipoPartida_id } = req.body;
+      const { nome, email, senha, cpf } = req.body;
+      const repo = AppDataSource.getRepository(Usuario);
 
-      const tipoNum = tipo === "publico" ? 1 : 0;
-
-      const partidaRepo = AppDataSource.getRepository(Partida);
-      const localRepo = AppDataSource.getRepository(Local);
-      const tipoPartidaRepo = AppDataSource.getRepository(TipoPartida);
-
-      const local = await localRepo.findOneBy({ id: local_id });
-      const tipoPartida = await tipoPartidaRepo.findOneBy({ idtipoPartida: tipoPartida_id });
-
-      if (!local || !tipoPartida) {
-        return res.status(400).json({ error: "Local ou Tipo de Partida não encontrados." });
+      const emailExistente = await repo.findOne({ where: { email } });
+      if (emailExistente) {
+        return res.status(400).json({ error: "Email já cadastrado" });
       }
 
-      const novaPartida = partidaRepo.create({
-        tipo: tipoNum,
-        data,
-        hora,
-        nome,
-        local,
-        tipoPartida,
-      });
+      const novoUsuario = repo.create({ nome, email, senha, cpf });
+      const usuarioCriado = await repo.save(novoUsuario);
+      return res.status(201).json(usuarioCriado);
 
-      const partidaCriada = await partidaRepo.save(novaPartida);
-      return res.status(201).json(partidaCriada);
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "Erro ao criar partida" });
+      return res.status(500).json({ error: "Erro ao criar usuário" });
     }
   }
 
   static async getAll(req: Request, res: Response) {
     try {
-      const repo = AppDataSource.getRepository(Partida);
-      const partidas = await repo.find({ relations: ["local", "tipoPartida"] });
-      return res.json(partidas);
+      const repo = AppDataSource.getRepository(Usuario);
+      const usuarios = await repo.find();
+      return res.json(usuarios);
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "Erro ao buscar partidas" });
+      return res.status(500).json({ error: "Erro ao buscar usuários" });
     }
   }
 
   static async getById(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const repo = AppDataSource.getRepository(Partida);
-
-      const partida = await repo.findOne({
-        where: { id: Number(id) },
-        relations: ["local", "tipoPartida"],
-      });
-
-      if (!partida) {
-        return res.status(404).json({ error: "Partida não encontrada" });
+      const repo = AppDataSource.getRepository(Usuario);
+      const usuario = await repo.findOne({ where: { id: Number(id) } });
+      if (!usuario) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
       }
-
-      return res.json(partida);
+      return res.json(usuario);
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "Erro ao buscar partida" });
-    }
-  }
-
-// src/controllers/PartidaController.ts
-import { Request, Response } from "express";
-import { AppDataSource } from "../config/database";
-import { Partida } from "../models/Partida";
-import { Local } from "../models/Local";
-import { TipoPartida } from "../models/TipoPartida";
-
-export class PartidaController {
-  static async create(req: Request, res: Response) {
-    try {
-      let { tipo, data, hora, nome, local_id, tipoPartida_id } = req.body;
-
-      const tipoNum = tipo === "publico" ? 1 : 0;
-
-      const partidaRepo = AppDataSource.getRepository(Partida);
-      const localRepo = AppDataSource.getRepository(Local);
-      const tipoPartidaRepo = AppDataSource.getRepository(TipoPartida);
-
-      const local = await localRepo.findOneBy({ id: local_id });
-      const tipoPartida = await tipoPartidaRepo.findOneBy({ idtipoPartida: tipoPartida_id });
-
-      if (!local || !tipoPartida) {
-        return res.status(400).json({ error: "Local ou Tipo de Partida não encontrados." });
-      }
-
-      const novaPartida = partidaRepo.create({
-        tipo: tipoNum,
-        data,
-        hora,
-        nome,
-        local,
-        tipoPartida,
-      });
-
-      const partidaCriada = await partidaRepo.save(novaPartida);
-      return res.status(201).json(partidaCriada);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Erro ao criar partida" });
-    }
-  }
-
-  static async getAll(req: Request, res: Response) {
-    try {
-      const repo = AppDataSource.getRepository(Partida);
-      const partidas = await repo.find({ relations: ["local", "tipoPartida"] });
-      return res.json(partidas);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Erro ao buscar partidas" });
-    }
-  }
-
-  static async getById(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const repo = AppDataSource.getRepository(Partida);
-
-      const partida = await repo.findOne({
-        where: { id: Number(id) },
-        relations: ["local", "tipoPartida"],
-      });
-
-      if (!partida) {
-        return res.status(404).json({ error: "Partida não encontrada" });
-      }
-
-      return res.json(partida);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Erro ao buscar partida" });
-    }
-  }
-
-  static async getMeusRachas(req: Request, res: Response) {
-    try {
-      const usuarioId = Number(req.usuario?.id);
-
-      if (!usuarioId) {
-        return res.status(401).json({ error: "Usuário não autenticado." });
-      }
-
-      if (isNaN(usuarioId)) {
-        return res.status(400).json({ error: "ID de usuário inválido" });
-      }
-
-      const partidas = await AppDataSource
-        .getRepository(Partida)
-        .createQueryBuilder("partida")
-        .leftJoinAndSelect("partida.partidaUsuarios", "pu")
-        .leftJoinAndSelect("partida.local", "local")
-        .where("pu.usuario.id = :usuarioId", { usuarioId })
-        .getMany();
-
-      return res.json(partidas);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Erro ao buscar rachas que participa" });
-    }
-  }
-
-  static async getPublicas(req: Request, res: Response) {
-    try {
-      const repo = AppDataSource.getRepository(Partida);
-
-      const publicas = await repo.find({
-        where: { tipo: 1 },
-        relations: ["local", "tipoPartida"],
-      });
-
-      return res.json(publicas);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Erro ao buscar partidas públicas" });
+      return res.status(500).json({ error: "Erro ao buscar usuário" });
     }
   }
 
   static async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      let { tipo, data, hora, nome, local_id, tipoPartida_id } = req.body;
+      const { nome, email, senha, cpf } = req.body;
+      const repo = AppDataSource.getRepository(Usuario);
 
-      const partidaRepo = AppDataSource.getRepository(Partida);
-      const localRepo = AppDataSource.getRepository(Local);
-      const tipoPartidaRepo = AppDataSource.getRepository(TipoPartida);
-
-      const partida = await partidaRepo.findOneBy({ id: Number(id) });
-      if (!partida) {
-        return res.status(404).json({ error: "Partida não encontrada" });
+      const usuario = await repo.findOne({ where: { id: Number(id) } });
+      if (!usuario) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
       }
 
-      const local = await localRepo.findOneBy({ id: local_id });
-      const tipoPartida = await tipoPartidaRepo.findOneBy({ idtipoPartida: tipoPartida_id });
-
-      if (!local || !tipoPartida) {
-        return res.status(400).json({ error: "Local ou Tipo de Partida inválidos." });
+      if (email && email !== usuario.email) {
+        const emailExistente = await repo.findOne({ where: { email } });
+        if (emailExistente) {
+          return res.status(400).json({ error: "Email já cadastrado por outro usuário" });
+        }
       }
 
-      const tipoNum = tipo === "publico" ? 1 : 0;
+      usuario.nome = nome ?? usuario.nome;
+      usuario.email = email ?? usuario.email;
+      usuario.senha = senha ?? usuario.senha;
+      usuario.cpf = cpf ?? usuario.cpf;
 
-      partida.tipo = tipoNum;
-      partida.data = data;
-      partida.hora = hora;
-      partida.nome = nome;
-      partida.local = local;
-      partida.tipoPartida = tipoPartida;
-
-      const partidaAtualizada = await partidaRepo.save(partida);
-      return res.json(partidaAtualizada);
+      const usuarioAtualizado = await repo.save(usuario);
+      return res.json(usuarioAtualizado);
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "Erro ao atualizar partida" });
+      return res.status(500).json({ error: "Erro ao atualizar usuário" });
     }
   }
 
   static async delete(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const repo = AppDataSource.getRepository(Partida);
+      const repo = AppDataSource.getRepository(Usuario);
 
       const result = await repo.delete(Number(id));
       if (result.affected === 0) {
-        return res.status(404).json({ error: "Partida não encontrada" });
+        return res.status(404).json({ error: "Usuário não encontrado" });
       }
 
       const remaining = await repo.count();
       if (remaining === 0) {
-        await repo.query("ALTER TABLE partida AUTO_INCREMENT = 1");
+        await repo.query("ALTER TABLE usuario AUTO_INCREMENT = 1");
       }
 
       return res.status(204).send();
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "Erro ao deletar partida" });
+      return res.status(500).json({ error: "Erro ao deletar usuário" });
     }
   }
 }
-
-
