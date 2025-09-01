@@ -1,7 +1,7 @@
 // src/controllers/PartidaController.ts
 import { Request, Response } from "express";
 import { AppDataSource } from "../config/database";
-import { Partida, TipoEnum } from "../models/Partida";
+import { Partida } from "../models/Partida";
 import { Local } from "../models/Local";
 import { TipoPartida } from "../models/TipoPartida";
 import { PartidaUsuario } from "../models/PartidaUsuario";
@@ -176,9 +176,10 @@ static async create(req: Request, res: Response) {
       const repo = AppDataSource.getRepository(Partida);
 
       const publicas = await repo.find({
-        where: { tipo: TipoEnum.PUBLICO}, 
+        where: { tipo: 1 }, // usar direto o número
         relations: ["local", "tipoPartida"],
       });
+      console.log("Partidas públicas encontradas:", publicas);
 
       return res.json(publicas);
     } catch (error) {
