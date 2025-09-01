@@ -176,8 +176,7 @@ static async create(req: Request, res: Response) {
       const repo = AppDataSource.getRepository(Partida);
 
       const publicas = await repo.find({
-        where: { tipo: 1 }, // usar direto o número
-        relations: ["local", "tipoPartida"],
+        where: { tipo: 1 }
       });
       console.log("Partidas públicas encontradas:", publicas);
 
