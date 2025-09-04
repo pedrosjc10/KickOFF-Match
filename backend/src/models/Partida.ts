@@ -15,14 +15,7 @@ export class Partida {
 
   @Column({
     type: "smallint",
-    transformer: {
-      to: (value: "privado" | "publico") => {
-        return value === "privado" ? TipoEnum.PRIVADO : TipoEnum.PUBLICO;
-      },
-      from: (value: number) => {
-        return value === TipoEnum.PRIVADO ? "privado" : "publico";
-      },
-    },
+    enum: TipoEnum, // agora o banco guarda 0 ou 1, mas no código tu usa o enum
   })
   tipo!: TipoEnum;
 
