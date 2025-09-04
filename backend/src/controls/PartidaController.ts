@@ -1,7 +1,7 @@
 // src/controllers/PartidaController.ts
 import { Request, Response } from "express";
 import { AppDataSource } from "../config/database";
-import { Partida } from "../models/Partida";
+import { Partida, TipoEnum } from "../models/Partida";
 import { Local } from "../models/Local";
 import { TipoPartida } from "../models/TipoPartida";
 import { PartidaUsuario } from "../models/PartidaUsuario";
