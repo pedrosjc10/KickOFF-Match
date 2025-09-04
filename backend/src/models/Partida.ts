@@ -19,10 +19,10 @@ export class Partida {
   })
   tipo!: TipoEnum;
 
-  @Column()
+  @Column({ type: "date" })
   data!: Date;
 
-  @Column()
+  @Column({ type: "time" })
   hora!: string;
 
   @Column()
