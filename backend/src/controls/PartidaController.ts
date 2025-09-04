@@ -172,18 +172,18 @@ static async create(req: Request, res: Response) {
   }
 
   static async getPublicas(req: Request, res: Response) {
-    try {
-      const repo = AppDataSource.getRepository(Partida);
+  try {
+    const repo = AppDataSource.getRepository(Partida);
 
-      const publicas = await repo.find({
-        where: { tipo: 1 }
-      });
-      console.log("Partidas públicas encontradas:", publicas);
+    const publicas = await repo.find({
+      where: { tipo: TipoEnum.PUBLICO } // agora funciona suave
+    });
+    console.log("Partidas públicas encontradas:", publicas);
 
-      return res.json(publicas);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Erro ao buscar partidas públicas" });
-    }
+    return res.json(publicas);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Erro ao buscar partidas públicas" });
   }
+}
 }
