@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { PartidaUsuarioController } from "../controls/Partida_UsuarioController";
+import { authMiddleware } from "../middleware/authMiddleware";
 
 
 const partidaUsuarioRouter = Router();
@@ -10,5 +11,6 @@ partidaUsuarioRouter.get("/:id",  PartidaUsuarioController.getById);
 partidaUsuarioRouter.put("/:id",  PartidaUsuarioController.update);
 partidaUsuarioRouter.delete("/:id", PartidaUsuarioController.delete);
 partidaUsuarioRouter.get('/:usuarioId/:partidaId', PartidaUsuarioController.getByUsuarioAndPartida);
+partidaUsuarioRouter.get("/:id(\\d+)/confirmados", authMiddleware, PartidaUsuarioController.getConfirmedById);
 
 export default partidaUsuarioRouter;

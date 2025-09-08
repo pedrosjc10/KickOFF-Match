@@ -82,3 +82,8 @@ export const participarPartida = async (id: number) => {
   return response.data;
 };
 
+export const buscarConfirmados = async (id: number) => {
+  const response = await api.get<Jogador[]>(`/partidaUsuario/${id}/confirmados`);
+  return response.data;
+}
+
