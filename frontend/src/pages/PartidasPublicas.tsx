@@ -1,6 +1,6 @@
 // src/pages/PublicRachas.tsx
 import React, { useEffect, useState } from "react";
-import { buscarPartidasPublicas, PartidaDetalhes } from "../services/partidaService";
+import { buscarPartidasPublicas, participarPartida, PartidaDetalhes } from "../services/partidaService";
 import "../styles/PartidasPublicas.css";
 
 const PublicRachas: React.FC = () => {
@@ -34,6 +34,18 @@ const PublicRachas: React.FC = () => {
               ) : (
                 <p>Local não informado</p>
               )}
+
+              <button onClick={async () => {
+                try {
+                  await participarPartida(r.id); // r.id é number
+                  alert("Você entrou no racha!");
+                } catch (e:any) {
+                  alert(e?.response?.data?.error ?? "Erro ao participar");
+                }
+              }}>
+                Participar
+              </button>
+
             </li>
           ))}
         </ul>

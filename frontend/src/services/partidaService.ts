@@ -76,3 +76,9 @@ export const buscarRelacaoPartidaUsuario = async (usuarioId: number, partidaId: 
   const response = await api.get(`/partidaUsuario/${usuarioId}/${partidaId}`);
   return response.data;
 };
+
+export const participarPartida = async (id: number) => {
+  const response = await api.post(`/meusrachas/${id}/participar`);
+  return response.data;
+};
+

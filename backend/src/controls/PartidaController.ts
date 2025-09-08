@@ -199,4 +199,54 @@ static async create(req: Request, res: Response) {
       return res.status(500).json({ error: "Erro ao buscar partidas públicas" });
     }
   }
+
+  static async participar(req: Request, res: Response) {
+    try {
+      const usuarioIdRaw = req.usuario?.id;   // pode vir string do middleware/JWT
+      const partidaIdRaw = req.params.id;     // string vinda da URL
+
+      // validação segura
+      const usuarioId = Number(usuarioIdRaw);
+      const partidaId = Number(partidaIdRaw);
+
+      if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+        return res.status(400).json({ error: "Usuário inválido" });
+      }
+      if (!Number.isInteger(partidaId) || partidaId <= 0) {
+        return res.status(400).json({ error: "ID de partida inválido" });
+      }
+
+      const partidaRepo = AppDataSource.getRepository(Partida);
+      const partidaUsuarioRepo = AppDataSource.getRepository(PartidaUsuario);
+
+      const partida = await partidaRepo.findOneBy({ id: partidaId });
+      if (!partida) {
+        return res.status(404).json({ error: "Partida não encontrada" });
+      }
+
+      // checa se já participa
+      const jaParticipa = await partidaUsuarioRepo.findOne({
+        where: { usuario: { id: usuarioId }, partida: { id: partidaId } },
+        relations: ["usuario", "partida"],
+      });
+      if (jaParticipa) {
+        return res.status(400).json({ error: "Usuário já participa desta partida" });
+      }
+
+      const relacao = partidaUsuarioRepo.create({
+        confirmado: true,
+        organizador: false,
+        jog_linha: false,
+        usuario: { id: usuarioId } as any, // ok: setando relação por id
+        partida,
+      });
+
+      await partidaUsuarioRepo.save(relacao);
+
+      return res.status(201).json({ message: "Participação registrada com sucesso" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro ao participar da partida" });
+    }
+  }
 }
