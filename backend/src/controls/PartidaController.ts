@@ -191,7 +191,6 @@ static async create(req: Request, res: Response) {
       const publicas = await repo.find({
         where: { tipo: TipoEnum.PUBLICO } // agora funciona suave
       });
-      console.log("Partidas públicas encontradas:", publicas);
 
       return res.json(publicas);
     } catch (error) {
@@ -234,7 +233,7 @@ static async create(req: Request, res: Response) {
       }
 
       const relacao = partidaUsuarioRepo.create({
-        confirmado: true,
+        confirmado: false,
         organizador: false,
         jog_linha: false,
         usuario: { id: usuarioId } as any, // ok: setando relação por id
