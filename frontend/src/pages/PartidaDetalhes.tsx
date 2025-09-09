@@ -4,6 +4,7 @@ import {
   buscarDetalhesPartida,
   confirmarPresenca,
   buscarRelacaoPartidaUsuario,
+  buscarConfirmados,
   // sortearTimes,
   PartidaDetalhes
 } from '../services/partidaService';
@@ -37,20 +38,23 @@ const PartidaDetalhesPage: React.FC = () => {
   }, [partidaId, usuario]);
 
   const handleConfirmar = async () => {
-  if (!partidaUsuarioId || !partidaId) return;
+    if (!partidaUsuarioId || !partidaId) return;
+  
+    try {
+      await confirmarPresenca(partidaUsuarioId.toString(), jogLinha);
+  
+      // pega os confirmados atualizados
+      const confirmados = await buscarConfirmados(Number(partidaId));
+  
+      // atualiza só os jogadores dentro do objeto detalhes
+      setDetalhes((prev) =>
+        prev ? { ...prev, jogadores: confirmados } : prev
+      );
+    } catch (err) {
+      console.error("Erro ao confirmar presença:", err);
+    }
+  };
 
-  try {
-    await confirmarPresenca(partidaUsuarioId.toString(), jogLinha);
-    
-    // Atualiza apenas os dados da partida, sem reload da página
-    const kek = await buscarDetalhesPartida(partidaId);
-      setDetalhes(kek);
-      console.log(detalhes);
-      console.log(kek);
-  } catch (err) {
-    console.error("Erro ao confirmar presença:", err);
-  }
-};
 
 
   /* const handleSortear = async () => {
