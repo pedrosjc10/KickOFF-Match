@@ -20,13 +20,13 @@ const PartidaDetalhesPage: React.FC = () => {
   const [jogLinha, setJogLinha] = useState<boolean>(false);
   const [partidaUsuarioId, setPartidaUsuarioId] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (!partidaId) return;
-
+    useEffect(() => {
+    if (!partidaId || isNaN(Number(partidaId))) return; // impede erro
+  
     buscarDetalhesPartida(partidaId)
       .then(detalhes => setDetalhes(detalhes))
       .catch(console.error);
-
+  
     if (usuario?.id) {
       buscarRelacaoPartidaUsuario(usuario.id, Number(partidaId))
         .then((relacao) => {
@@ -36,6 +36,7 @@ const PartidaDetalhesPage: React.FC = () => {
         .catch(console.error);
     }
   }, [partidaId, usuario]);
+
 
   const handleConfirmar = async () => {
     if (!partidaUsuarioId || !partidaId) return;
