@@ -57,7 +57,7 @@ export const buscarPartidasPublicas = async (): Promise<PartidaDetalhes[]> => {
 
 // Buscar detalhes de uma partida
 export const buscarDetalhesPartida = async (id: string): Promise<PartidaDetalhes> => {
-  const response = await api.get(`/partida/${id}`);
+  const response = await api.get(`/meusrachas/${id}`);
   return response.data;
 };
 
@@ -96,3 +96,8 @@ export const buscarRelacaoPartidaUsuario = async (usuarioId: number, partidaId: 
   const response = await api.get(`/partidaUsuario/${usuarioId}/${partidaId}`);
   return response.data;
 };
+
+export const buscarRachasQueParticipo = async (userId: number) => {
+  const response = await api.get(`/meusrachas/participando/${userId}`);
+  return response.data;
+}
