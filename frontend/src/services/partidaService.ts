@@ -17,7 +17,7 @@ export interface NovaPartida {
 export interface Jogador {
   id: number;
   nome: string;
-  confirmado: boolean;
+  confirmado: number | boolean; // pode ser 0, 1, true ou false
   organizador: boolean;
   jog_linha: boolean;
 }
