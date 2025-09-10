@@ -110,14 +110,24 @@ export class PartidaUsuarioController {
 
   static async getByUsuarioAndPartida(req: Request, res: Response) {
     try {
-      const { usuarioId, partidaId } = req.params;
+      const usuarioId = Number(req.params.usuarioId);
+      const partidaId = Number(req.params.partidaId);
+
+      console.log("DEBUG getByUsuarioAndPartida params:", { usuarioId: req.params.usuarioId, partidaId: req.params.partidaId, parsed: { usuarioId, partidaId } });
+
+      if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+        return res.status(400).json({ error: "ID de usuário inválido" });
+      }
+      if (!Number.isInteger(partidaId) || partidaId <= 0) {
+        return res.status(400).json({ error: "ID de partida inválido" });
+      }
 
       const repo = AppDataSource.getRepository(PartidaUsuario);
 
       const registro = await repo.findOne({
         where: {
-          usuario: { id: Number(usuarioId) },
-          partida: { id: Number(partidaId) },
+          usuario: { id: usuarioId },
+          partida: { id: partidaId },
         },
         relations: ["partida", "usuario"]
       });
@@ -132,6 +142,7 @@ export class PartidaUsuarioController {
       return res.status(500).json({ error: "Erro ao buscar relação" });
     }
   }
+
 
     static async getConfirmedById(req: Request, res: Response) {
   try {

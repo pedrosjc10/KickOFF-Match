@@ -5,12 +5,15 @@ import { authMiddleware } from "../middleware/authMiddleware";
 
 const partidaUsuarioRouter = Router();
 
-partidaUsuarioRouter.post("/",  PartidaUsuarioController.create);
-partidaUsuarioRouter.get("/",  PartidaUsuarioController.getAll);
-partidaUsuarioRouter.get("/:id",  PartidaUsuarioController.getById);
-partidaUsuarioRouter.put("/:id",  PartidaUsuarioController.update);
-partidaUsuarioRouter.delete("/:id", PartidaUsuarioController.delete);
-partidaUsuarioRouter.get('/:usuarioId/:partidaId', PartidaUsuarioController.getByUsuarioAndPartida);
+// rota específica primeiro (ou use regex abaixo)
+partidaUsuarioRouter.get('/:usuarioId(\\d+)/:partidaId(\\d+)', PartidaUsuarioController.getByUsuarioAndPartida);
+
+// rotas genéricas depois
+partidaUsuarioRouter.get("/:id(\\d+)",  PartidaUsuarioController.getById);
+partidaUsuarioRouter.put("/:id(\\d+)",  PartidaUsuarioController.update);
+partidaUsuarioRouter.delete("/:id(\\d+)", PartidaUsuarioController.delete);
 partidaUsuarioRouter.get("/:id(\\d+)/confirmados", authMiddleware, PartidaUsuarioController.getConfirmedById);
+partidaUsuarioRouter.post("/", authMiddleware, PartidaUsuarioController.create);
+partidaUsuarioRouter.get("/", authMiddleware, PartidaUsuarioController.getAll);
 
 export default partidaUsuarioRouter;
