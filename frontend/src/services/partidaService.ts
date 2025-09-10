@@ -6,9 +6,9 @@ export type TipoEnum = "privado" | "publico";
 
 export interface NovaPartida {
   nome: string;
-  tipo: TipoEnum; // continua string, mas agora batendo com o enum
-  data: string; // formato YYYY-MM-DD
-  hora: string; // formato HH:MM
+  tipo: TipoEnum;
+  data: string; // YYYY-MM-DD
+  hora: string; // HH:MM
   local_id: number;
   tipoPartida_id: number;
   organizador: boolean;
@@ -17,9 +17,9 @@ export interface NovaPartida {
 export interface Jogador {
   id: number;
   nome: string;
-  confirmado: number | boolean; // pode ser 0, 1, true ou false
-  organizador: boolean;
-  jog_linha: boolean;
+  confirmado: number | boolean; // 0 | 1 or boolean
+  organizador: number | boolean; // 0 | 1 or boolean
+  jog_linha: number | boolean; // 0 | 1 or boolean
 }
 
 export interface Time {
@@ -32,15 +32,20 @@ export interface PartidaDetalhes {
   nome: string;
   data: string;
   hora: string;
-  tipo: TipoEnum; // também string aqui, já que o transformer converte
-  local?: NovoLocal[];
-  jogadores?: Jogador[];
+  tipo: TipoEnum;
+  local?: NovoLocal[] | any;
+  jogadores?: Jogador[]; // pode vir do backend ou construído no front
   times?: Time[];
+  tipoPartida?: {
+    id?: number;
+    nometipopartida?: string;
+    quantidadejogadores?: number; // por time
+  };
 }
 
 // Cria nova partidas
 export const criarPartida = async (novaPartida: NovaPartida) => {
-  const response = await api.post('/meusrachas', novaPartida);
+  const response = await api.post("/meusrachas", novaPartida);
   return response.data;
 };
 
@@ -51,16 +56,24 @@ export const buscarPartidasPublicas = async (): Promise<PartidaDetalhes[]> => {
 };
 
 // Buscar detalhes de uma partida
-export const buscarDetalhesPartida = async (id: string): Promise<PartidaDetalhes> => {
+export const buscarDetalhesPartida = async (
+  id: string
+): Promise<PartidaDetalhes> => {
   const response = await api.get(`/meusrachas/${id}`);
   return response.data;
 };
 
-// Confirmar presença
+// Atualizar partida (data/hora/tipo/nome etc)
+export const atualizarPartida = async (id: number, dados: Partial<PartidaDetalhes>) => {
+  const response = await api.put(`/meusrachas/${id}`, dados);
+  return response.data;
+};
+
+// Confirmar presença (usa id do registro partida_usuario)
 export const confirmarPresenca = async (id: string, jog_linha: boolean) => {
   const response = await api.put(`/partidaUsuario/${id}`, {
     jog_linha,
-    confirmado: true,
+    confirmado: 1, // smallint 1
   });
   return response.data;
 };
@@ -82,8 +95,8 @@ export const participarPartida = async (id: number) => {
   return response.data;
 };
 
+// Buscar confirmados da partida (rota criada no backend: PartidaController.getConfirmados)
 export const buscarConfirmados = async (id: number) => {
-  const response = await api.get<Jogador[]>(`/partidaUsuario/${id}/confirmados`);
+  const response = await api.get<Jogador[]>(`/meusrachas/${id}/confirmados`);
   return response.data;
-}
-
+};
