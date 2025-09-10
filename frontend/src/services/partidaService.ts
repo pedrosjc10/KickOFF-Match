@@ -97,6 +97,6 @@ export const participarPartida = async (id: number) => {
 
 // Buscar confirmados da partida (rota criada no backend: PartidaController.getConfirmados)
 export const buscarConfirmados = async (id: number) => {
-  const response = await api.get<Jogador[]>(`/meusrachas/${id}/confirmados`);
+  const response = await api.get<Jogador[]>(`/partidaUsuario/${id}/confirmados`);
   return response.data;
 };
