@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
   buscarDetalhesPartida,
   confirmarPresenca,
   buscarRelacaoPartidaUsuario,
   buscarConfirmados,
-  // sortearTimes,
-  PartidaDetalhes
+  PartidaDetalhes,
 } from '../services/partidaService';
 import { useUserStore } from '../stores/userStore';
 import '../styles/PartidaDetalhes.css';
@@ -14,122 +13,200 @@ import '../styles/PartidaDetalhes.css';
 const PartidaDetalhesPage: React.FC = () => {
   const { id: partidaId } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { usuario } = useUserStore();
 
   const [detalhes, setDetalhes] = useState<PartidaDetalhes | null>(null);
   const [jogLinha, setJogLinha] = useState<boolean>(false);
   const [partidaUsuarioId, setPartidaUsuarioId] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [saving, setSaving] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-    if (!partidaId || isNaN(Number(partidaId))) return; // impede erro
-  
-    buscarDetalhesPartida(partidaId)
-      .then(detalhes => setDetalhes(detalhes))
-      .catch(console.error);
-  
-    if (usuario?.id) {
-      buscarRelacaoPartidaUsuario(usuario.id, Number(partidaId))
-        .then((relacao) => {
-          setPartidaUsuarioId(relacao.id);
-          setJogLinha(relacao.jog_linha);
-        })
-        .catch(console.error);
+  const fetchAll = async () => {
+    setError(null);
+    if (!partidaId || isNaN(Number(partidaId))) {
+      setError('ID de partida inválido');
+      setLoading(false);
+      return;
     }
-  }, [partidaId, usuario]);
 
-
-  const handleConfirmar = async () => {
-    if (!partidaUsuarioId || !partidaId) return;
-  
+    setLoading(true);
     try {
-      await confirmarPresenca(partidaUsuarioId.toString(), jogLinha);
-  
-      // pega os confirmados atualizados
+      const dados = await buscarDetalhesPartida(partidaId);
       const confirmados = await buscarConfirmados(Number(partidaId));
-  
-      // atualiza só os jogadores dentro do objeto detalhes
-      setDetalhes((prev) =>
-        prev ? { ...prev, jogadores: confirmados } : prev
-      );
-    } catch (err) {
-      console.error("Erro ao confirmar presença:", err);
+
+      const merged: PartidaDetalhes = {
+        ...dados,
+        jogadores: confirmados,
+      };
+
+      setDetalhes(merged);
+
+      if (usuario?.id) {
+        try {
+          const relacao = await buscarRelacaoPartidaUsuario(usuario.id, Number(partidaId));
+          if (relacao) {
+            setPartidaUsuarioId(relacao.id);
+            setJogLinha(Boolean(relacao.jog_linha));
+          } else {
+            setPartidaUsuarioId(null);
+            setJogLinha(false);
+          }
+        } catch {
+          setPartidaUsuarioId(null);
+          setJogLinha(false);
+        }
+      }
+    } catch (err: any) {
+      console.error('Erro ao carregar detalhes:', err);
+      setError(err?.response?.data?.error ?? 'Erro ao carregar detalhes');
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.key, partidaId, usuario?.id]);
 
+  const handleConfirmar = async () => {
+    if (!partidaUsuarioId || !partidaId) return;
 
-  /* const handleSortear = async () => {
-    if (!partidaId) return;
+    setSaving(true);
     try {
-      const dados = await sortearTimes(partidaId);
-      setDetalhes(dados);
+      await confirmarPresenca(partidaUsuarioId.toString(), jogLinha);
+
+      const confirmados = await buscarConfirmados(Number(partidaId));
+      setDetalhes((prev) => (prev ? { ...prev, jogadores: confirmados } : prev));
+
+      if (usuario?.id) {
+        try {
+          const relacao = await buscarRelacaoPartidaUsuario(usuario.id, Number(partidaId));
+          if (relacao) {
+            setPartidaUsuarioId(relacao.id);
+            setJogLinha(Boolean(relacao.jog_linha));
+          }
+        } catch {
+          // ignore
+        }
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Erro ao confirmar presença:', err);
+      setError('Erro ao confirmar presença');
+    } finally {
+      setSaving(false);
     }
-  }; */
+  };
 
-  if (!detalhes) return <div className="detalhes-loading">Carregando...</div>;
+  if (loading) {
+    return (
+      <div className="detalhes-container">
+        <div className="detalhes-card">
+          <div style={{ padding: 24, textAlign: 'center' }}>Carregando detalhes...</div>
+        </div>
+      </div>
+    );
+  }
 
-  //const isOrganizador = detalhes.jogadores?.some(j => j.organizador && j.id === usuario?.id);
+  if (!detalhes) {
+    return (
+      <div className="detalhes-container">
+        <button className="back-btn" onClick={() => navigate(-1)}>← Voltar</button>
+        <div className="detalhes-card">
+          <div style={{ padding: 16 }}>{error ?? 'Detalhes não encontrados'}</div>
+        </div>
+      </div>
+    );
+  }
+
+  const localObj = Array.isArray(detalhes.local) ? detalhes.local[0] : (detalhes.local as any) || null;
 
   return (
     <div className="detalhes-container">
       <button className="back-btn" onClick={() => navigate(-1)}>← Voltar</button>
-      <h2 className="detalhes-nome">{detalhes.nome}</h2>
-      <p className="detalhes-info">{detalhes.data} | {detalhes.hora}</p>
-      {Array.isArray(detalhes.local) && detalhes.local.length > 0 ? (
-        <>
-          <p className="detalhes-loc">{detalhes.local[0].nome}</p>
-          <p className="detalhes-end">
-            {detalhes.local[0].logradouro} {detalhes.local[0].numero}
-            {detalhes.local[0].cidade ? `, ${detalhes.local[0].cidade}` : ''}
-            {detalhes.local[0].cep ? ` - CEP: ${detalhes.local[0].cep}` : ''}
-          </p>
-        </>
-      ) : (
-        <>
-          <p className="detalhes-loc">Local não informado</p>
-        </>
-      )}
 
-      <div className="detalhes-section">
-        <h3>Jogadores Confirmados</h3>
-        {detalhes.jogadores && detalhes.jogadores.length > 0 ? (
-          <ul>
-            {detalhes.jogadores.map(j => (
-              <li key={j.id}>{j.nome} {j.organizador && "(Org.)"}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>Nenhum jogador confirmado ainda.</p>
-        )}
-      </div>
+      <div className="detalhes-card">
+        <div className="layout-grid">
+          <div>
+            <h2 className="detalhes-nome">{detalhes.nome}</h2>
+            <p className="detalhes-info">{detalhes.data} • {detalhes.hora}</p>
 
-      {detalhes.times && (
-        <div className="detalhes-section">
-          <h3>Times</h3>
-          {detalhes.times.map((time, idx) => (
-            <div key={idx} className="time-group">
-              <strong>{time.nome}</strong>
-              <ul>
-                {time.jogadores?.map(j => <li key={j.id}>{j.nome}</li>)}
-              </ul>
+            {localObj ? (
+              <div className="detalhes-section">
+                <h3 className="text-muted">Local</h3>
+                <p className="detalhes-loc">{localObj.nome}</p>
+                <p className="detalhes-end">
+                  {localObj.logradouro ?? ''} {localObj.numero ?? ''} {localObj.cidade ? `, ${localObj.cidade}` : ''}
+                  {localObj.cep ? ` • CEP: ${localObj.cep}` : ''}
+                </p>
+              </div>
+            ) : (
+              <p className="detalhes-section detalhes-loc">Local não informado</p>
+            )}
+
+            {detalhes.times && detalhes.times.length > 0 && (
+              <div className="detalhes-section">
+                <h3>Times</h3>
+                <div>
+                  {detalhes.times.map((time, idx) => (
+                    <div key={idx} className="time-group">
+                      <strong>{time.nome}</strong>
+                      <ul>
+                        {time.jogadores?.map(j => (
+                          <li key={j.id}>{j.nome}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <aside>
+            <div className="detalhes-section">
+              <h3>Jogadores Confirmados</h3>
+
+              <div className="confirmados-list">
+                {detalhes.jogadores && detalhes.jogadores.length > 0 ? (
+                  <ul>
+                    {detalhes.jogadores.map(j => (
+                      <li key={j.id}>
+                        <span>{j.nome} {j.organizador ? '(Org.)' : ''}</span>
+                        <span style={{ color: '#777', fontSize: 12 }}>{ j.confirmado === 1 || j.confirmado === true ? '✓' : ''}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-muted">Nenhum jogador confirmado ainda.</p>
+                )}
+              </div>
+
+              <div className="detalhes-actions" style={{ marginTop: 12 }}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={jogLinha}
+                    onChange={() => setJogLinha(prev => !prev)}
+                    disabled={!partidaUsuarioId}
+                  />
+                  Jogador de Linha
+                </label>
+
+                <button
+                  onClick={handleConfirmar}
+                  disabled={!partidaUsuarioId || saving}
+                >
+                  {saving ? 'Salvando...' : partidaUsuarioId ? 'Confirmar presença' : 'Participar para confirmar'}
+                </button>
+
+                {error && <p style={{ color: 'red', marginTop: 8 }}>{error}</p>}
+              </div>
             </div>
-          ))}
+          </aside>
         </div>
-      )}
-
-      <div className="detalhes-actions">
-        <label>
-          <input type="checkbox" checked={jogLinha} onChange={() => setJogLinha(!jogLinha)} />
-          Jogador de Linha
-        </label>
-        <button onClick={handleConfirmar}>Confirmar presença</button>
-
-        {/* Botão só aparece para organizadores */}
-        {/* {isOrganizador && (
-          <button className="sort-btn" onClick={handleSortear}>Sortear Times</button>
-        )} */}
       </div>
     </div>
   );
