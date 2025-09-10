@@ -249,25 +249,4 @@ static async create(req: Request, res: Response) {
       return res.status(500).json({ error: "Erro ao participar da partida" });
     }
   }
-  
-  static async getConfirmedById(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const repo = AppDataSource.getRepository(PartidaUsuario);
-      const registro = await repo.find({
-        where: { id: Number(id), confirmado: true },
-        relations: ["partida", "usuario"]
-      });
-
-      if (!registro) {
-        return res.status(404).json({ error: "Registro não encontrado" });
-      }
-      const usuarios = registro.map(r => r.usuario);
-
-      return res.json(usuarios);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Erro ao buscar registro" });
-    }
-  }
 }

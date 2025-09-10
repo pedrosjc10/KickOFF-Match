@@ -134,35 +134,26 @@ export class PartidaUsuarioController {
   }
 
     static async getConfirmedById(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const partidaId = Number(id);
-  
-      if (isNaN(partidaId)) {
-        return res.status(400).json({ error: "id da partida inválido" });
-      }
-  
-      const repo = AppDataSource.getRepository(PartidaUsuario);
-  
-      // Busca registros de PartidaUsuario onde partida.id = partidaId e confirmado = true
-      const registros = await repo.find({
-        where: {
-          partida: { id: partidaId }, // relacionando pela entidade partida
-          confirmado: true
-        },
-        relations: ["partida", "usuario"]
-      });
-  
-      // Se quiser devolver um array vazio ao invés de 404:
-      const usuarios = registros.map(r => r.usuario);
-      return res.json(usuarios);
-  
-      // Se preferir 404 quando não houver confirmados:
-      // if (registros.length === 0) return res.status(404).json({ error: "Nenhum jogador confirmado" });
-      // return res.json(usuarios);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Erro ao buscar registro" });
+  try {
+    const partidaId = Number(req.params.id);
+    if (!Number.isInteger(partidaId) || partidaId <= 0) {
+      return res.status(400).json({ error: "ID de partida inválido" });
     }
+
+    const repo = AppDataSource.getRepository(PartidaUsuario);
+    const registros = await repo.find({
+      where: { partida: { id: partidaId }, confirmado: true },
+      relations: ["partida", "usuario"],
+    });
+
+    // se nenhum registro, retorna array vazio (ou 404 se preferir)
+    const usuarios = registros.map(r => r.usuario || null).filter(Boolean);
+
+    return res.json(usuarios);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Erro ao buscar confirmados" });
   }
+}
+
 }
