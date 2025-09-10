@@ -151,11 +151,16 @@ export class PartidaUsuarioController {
       return res.status(400).json({ error: "ID de partida inválido" });
     }
 
-    const repo = AppDataSource.getRepository(PartidaUsuario);
-    const registros = await repo.find({
-      where: { partida: { id: partidaId }, confirmado: true },
-      relations: ["partida", "usuario"],
-    });
+    const repo = AppDataSource.getRepository(PartidaUsuario); 
+
+    const registros = await repo
+      .createQueryBuilder("pu")
+      .leftJoinAndSelect("pu.partida", "p")
+      .leftJoinAndSelect("pu.usuario", "u")
+      .where("p.id = :partidaId", { partidaId })
+      .andWhere("pu.confirmado = :confirmado", { confirmado: 1 }) // 1 = confirmado
+      .getMany();
+
 
     // se nenhum registro, retorna array vazio (ou 404 se preferir)
     const usuarios = registros.map(r => r.usuario || null).filter(Boolean);
