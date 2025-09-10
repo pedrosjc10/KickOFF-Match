@@ -6,6 +6,7 @@ import {
   buscarRelacaoPartidaUsuario,
   confirmarPresenca,
   atualizarPartida,
+  atualizarPartidaUsuario, // <- NOVO
   PartidaDetalhes,
   Jogador,
 } from "../services/partidaService";
@@ -21,15 +22,15 @@ const PartidaDetalhesPage: React.FC = () => {
 
   const [detalhes, setDetalhes] = useState<PartidaDetalhes | null>(null);
   const [confirmados, setConfirmados] = useState<Jogador[]>([]);
-  const [partidaUsuarioId, setPartidaUsuarioId] = useState<number | null>(null);
-  const [jogLinhaLocal, setJogLinhaLocal] = useState<boolean>(false);
+  const [partidaUsuarioId, setPartidaUsuarioId] = useState<number | null>(null); // registro do usuario atual na pivot
+  const [jogLinhaLocal, setJogLinhaLocal] = useState<boolean>(false); // estado local do checkbox do próprio usuário
   const [overalls, setOveralls] = useState<Record<number, number>>({});
   const [resultado, setResultado] = useState<{ teamA: Jogador[]; teamB: Jogador[] } | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // carrega dados quando entrar na página / quando partidaId mudar
+  // carrega detalhes + confirmados + relação (para saber partidaUsuarioId)
   useEffect(() => {
     const load = async () => {
       setError(null);
@@ -44,23 +45,21 @@ const PartidaDetalhesPage: React.FC = () => {
         setDetalhes(det);
 
         const conf = await buscarConfirmados(Number(partidaId));
-        // garantir formato consistente (confirmado: 1|0 ou boolean)
         const normalized = conf.map((c: any) => ({
           ...c,
+          id: c.id, // aqui id do usuário (como o backend já mapeou)
           confirmado: typeof c.confirmado === "number" ? c.confirmado : (c.confirmado ? 1 : 0),
           organizador: Boolean(c.organizador),
           jog_linha: Boolean(c.jog_linha),
         })) as Jogador[];
         setConfirmados(normalized);
 
-        // inicializa overalls com 50 se ainda não tiver
         const initialOveralls: Record<number, number> = {};
         normalized.forEach(p => {
           initialOveralls[p.id] = initialOveralls[p.id] ?? 50;
         });
         setOveralls(initialOveralls);
 
-        // busca relação usuario-partida pra pegar partidaUsuarioId e jogLinha (se existir)
         if (usuario?.id) {
           try {
             const rel = await buscarRelacaoPartidaUsuario(usuario.id, Number(partidaId));
@@ -89,7 +88,6 @@ const PartidaDetalhesPage: React.FC = () => {
   }, [partidaId, usuario?.id]);
 
   const isOrganizer = useMemo(() => {
-    // determinamos organizador se algum confirmados tiver organizador=true e id === usuario.id
     if (!usuario?.id) return false;
     return confirmados.some(c => c.id === usuario.id && Boolean(c.organizador));
   }, [confirmados, usuario?.id]);
@@ -115,7 +113,37 @@ const PartidaDetalhesPage: React.FC = () => {
     }
   };
 
-  // Atualizar data/hora (somente organizador)
+  // NOVO: toggle jog_linha para o próprio usuário (escolher não ser goleiro)
+  const handleToggleJogLinhaOwn = async (newVal: boolean) => {
+    if (!partidaUsuarioId) {
+      setError("Relação partida-usuario não encontrada");
+      return;
+    }
+    setSaving(true);
+    try {
+      // backend espera smallint — enviamos 1/0
+      await atualizarPartidaUsuario(partidaUsuarioId, { jog_linha: newVal ? 1 : 0 });
+      // atualizar estados locais:
+      setJogLinhaLocal(newVal);
+      // refetch confirmados para refletir mudança
+      const conf = await buscarConfirmados(Number(partidaId));
+      const normalized = conf.map((c: any) => ({
+        ...c,
+        confirmado: typeof c.confirmado === "number" ? c.confirmado : (c.confirmado ? 1 : 0),
+        organizador: Boolean(c.organizador),
+        jog_linha: Boolean(c.jog_linha),
+      })) as Jogador[];
+      setConfirmados(normalized);
+      setError(null);
+    } catch (err) {
+      console.error("Erro ao atualizar posição:", err);
+      setError("Erro ao atualizar posição");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Atualizar data/hora (organizador) - idem já implementado
   const handleAtualizarData = async (novaData: string) => {
     if (!detalhes) return;
     const hoje = new Date().toISOString().split("T")[0];
@@ -153,67 +181,50 @@ const PartidaDetalhesPage: React.FC = () => {
     }
   };
 
-  // altera overall na UI somente
+  // altera overall UI-only
   const handleOverallChange = (playerId: number, value: number) => {
     const v = clamp(Math.round(value), 50, 99);
     setOveralls(prev => ({ ...prev, [playerId]: v }));
   };
 
-  // Sorteio dos times (apenas client-side; mostra resultado sem persistir)
+  // Sorteio dos times (client-side) — função já implementada anteriormente (handleSortearTimes)
   const handleSortearTimes = () => {
     if (!detalhes) return;
-    // quantidade por time (se existir tipoPartida.quantidadejogadores)
     const perTeam =
       (detalhes as any)?.tipoPartida?.quantidadejogadores ??
       ((detalhes as any)?.tipoPartida?.quantidadeJogadores ?? 0);
-
-    // se não tiver info sobre tipoPartida, tenta assumir 5 (fallback)
     const perTeamFinal = perTeam > 0 ? perTeam : 5;
     const totalNeeded = perTeamFinal * 2;
 
-    // jogadores de linha confirmados
     const lines = confirmados.filter(c => Boolean(c.jog_linha));
     if (lines.length < Math.max(0, totalNeeded - 0)) {
       setError("Não há jogadores de linha suficientes para sortear.");
       return;
     }
 
-    // goleiros (não jogador de linha)
     const keepers = confirmados.filter(c => !c.jog_linha);
-
-    // prepare array with overalls map
     const getOverall = (p: Jogador) => overalls[p.id] ?? 50;
-
-    // Copy arrays to mutate
     const linesPool = [...lines];
-    // sort descending by overall to balance by greedy
     linesPool.sort((a, b) => getOverall(b) - getOverall(a));
 
-    // teams
     const teamA: Jogador[] = [];
     const teamB: Jogador[] = [];
 
-    // ensure 1 keeper per team (if exist)
     if (keepers.length >= 2) {
       teamA.push(keepers[0]);
       teamB.push(keepers[1]);
     } else if (keepers.length === 1) {
-      // reuse keeper if only one
       teamA.push(keepers[0]);
       teamB.push(keepers[0]);
-    } // else no keepers at all -> teams will be composed of lines only
+    }
 
-    // initialize sums
     let sumA = teamA.reduce((s, p) => s + getOverall(p), 0);
     let sumB = teamB.reduce((s, p) => s + getOverall(p), 0);
 
-    // Distribute lines to balance sums and respect perTeamFinal
-    // If not enough players, we will repeat from the pool circularly (allowed)
     let i = 0;
     while (teamA.length < perTeamFinal || teamB.length < perTeamFinal) {
       const idx = i % linesPool.length;
       const player = linesPool[idx];
-      // avoid assigning same player twice to same team only if possible — but repeating is allowed
       if (teamA.length < perTeamFinal && sumA <= sumB) {
         teamA.push(player);
         sumA += getOverall(player);
@@ -225,7 +236,6 @@ const PartidaDetalhesPage: React.FC = () => {
         sumA += getOverall(player);
       }
       i++;
-      // safety break (shouldn't be infinite because we allow reuse)
       if (i > perTeamFinal * linesPool.length * 3) break;
     }
 
@@ -311,18 +321,30 @@ const PartidaDetalhesPage: React.FC = () => {
 
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                     {isOrganizer && (
-                      <>
-                        <input
-                          type="number"
-                          min={50}
-                          max={99}
-                          value={overalls[j.id] ?? 50}
-                          onChange={(e) => handleOverallChange(j.id, Number(e.target.value))}
-                          style={{ width: 72 }}
-                        />
-                      </>
+                      <input
+                        type="number"
+                        min={50}
+                        max={99}
+                        value={overalls[j.id] ?? 50}
+                        onChange={(e) => handleOverallChange(j.id, Number(e.target.value))}
+                        style={{ width: 72 }}
+                      />
                     )}
-                    <span style={{ fontSize: 14, color: "#777" }}>{j.confirmado === 1 || j.confirmado === true ? "✓" : ""}</span>
+
+                    {/* NOVO: checkbox editável apenas se for o próprio usuário */}
+                    {usuario?.id === j.id ? (
+                      <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <input
+                          type="checkbox"
+                          checked={Boolean(j.jog_linha)}
+                          onChange={(e) => handleToggleJogLinhaOwn(e.target.checked)}
+                          disabled={saving}
+                        />
+                        <span style={{ fontSize: 13 }}>Sou jogador de linha</span>
+                      </label>
+                    ) : (
+                      <span style={{ fontSize: 13, color: "#777" }}>{j.confirmado === 1 || j.confirmado === true ? "✓" : ""}</span>
+                    )}
                   </div>
                 </li>
               ))}

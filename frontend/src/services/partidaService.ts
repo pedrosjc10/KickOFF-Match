@@ -69,15 +69,6 @@ export const atualizarPartida = async (id: number, dados: Partial<PartidaDetalhe
   return response.data;
 };
 
-// Confirmar presença (usa id do registro partida_usuario)
-export const confirmarPresenca = async (id: string, jog_linha: boolean) => {
-  const response = await api.put(`/partidaUsuario/${id}`, {
-    jog_linha,
-    confirmado: 1, // smallint 1
-  });
-  return response.data;
-};
-
 // Buscar rachas que o usuário participa
 export const buscarRachasQueParticipo = async (userId: number) => {
   const response = await api.get(`/meusrachas/participando/${userId}`);
@@ -95,8 +86,24 @@ export const participarPartida = async (id: number) => {
   return response.data;
 };
 
-// Buscar confirmados da partida (rota criada no backend: PartidaController.getConfirmados)
-export const buscarConfirmados = async (id: number) => {
-  const response = await api.get<Jogador[]>(`/partidaUsuario/${id}/confirmados`);
+export const confirmarPresenca = async (id: string, jog_linha: boolean) => {
+  const response = await api.put(`/partidaUsuario/${id}`, {
+    jog_linha,
+    confirmado: 1, // smallint 1
+  });
   return response.data;
 };
+
+// Atualiza um registro partidaUsuario (ex: só jog_linha ou confirmado)
+export const atualizarPartidaUsuario = async (id: number | string, dados: Partial<{ jog_linha: number | boolean; confirmado: number | boolean }>) => {
+  const response = await api.put(`/partidaUsuario/${id}`, dados);
+  return response.data;
+};
+
+// Buscar confirmados (rota no backend)
+export const buscarConfirmados = async (id: number) => {
+  const response = await api.get<Jogador[]>(`/meusrachas/${id}/confirmados`);
+  return response.data;
+};
+
+
