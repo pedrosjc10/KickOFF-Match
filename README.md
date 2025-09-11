@@ -1,4 +1,4 @@
-# TCC - Sistema de Gerenciamento de Partidas Esportivas
+# TCC - Sistema de Gerenciamento de Partidas Esportivas(KickOFF Match)
 
 Este projeto tem como objetivo facilitar o gerenciamento de partidas esportivas, permitindo o cadastro de usuários (jogadores e organizadores), criação e organização de partidas, controle de locais e acompanhamento dos resultados.
 
