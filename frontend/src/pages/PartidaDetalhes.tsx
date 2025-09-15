@@ -1,125 +1,139 @@
-// src/pages/PartidaDetalhes.tsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   buscarDetalhesPartida,
   buscarConfirmados,
   confirmarPresenca,
-  toggleJogLinha,
-  PartidaDetalhes as PartidaDetalhesType,
-  Jogador,
+  atualizarPartidaUsuario,
 } from "../services/partidaService";
 import "../styles/PartidaDetalhes.css";
 
+interface Jogador {
+  id: number;
+  nome: string;
+  confirmado: number | boolean;
+  organizador: number | boolean;
+  jog_linha: number | boolean;
+}
+
+interface Partida {
+  id: number;
+  nome: string;
+  data: string;
+  hora: string;
+  tipo: string;
+  local?: { nome: string; cidade: string };
+  tipoPartida?: {
+    id?: number;
+    nometipopartida?: string;
+    quantidadejogadores?: number;
+  };
+}
+
 const PartidaDetalhes: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [partida, setPartida] = useState<PartidaDetalhesType | null>(null);
-  const [jogadores, setJogadores] = useState<Jogador[]>([]);
-  const [times, setTimes] = useState<{ nome: string; jogadores: Jogador[] }[]>(
-    []
-  );
+  const [partida, setPartida] = useState<Partida | null>(null);
+  const [confirmados, setConfirmados] = useState<Jogador[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // buscar dados da partida
-  useEffect(() => {
-    if (id) {
-      carregarDetalhes();
+  // Carrega detalhes e confirmados
+  const carregarDados = async () => {
+    if (!id) return;
+    try {
+      const partidaData = await buscarDetalhesPartida(id);
+      setPartida(partidaData);
+      const confirmadosData = await buscarConfirmados(Number(id));
+      setConfirmados(confirmadosData);
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    carregarDados();
   }, [id]);
 
-  const carregarDetalhes = async () => {
-    if (!id) return;
-    const detalhes = await buscarDetalhesPartida(id);
-    setPartida(detalhes);
-
-    const confirmados = await buscarConfirmados(Number(id));
-    setJogadores(confirmados);
+  // Confirma presença
+  const handleConfirmar = async (partidaUsuarioId: string) => {
+    try {
+      await confirmarPresenca(partidaUsuarioId, true);
+      await carregarDados();
+    } catch (error) {
+      console.error("Erro ao confirmar presença:", error);
+    }
   };
 
-  const handleConfirmarPresenca = async (jogador: Jogador) => {
-    await confirmarPresenca(jogador.partidaUsuarioId, jogador.jog_linha);
-    await carregarDetalhes();
+  // Alternar entre jogador de linha e goleiro
+  const handleToggleJogLinha = async (partidaUsuarioId: number, jog_linha: number | boolean) => {
+    try {
+      await atualizarPartidaUsuario(partidaUsuarioId, {
+        jog_linha: jog_linha ? 0 : 1,
+      });
+      await carregarDados();
+    } catch (error) {
+      console.error("Erro ao atualizar posição:", error);
+    }
   };
 
-  const handleToggleJogLinha = async (jogador: Jogador) => {
-    await toggleJogLinha(jogador.partidaUsuarioId, !jogador.jog_linha);
-    await carregarDetalhes();
-  };
-
-  const sortearTimes = () => {
-    if (!partida || !partida.tipoPartida?.quantidadejogadores) return;
-
-    const jogadoresConfirmados = jogadores.filter((j) => j.confirmado);
-    const shuffled = [...jogadoresConfirmados].sort(
-      () => Math.random() - 0.5
-    );
-
-    const tamanho = partida.tipoPartida.quantidadejogadores;
-    const timeA = shuffled.slice(0, tamanho);
-    const timeB = shuffled.slice(tamanho, tamanho * 2);
-
-    setTimes([
-      { nome: "Time A", jogadores: timeA },
-      { nome: "Time B", jogadores: timeB },
-    ]);
-  };
-
-  if (!partida) return <p>Carregando detalhes...</p>;
+  if (loading) return <p>Carregando...</p>;
 
   return (
     <div className="detalhes-container">
-      <h2>{partida.nome}</h2>
-      <p>
-        <strong>Data:</strong> {partida.data} às {partida.hora}
-      </p>
-      <p>
-        <strong>Local:</strong> {partida.local?.nome} - {partida.local?.cidade}
-      </p>
-      <p>
-        <strong>Tipo:</strong> {partida.tipo}
-      </p>
+      {partida ? (
+        <>
+          <h2>{partida.nome}</h2>
+          <p>
+            <strong>Data:</strong> {new Date(partida.data).toLocaleDateString("pt-BR")} às{" "}
+            {partida.hora?.slice(0, 5)}
+          </p>
+          <p>
+            <strong>Local:</strong> {partida.local?.nome} - {partida.local?.cidade}
+          </p>
+          <p>
+            <strong>Tipo:</strong> {partida.tipo}
+          </p>
 
-      <h3>Jogadores Confirmados</h3>
-      <ul>
-        {jogadores.map((j) => (
-          <li key={j.partidaUsuarioId}>
-            {j.nome}{" "}
-            {j.organizador && <span>(Organizador)</span>}{" "}
-            {j.confirmado ? (
-              <>
-                ✅ Confirmado |{" "}
-                <button onClick={() => handleToggleJogLinha(j)}>
-                  {j.jog_linha ? "Sou jogador de linha" : "Sou goleiro"}
-                </button>
-              </>
-            ) : (
-              <button onClick={() => handleConfirmarPresenca(j)}>
-                Confirmar Presença
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
+          <h3>Jogadores Confirmados</h3>
+          <ul>
+            {confirmados.map((jogador) => (
+              <li key={jogador.id}>
+                {jogador.nome}{" "}
+                {jogador.confirmado ? (
+                  <>
+                    -{" "}
+                    <button
+                      onClick={() =>
+                        handleToggleJogLinha(jogador.id, jogador.jog_linha)
+                      }
+                    >
+                      {jogador.jog_linha ? "⚽ Jogador de Linha" : "🧤 Goleiro"}
+                    </button>
+                  </>
+                ) : (
+                  <button onClick={() => handleConfirmar(String(jogador.id))}>
+                    Confirmar Presença
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
 
-      {/* Botão sorteio só para organizador */}
-      {jogadores.some((j) => j.organizador) && (
-        <button className="btn-sortear" onClick={sortearTimes}>
-          Sortear Times
-        </button>
-      )}
-
-      {times.length > 0 && (
-        <div className="times-container">
-          {times.map((time, idx) => (
-            <div key={idx} className="time-card">
-              <h4>{time.nome}</h4>
-              <ul>
-                {time.jogadores.map((j) => (
-                  <li key={j.partidaUsuarioId}>{j.nome}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+          {/* Botão global no final da página */}
+          <div className="confirmar-container">
+            <button
+              onClick={() => {
+                const usuario = confirmados.find((j) => !j.confirmado);
+                if (usuario) handleConfirmar(String(usuario.id));
+              }}
+            >
+              Confirmar Minha Presença
+            </button>
+          </div>
+        </>
+      ) : (
+        <p>Partida não encontrada</p>
       )}
     </div>
   );
