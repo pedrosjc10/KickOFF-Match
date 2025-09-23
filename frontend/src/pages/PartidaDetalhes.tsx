@@ -4,7 +4,8 @@ import {
   buscarDetalhesPartida,
   buscarConfirmados,
   atualizarPartidaUsuario,
-  Jogador, // Importa a interface do arquivo de serviço
+  buscarTodosParticipantes, // Importa a nova função
+  Jogador,
 } from "../services/partidaService";
 import "../styles/PartidaDetalhes.css";
 
@@ -31,30 +32,32 @@ interface Partida {
 const PartidaDetalhes: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [partida, setPartida] = useState<Partida | null>(null);
-  const [jogadores, setJogadores] = useState<Jogador[]>([]);
+  const [jogadoresConfirmados, setJogadoresConfirmados] = useState<Jogador[]>([]);
+  const [jogadoresNaoConfirmados, setJogadoresNaoConfirmados] = useState<Jogador[]>([]);
   const [loading, setLoading] = useState(true);
   const usuarioLogadoId = getUsuarioLogadoId();
 
-  const jogadoresConfirmados = jogadores.filter(
-    (jogador) => jogador.confirmado
-  );
-  const jogadoresParticipantes = jogadores.filter(
-    (jogador) => !jogador.confirmado
-  );
-
-  const usuarioLogado = jogadores.find(
+  // Encontra o usuário logado na lista de não confirmados
+  const usuarioLogadoNaoConfirmou = jogadoresNaoConfirmados.find(
     (jogador) => jogador.id === usuarioLogadoId
   );
-  const usuarioNaoConfirmou = usuarioLogado && !usuarioLogado.confirmado;
 
-  // Carrega detalhes e todos os jogadores
+  // Carrega todos os dados da partida
   const carregarDados = async () => {
     if (!id) return;
     try {
+      setLoading(true);
       const partidaData = await buscarDetalhesPartida(id);
       setPartida(partidaData);
-      const jogadoresData = await buscarConfirmados(Number(id)); // Renomeei a função para buscar todos os jogadores, não apenas confirmados
-      setJogadores(jogadoresData);
+
+      const confirmadosData = await buscarConfirmados(Number(id));
+      setJogadoresConfirmados(confirmadosData);
+
+      const todosParticipantes = await buscarTodosParticipantes(Number(id));
+      const naoConfirmadosData = todosParticipantes.filter(
+        (jogador) => !jogador.confirmado
+      );
+      setJogadoresNaoConfirmados(naoConfirmadosData);
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
     } finally {
@@ -66,31 +69,25 @@ const PartidaDetalhes: React.FC = () => {
     carregarDados();
   }, [id]);
 
-  // Confirma presença
   const handleConfirmar = async () => {
-    if (!usuarioLogado) return;
+    if (!usuarioLogadoNaoConfirmou) return;
     try {
-      await atualizarPartidaUsuario(usuarioLogado.id, {
+      await atualizarPartidaUsuario(usuarioLogadoNaoConfirmou.id, {
         confirmado: 1,
-        jog_linha: 1, // Define como jogador de linha por padrão
+        jog_linha: 1,
       });
-      await carregarDados();
+      await carregarDados(); // Recarrega os dados para atualizar as listas
     } catch (error) {
       console.error("Erro ao confirmar presença:", error);
     }
   };
 
-  // Alterna entre jogador de linha e goleiro com o checkbox
-  const handleToggleJogLinha = async (
-    jogadorId: number,
-    isJogLinha: number | boolean,
-    isChecked: boolean
-  ) => {
+  const handleToggleJogLinha = async (jogadorId: number, isChecked: boolean) => {
     try {
       await atualizarPartidaUsuario(jogadorId, {
         jog_linha: isChecked ? 1 : 0,
       });
-      await carregarDados();
+      await carregarDados(); // Recarrega os dados para atualizar a lista
     } catch (error) {
       console.error("Erro ao atualizar posição:", error);
     }
@@ -114,31 +111,26 @@ const PartidaDetalhes: React.FC = () => {
             <strong>Tipo:</strong> {partida.tipo}
           </p>
 
-          {/* Lista de Jogadores Confirmados */}
           ---
+
           <h3>Jogadores Confirmados ({jogadoresConfirmados.length})</h3>
           <ul>
             {jogadoresConfirmados.map((jogador) => (
               <li key={jogador.id}>
                 {jogador.nome}{" "}
-                {jogador.organizador && <span>(Organizador)</span>}
-                {jogador.id === usuarioLogadoId && (
+                {jogador.organizador ? <span>(Organizador)</span> : null}
+                {jogador.id === usuarioLogadoId ? (
                   <label>
                     <input
                       type="checkbox"
                       checked={!!jogador.jog_linha}
                       onChange={(e) =>
-                        handleToggleJogLinha(
-                          jogador.id,
-                          jogador.jog_linha,
-                          e.target.checked
-                        )
+                        handleToggleJogLinha(jogador.id, e.target.checked)
                       }
                     />{" "}
                     {!!jogador.jog_linha ? "⚽ Jogador de Linha" : "🧤 Goleiro"}
                   </label>
-                )}
-                {jogador.id !== usuarioLogadoId && (
+                ) : (
                   <span>
                     {" - "}
                     {!!jogador.jog_linha ? "⚽ Jogador de Linha" : "🧤 Goleiro"}
@@ -148,19 +140,19 @@ const PartidaDetalhes: React.FC = () => {
             ))}
           </ul>
 
-          {/* Lista de Jogadores Participantes */}
           ---
-          <h3>Jogadores Participantes ({jogadoresParticipantes.length})</h3>
+
+          <h3>Jogadores Participantes ({jogadoresNaoConfirmados.length})</h3>
           <ul>
-            {jogadoresParticipantes.map((jogador) => (
+            {jogadoresNaoConfirmados.map((jogador) => (
               <li key={jogador.id}>
-                {jogador.nome} {jogador.organizador && <span>(Organizador)</span>}
+                {jogador.nome} {jogador.organizador ? <span>(Organizador)</span> : null}
               </li>
             ))}
           </ul>
 
           {/* Botão para o usuário logado confirmar sua presença */}
-          {usuarioNaoConfirmou && (
+          {!!usuarioLogadoNaoConfirmou && (
             <div className="confirmar-container">
               <button onClick={handleConfirmar}>Confirmar Minha Presença</button>
             </div>
