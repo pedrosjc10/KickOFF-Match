@@ -172,4 +172,46 @@ export class PartidaUsuarioController {
   }
 }
 
+   static async getAllParticipantsById(req: Request, res: Response) {
+        try {
+            const partidaId = Number(req.params.id);
+            if (!Number.isInteger(partidaId) || partidaId <= 0) {
+                return res.status(400).json({ error: "ID de partida inválido" });
+            }
+
+            const repo = AppDataSource.getRepository(PartidaUsuario);
+
+            const registros = await repo
+                .createQueryBuilder("pu")
+                .leftJoinAndSelect("pu.partida", "p")
+                .leftJoinAndSelect("pu.usuario", "u")
+                .where("p.id = :partidaId", { partidaId })
+                .getMany(); // Removido o filtro de 'confirmado'
+
+            if (!registros || registros.length === 0) {
+                return res.status(404).json({ error: "Nenhum participante encontrado para esta partida" });
+            }
+
+            // Mapeia os registros para um formato mais limpo
+            const usuariosFormatados = registros.map(registro => {
+                if (!registro.usuario) {
+                    return null;
+                }
+                return {
+                    id: registro.usuario.id,
+                    nome: registro.usuario.nome,
+                    confirmado: registro.confirmado,
+                    jog_linha: registro.jog_linha,
+                    organizador: registro.organizador,
+                    // Adicione aqui outros campos que você precise do 'PartidaUsuario'
+                };
+            }).filter(Boolean); // Filtra qualquer valor nulo
+
+            return res.status(200).json(usuariosFormatados);
+        } catch (error) {
+            console.error("Erro ao buscar todos os participantes:", error);
+            return res.status(500).json({ error: "Erro interno do servidor." });
+        }
+    }
+
 }
