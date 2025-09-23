@@ -13,6 +13,7 @@ partidaUsuarioRouter.get("/:id(\\d+)",  PartidaUsuarioController.getById);
 partidaUsuarioRouter.put("/:id(\\d+)",  PartidaUsuarioController.update);
 partidaUsuarioRouter.delete("/:id(\\d+)", PartidaUsuarioController.delete);
 partidaUsuarioRouter.get("/:id(\\d+)/confirmados", authMiddleware, PartidaUsuarioController.getConfirmedById);
+partidaUsuarioRouter.get("/:id(\\d+)/todos", authMiddleware, PartidaUsuarioController.getAllParticipantsById);
 partidaUsuarioRouter.post("/", authMiddleware, PartidaUsuarioController.create);
 partidaUsuarioRouter.get("/", authMiddleware, PartidaUsuarioController.getAll);
 
