@@ -36,7 +36,7 @@ export const AppDataSource = new DataSource({
         database: "tcc2",
       }),
       
-  synchronize: false,
+  synchronize: true,
   logging: false,
   entities: [Usuario, Partida, Local, TipoPartida, PartidaUsuario],
   migrations: [__dirname + "/../migrations/*.js"],
