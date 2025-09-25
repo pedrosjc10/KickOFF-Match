@@ -12,6 +12,9 @@ export class PartidaUsuario {
 
   @Column()
   organizador!: boolean;
+
+  @Column()
+  habilidade!: number;
   
   @Column({ name: 'jog_linha' }) // <-- Correção: Especifique o nome da coluna caso seja diferente
   jog_linha!: boolean;

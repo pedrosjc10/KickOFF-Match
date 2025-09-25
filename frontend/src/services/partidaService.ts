@@ -20,6 +20,7 @@ export interface Jogador {
   confirmado: number | boolean; // 0 | 1 or boolean
   organizador: number | boolean; // 0 | 1 or boolean
   jog_linha: number | boolean; // 0 | 1 or boolean
+  habilidade?: number; 
 }
 
 export interface Time {
@@ -95,7 +96,7 @@ export const confirmarPresenca = async (id: string, jog_linha: boolean) => {
 };
 
 // Atualiza um registro partidaUsuario (ex: só jog_linha ou confirmado)
-export const atualizarPartidaUsuario = async (id: number | string, dados: Partial<{ jog_linha: number | boolean; confirmado: number | boolean }>) => {
+export const atualizarPartidaUsuario = async (id: number | string, dados: Partial<{ jog_linha: number | boolean; confirmado: number | boolean; habilidade: number }>) => {
   const response = await api.put(`/partidaUsuario/${id}`, dados);
   return response.data;
 };
@@ -109,4 +110,14 @@ export const buscarConfirmados = async (id: number) => {
 export const buscarTodosParticipantes = async (id: number) => {
   const response = await api.get<Jogador[]>(`/partidausuario/${id}/todos`);
   return response.data;
+};
+
+/**
+ * Verifica se o usuário é organizador da partida.
+ * Retorna true se for organizador, false caso contrário.
+ */
+export const verificarSeOrganizador = async (usuarioId: number, partidaId: number): Promise<boolean> => {
+  const response = await api.get(`/partidaUsuario/${usuarioId}/${partidaId}/organizador`);
+  // O backend retorna o registro da relação, incluindo o campo 'organizador'
+  return !!response.data.organizador;
 };

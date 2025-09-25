@@ -4,7 +4,8 @@ import {
   buscarDetalhesPartida,
   buscarConfirmados,
   atualizarPartidaUsuario,
-  buscarTodosParticipantes, // Importa a nova função
+  buscarTodosParticipantes,
+  verificarSeOrganizador, // <-- importação da função
   Jogador,
 } from "../services/partidaService";
 import "../styles/PartidaDetalhes.css";
@@ -35,6 +36,8 @@ const PartidaDetalhes: React.FC = () => {
   const [jogadoresConfirmados, setJogadoresConfirmados] = useState<Jogador[]>([]);
   const [jogadoresNaoConfirmados, setJogadoresNaoConfirmados] = useState<Jogador[]>([]);
   const [loading, setLoading] = useState(true);
+  const [jogLinhaSelecionado, setJogLinhaSelecionado] = useState<boolean | null>(null);
+  const [isOrganizador, setIsOrganizador] = useState<boolean>(false); // <-- novo estado
   const usuarioLogadoId = getUsuarioLogadoId();
 
   // Encontra o usuário logado na lista de não confirmados
@@ -58,6 +61,10 @@ const PartidaDetalhes: React.FC = () => {
         (jogador) => !jogador.confirmado
       );
       setJogadoresNaoConfirmados(naoConfirmadosData);
+
+      // Verifica se o usuário logado é organizador
+      const organizador = await verificarSeOrganizador(usuarioLogadoId, Number(id));
+      setIsOrganizador(organizador);
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
     } finally {
@@ -67,16 +74,17 @@ const PartidaDetalhes: React.FC = () => {
 
   useEffect(() => {
     carregarDados();
+    // eslint-disable-next-line
   }, [id]);
 
   const handleConfirmar = async () => {
-    if (!usuarioLogadoNaoConfirmou) return;
+    if (!usuarioLogadoNaoConfirmou || jogLinhaSelecionado === null) return;
     try {
       await atualizarPartidaUsuario(usuarioLogadoNaoConfirmou.id, {
         confirmado: 1,
-        jog_linha: 1,
+        jog_linha: jogLinhaSelecionado ? 1 : 0,
       });
-      await carregarDados(); // Recarrega os dados para atualizar as listas
+      await carregarDados();
     } catch (error) {
       console.error("Erro ao confirmar presença:", error);
     }
@@ -90,6 +98,16 @@ const PartidaDetalhes: React.FC = () => {
       await carregarDados(); // Recarrega os dados para atualizar a lista
     } catch (error) {
       console.error("Erro ao atualizar posição:", error);
+    }
+  };
+
+  // Função para alterar habilidade de um jogador
+  const handleAlterarHabilidade = async (jogadorId: number, novaHabilidade: number) => {
+    try {
+      await atualizarPartidaUsuario(jogadorId, { habilidade: novaHabilidade });
+      await carregarDados();
+    } catch (error) {
+      console.error("Erro ao atualizar habilidade:", error);
     }
   };
 
@@ -136,6 +154,24 @@ const PartidaDetalhes: React.FC = () => {
                     {!!jogador.jog_linha ? "⚽ Jogador de Linha" : "🧤 Goleiro"}
                   </span>
                 )}
+                {/* Campo para alterar habilidade, visível apenas para organizador */}
+                {isOrganizador && (
+                  <span style={{ marginLeft: "10px" }}>
+                    <label>
+                      Habilidade:
+                      <input
+                        type="number"
+                        min={1}
+                        max={10}
+                        value={jogador.habilidade ?? ""}
+                        style={{ width: "40px", marginLeft: "5px" }}
+                        onChange={e =>
+                          handleAlterarHabilidade(jogador.id, Number(e.target.value))
+                        }
+                      />
+                    </label>
+                  </span>
+                )}
               </li>
             ))}
           </ul>
@@ -154,7 +190,20 @@ const PartidaDetalhes: React.FC = () => {
           {/* Botão para o usuário logado confirmar sua presença */}
           {!!usuarioLogadoNaoConfirmou && (
             <div className="confirmar-container">
-              <button onClick={handleConfirmar}>Confirmar Minha Presença</button>
+              <label>
+                Selecione sua posição:
+                <select
+                  value={jogLinhaSelecionado === null ? "" : jogLinhaSelecionado ? "linha" : "goleiro"}
+                  onChange={e => setJogLinhaSelecionado(e.target.value === "linha")}
+                >
+                  <option value="">Selecione</option>
+                  <option value="linha">Jogador de Linha</option>
+                  <option value="goleiro">Goleiro</option>
+                </select>
+              </label>
+              <button onClick={handleConfirmar} disabled={jogLinhaSelecionado === null}>
+                Confirmar Minha Presença
+              </button>
             </div>
           )}
         </>

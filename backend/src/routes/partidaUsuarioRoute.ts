@@ -8,6 +8,9 @@ const partidaUsuarioRouter = Router();
 // rota específica primeiro (ou use regex abaixo)
 partidaUsuarioRouter.get('/:usuarioId(\\d+)/:partidaId(\\d+)', PartidaUsuarioController.getByUsuarioAndPartida);
 
+// Rota para verificar se o usuário é organizador da partida
+partidaUsuarioRouter.get('/:usuarioId(\\d+)/:partidaId(\\d+)/organizador', PartidaUsuarioController.isOrganizador);
+
 // rotas genéricas depois
 partidaUsuarioRouter.get("/:id(\\d+)",  PartidaUsuarioController.getById);
 partidaUsuarioRouter.put("/:id(\\d+)",  PartidaUsuarioController.update);

@@ -8,7 +8,7 @@ import { Partida } from "../models/Partida";
 export class PartidaUsuarioController {
   static async create(req: Request, res: Response) {
     try {
-      const { confirmado, organizador, jog_linha, usuario_id, partida_id } = req.body;
+      const { confirmado, organizador, jog_linha, usuario_id, partida_id, habilidade } = req.body;
 
       const usuarioRepo = AppDataSource.getRepository(Usuario);
       const partidaRepo = AppDataSource.getRepository(Partida);
@@ -26,7 +26,8 @@ export class PartidaUsuarioController {
         organizador,
         jog_linha,
         usuario,
-        partida
+        partida,
+        habilidade
         });
 
       const resultado = await partidaUsuarioRepo.save(novaAssociacao);
@@ -203,6 +204,7 @@ export class PartidaUsuarioController {
                     confirmado: registro.confirmado,
                     jog_linha: registro.jog_linha,
                     organizador: registro.organizador,
+                    habilidade: registro.habilidade,
                     // Adicione aqui outros campos que você precise do 'PartidaUsuario'
                 };
             }).filter(Boolean); // Filtra qualquer valor nulo
@@ -213,5 +215,40 @@ export class PartidaUsuarioController {
             return res.status(500).json({ error: "Erro interno do servidor." });
         }
     }
+
+  /**
+   * Verifica se o usuário é organizador da partida
+   * GET /partidaUsuario/:usuarioId/:partidaId/organizador
+   */
+  static async isOrganizador(req: Request, res: Response) {
+    try {
+      const usuarioId = Number(req.params.usuarioId);
+      const partidaId = Number(req.params.partidaId);
+
+      if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+        return res.status(400).json({ error: "ID de usuário inválido" });
+      }
+      if (!Number.isInteger(partidaId) || partidaId <= 0) {
+        return res.status(400).json({ error: "ID de partida inválido" });
+      }
+
+      const repo = AppDataSource.getRepository(PartidaUsuario);
+      const registro = await repo.findOne({
+        where: {
+          usuario: { id: usuarioId },
+          partida: { id: partidaId },
+        },
+      });
+
+      if (!registro) {
+        return res.status(404).json({ error: "Relação não encontrada" });
+      }
+
+      return res.json({ organizador: !!registro.organizador });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro ao verificar organizador" });
+    }
+  }
 
 }
