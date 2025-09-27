@@ -43,6 +43,7 @@ const PartidaDetalhes: React.FC = () => {
   // Carrega todos os dados da partida
   const carregarDados = async () => {
     if (!id) return;
+    if (!usuario?.id) return;
     try {
       setLoading(true);
       const partidaData = await buscarDetalhesPartida(id);
@@ -57,8 +58,8 @@ const PartidaDetalhes: React.FC = () => {
       );
       setJogadoresNaoConfirmados(naoConfirmadosData);
 
-      // Verifica se o usuário logado é organizador
-      const organizador = await verificarSeOrganizador(usuario?.id ?? 0, Number(id));
+      // Verifica se o usuário logado é o organizador da partida
+      const organizador = await verificarSeOrganizador(usuario?.id , Number(id));
       setIsOrganizador(organizador);
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
