@@ -74,6 +74,14 @@ export class PartidaUsuarioController {
     try {
       const { id } = req.params;
       const { confirmado } = req.body;
+      const { habilidade } = req.body;
+      const {  jog_linha } = req.body;
+
+      // Validações
+
+      if (habilidade !== undefined && (typeof habilidade !== 'number' || habilidade < 50 || habilidade > 90)) {
+        return res.status(400).json({ error: "Habilidade deve ser um número entre 50 e 90." });
+      }
 
       const repo = AppDataSource.getRepository(PartidaUsuario);
       const registro = await repo.findOne({ where: { id: Number(id) } });
@@ -83,6 +91,8 @@ export class PartidaUsuarioController {
       }
 
       registro.confirmado = confirmado ?? registro.confirmado;
+      registro.habilidade = habilidade ?? registro.habilidade;
+      registro.jog_linha = jog_linha ?? registro.jog_linha;
 
       const atualizado = await repo.save(registro);
       return res.json(atualizado);

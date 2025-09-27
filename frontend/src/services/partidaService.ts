@@ -108,7 +108,7 @@ export const buscarConfirmados = async (id: number) => {
 };
 
 export const buscarTodosParticipantes = async (id: number) => {
-  const response = await api.get<Jogador[]>(`/partidausuario/${id}/todos`);
+  const response = await api.get<Jogador[]>(`/partidaUsuario/${id}/todos`);
   return response.data;
 };
 

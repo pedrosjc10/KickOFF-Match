@@ -157,8 +157,8 @@ const PartidaDetalhes: React.FC = () => {
                       Habilidade:
                       <input
                         type="number"
-                        min={1}
-                        max={10}
+                        min={50}
+                        max={90}
                         value={jogador.habilidade ?? ""}
                         style={{ width: "40px", marginLeft: "5px" }}
                         onChange={e =>
