@@ -209,4 +209,4 @@ const PartidaDetalhes: React.FC = () => {
   );
 };
 
-
+export default PartidaDetalhes;
