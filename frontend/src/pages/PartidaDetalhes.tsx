@@ -9,12 +9,7 @@ import {
   Jogador,
 } from "../services/partidaService";
 import "../styles/PartidaDetalhes.css";
-
-// Simula a obtenção do usuário logado. Em um app real, isso viria de um contexto ou estado global.
-const getUsuarioLogadoId = (): number => {
-  // Substitua por lógica real para obter o ID do usuário logado
-  return 1;
-};
+import { useUserStore } from "../stores/userStore";
 
 interface Partida {
   id: number;
@@ -38,11 +33,11 @@ const PartidaDetalhes: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [jogLinhaSelecionado, setJogLinhaSelecionado] = useState<boolean | null>(null);
   const [isOrganizador, setIsOrganizador] = useState<boolean>(false); // <-- novo estado
-  const usuarioLogadoId = getUsuarioLogadoId();
+  const { usuario } = useUserStore();
 
   // Encontra o usuário logado na lista de não confirmados
   const usuarioLogadoNaoConfirmou = jogadoresNaoConfirmados.find(
-    (jogador) => jogador.id === usuarioLogadoId
+    (jogador) => jogador.id === usuario?.id
   );
 
   // Carrega todos os dados da partida
@@ -63,7 +58,7 @@ const PartidaDetalhes: React.FC = () => {
       setJogadoresNaoConfirmados(naoConfirmadosData);
 
       // Verifica se o usuário logado é organizador
-      const organizador = await verificarSeOrganizador(usuarioLogadoId, Number(id));
+      const organizador = await verificarSeOrganizador(usuario?.id ?? 0, Number(id));
       setIsOrganizador(organizador);
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
@@ -137,7 +132,7 @@ const PartidaDetalhes: React.FC = () => {
               <li key={jogador.id}>
                 {jogador.nome}{" "}
                 {jogador.organizador ? <span>(Organizador)</span> : null}
-                {jogador.id === usuarioLogadoId ? (
+                {jogador.id === usuario?.id ? (
                   <label>
                     <input
                       type="checkbox"
@@ -214,4 +209,4 @@ const PartidaDetalhes: React.FC = () => {
   );
 };
 
-export default PartidaDetalhes;
+
