@@ -72,9 +72,7 @@ export class PartidaUsuarioController {
 
   static async update(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      console.log('ID RECEBIDO NA ROTA:', id); 
-      console.log('ID CONVERTIDO PARA BUSCA:', Number(id)); 
+      const usuarioId = Number(req.params.usuarioId);
       const { confirmado } = req.body;
       const { habilidade } = req.body;
       const { jog_linha } = req.body;
@@ -86,7 +84,7 @@ export class PartidaUsuarioController {
       }
 
       const repo = AppDataSource.getRepository(PartidaUsuario);
-      const registro = await repo.findOne({ where: { id: Number(id) } });
+      const registro = await repo.findOne({ where: { id: Number(usuarioId) } });
 
       if (!registro) {
         return res.status(404).json({ error: "Registro não encontrado" });
@@ -95,6 +93,7 @@ export class PartidaUsuarioController {
       registro.confirmado = confirmado ?? registro.confirmado;
       registro.habilidade = habilidade ?? registro.habilidade;
       registro.jog_linha = jog_linha ?? registro.jog_linha;
+      registro.usuario = usuarioId ? { id: usuarioId } as Usuario : registro.usuario;
 
       const atualizado = await repo.save(registro);
       return res.json(atualizado);
