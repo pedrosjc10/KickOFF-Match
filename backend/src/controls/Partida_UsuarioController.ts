@@ -73,6 +73,8 @@ export class PartidaUsuarioController {
   static async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      console.log('ID RECEBIDO NA ROTA:', id); 
+      console.log('ID CONVERTIDO PARA BUSCA:', Number(id)); 
       const { confirmado } = req.body;
       const { habilidade } = req.body;
       const { jog_linha } = req.body;
