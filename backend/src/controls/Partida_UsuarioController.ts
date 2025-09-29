@@ -81,12 +81,19 @@ export class PartidaUsuarioController {
 
       // Validações
 
+      if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+        return res.status(400).json({ error: "ID de usuário inválido" });
+      }
+
       if (habilidade !== undefined && (typeof habilidade !== 'number' || habilidade < 50 || habilidade > 90)) {
         return res.status(400).json({ error: "Habilidade deve ser um número entre 50 e 90." });
       }
 
       const repo = AppDataSource.getRepository(PartidaUsuario);
-      const registro = await repo.findOne({ where: { id: Number(usuarioId) } });
+      const registro = await repo.findOne({ 
+        where: { usuario: { id: usuarioId } },
+        relations: ["usuario"]
+      });
 
       if (!registro) {
         return res.status(404).json({ error: "Registro não encontrado" });
