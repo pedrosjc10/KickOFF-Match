@@ -75,7 +75,7 @@ export class PartidaUsuarioController {
       const { id } = req.params;
       const { confirmado } = req.body;
       const { habilidade } = req.body;
-      const {  jog_linha } = req.body;
+      const { jog_linha } = req.body;
 
       // Validações
 
