@@ -1,12 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Jogador } from "../services/partidaService"; 
 import { useUserStore } from "../stores/userStore"; 
 
-// Interface JogadorConfirmadoItemProps simplificada
 interface JogadorConfirmadoItemProps {
   jogador: Jogador;
   isOrganizador: boolean;
-  // Funções que o componente pai deve fornecer
   handleToggleJogLinha: (jogadorId: number, isChecked: boolean) => Promise<void>;
   handleSalvarHabilidade: (jogadorId: number, novaHabilidade: number) => Promise<void>;
 }
@@ -20,26 +18,31 @@ const Player: React.FC<JogadorConfirmadoItemProps> = ({
   const { usuario } = useUserStore();
   const isUsuarioLogado = jogador.id === usuario?.id;
 
-  // --- NOVO ESTADO INTERNO PARA EDIÇÃO DE HABILIDADE ---
+  // ESTADO INTERNO DE EDIÇÃO
   const [isEditing, setIsEditing] = useState(false);
-  // O valor inicial é a habilidade atual do jogador (ou 0 se for null/undefined)
-  const [habilidadeEmEdicao, setHabilidadeEmEdicao] = useState<number | string>(jogador.habilidade ?? "");
+  const [habilidadeEmEdicao, setHabilidadeEmEdicao] = useState<number | string>(
+    jogador.habilidade ?? ""
+  );
   const [erroEdicao, setErroEdicao] = useState("");
-  // ------------------------------------------------------
 
-  // Lógica para iniciar a edição
+  // NOVO: Sincroniza o estado interno com a prop 'jogador.habilidade'
+  // Isso garante que após o salvamento no componente pai, a tela seja atualizada.
+  useEffect(() => {
+    // Só atualiza o estado interno se NÃO estiver no modo de edição.
+    // Isso evita sobrescrever o que o usuário está digitando.
+    if (!isEditing) {
+      setHabilidadeEmEdicao(jogador.habilidade ?? "");
+    }
+  }, [jogador.habilidade, isEditing]);
+
+
   const handleIniciarEdicao = () => {
     setIsEditing(true);
-    // Usa a habilidade atual do jogador como valor inicial.
-    // Garante que é um número (ou string vazia) para o input
     setHabilidadeEmEdicao(jogador.habilidade ?? ""); 
     setErroEdicao("");
   };
 
-  // Lógica de validação e salvamento
   const handleSalvarComValidacaoInterna = async (jog: Jogador) => {
-    console.log(jog);
-    console.log(jogador);
     const valorNumerico = Number(habilidadeEmEdicao);
 
     if (isNaN(valorNumerico)) {
@@ -52,22 +55,23 @@ const Player: React.FC<JogadorConfirmadoItemProps> = ({
       return;
     }
 
-    setErroEdicao(""); // Limpa o erro
+    setErroEdicao(""); 
     
     try {
-        await handleSalvarHabilidade(jog.id, valorNumerico); // Chama a função de salvamento do pai
-        setIsEditing(false); // Fecha o modo de edição se o salvamento for bem-sucedido
+      // Chama a função do pai, que salva na API e recarrega a lista
+      await handleSalvarHabilidade(jog.id, valorNumerico); 
+      setIsEditing(false); // Fecha o modo de edição
     } catch (error) {
-        // Se a função do pai retornar um erro (ex: erro de API), você pode capturá-lo aqui
-        setErroEdicao("Erro ao salvar.");
-        console.error("Erro ao salvar habilidade:", error);
+      setErroEdicao("Erro ao salvar.");
+      console.error("Erro ao salvar habilidade:", error);
     }
   };
 
   const handleCancelarEdicao = () => {
     setIsEditing(false);
-    setHabilidadeEmEdicao(jogador.habilidade ?? ""); // Volta para o valor original do jogador
-    setErroEdicao(""); // Limpa o erro
+    // Ao cancelar, forçamos o valor original da prop (que já foi atualizada)
+    setHabilidadeEmEdicao(jogador.habilidade ?? ""); 
+    setErroEdicao(""); 
   };
 
   return (
@@ -108,7 +112,6 @@ const Player: React.FC<JogadorConfirmadoItemProps> = ({
                   value={habilidadeEmEdicao} // LIGADO AO ESTADO INTERNO
                   style={{ width: "40px", marginLeft: "5px" }}
                   onChange={(e) => {
-                    // Atualiza o estado interno e limpa o erro ao digitar
                     setHabilidadeEmEdicao(e.target.value); 
                     setErroEdicao(""); 
                   }}
@@ -116,7 +119,7 @@ const Player: React.FC<JogadorConfirmadoItemProps> = ({
                 <button
                   onClick={() => handleSalvarComValidacaoInterna(jogador)}
                   style={{ marginLeft: "5px" }}
-                  disabled={!!erroEdicao} // Desabilita se houver erro
+                  disabled={!!erroEdicao} 
                 >
                   Salvar
                 </button>

@@ -11,8 +11,7 @@ import {
 import "../styles/PartidaDetalhes.css";
 import { useUserStore } from "../stores/userStore";
 
-// Importe o novo componente
-import Player from "../components/Player"; // Certifique-se de que o caminho está correto
+import Player from "../components/Player"; 
 
 interface Partida {
   id: number;
@@ -28,12 +27,8 @@ interface Partida {
   };
 }
 
-// Interface para rastrear a edição de habilidade de um jogador específico (MANTIDA AQUI)
-interface EdicaoHabilidade {
-  jogadorId: number | null;
-  valor: number | string;
-  erro: string;
-}
+// A interface EdicaoHabilidade e as funções de manipulação de estado
+// foram removidas ou simplificadas, pois agora o Player as gerencia internamente.
 
 const PartidaDetalhes: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -45,19 +40,11 @@ const PartidaDetalhes: React.FC = () => {
   const [isOrganizador, setIsOrganizador] = useState<boolean>(false);
   const { usuario } = useUserStore();
 
-  // LÓGICA DE EDIÇÃO DE HABILIDADE
-  const [editandoHabilidade, setEditandoHabilidade] = useState<EdicaoHabilidade>({
-    jogadorId: null,
-    valor: "",
-    erro: "",
-  });
-
-  // Encontra o usuário logado na lista de não confirmados
   const usuarioLogadoNaoConfirmou = jogadoresNaoConfirmados.find(
     (jogador) => jogador.id === usuario?.id
   );
 
-  // Carrega todos os dados da partida
+  // Função central para buscar todos os dados
   const carregarDados = async () => {
     if (!id) return;
     if (!usuario?.id) return;
@@ -75,7 +62,6 @@ const PartidaDetalhes: React.FC = () => {
       );
       setJogadoresNaoConfirmados(naoConfirmadosData);
 
-      // Verifica se o usuário logado é o organizador da partida
       const organizador = await verificarSeOrganizador(usuario?.id, Number(id));
       setIsOrganizador(organizador);
     } catch (error) {
@@ -103,7 +89,6 @@ const PartidaDetalhes: React.FC = () => {
     }
   };
 
-  // Função passada para o componente filho (Não alterada)
   const handleToggleJogLinha = async (jogadorId: number, isChecked: boolean) => {
     try {
       await atualizarPartidaUsuario(jogadorId, {
@@ -115,76 +100,23 @@ const PartidaDetalhes: React.FC = () => {
     }
   };
 
-  // Função original que faz a chamada PUT (mantida)
-  const handleAlterarHabilidade = async (jogadorId: number, novaHabilidade: number) => {
-    try {
-      await atualizarPartidaUsuario(jogadorId, { habilidade: novaHabilidade });
-      // Não chame carregarDados aqui, a nova função de salvar fará isso
-    } catch (error) {
-      console.error("Erro ao atualizar habilidade:", error);
-      throw error; // Propagar o erro para o handler de salvar
-    }
-  };
-
-  // Função para Salvar com Validação e Controle de Estado (mantida)
-  const handleSalvarHabilidadeComValidacao = async (jogadorId: number) => {
-    const valorNumerico = Number(editandoHabilidade.valor);
-
-    // 1. Validação de Parâmetros
-    if (isNaN(valorNumerico)) {
-      setEditandoHabilidade({ ...editandoHabilidade, erro: "Valor inválido." });
-      return;
-    }
-    if (valorNumerico < 50 || valorNumerico > 90) {
-      setEditandoHabilidade({
-        ...editandoHabilidade,
-        erro: "O valor deve ser entre 50 e 90.",
-      });
-      return;
-    }
-
-    try {
-      // 2. Chama a função de serviço
-      await handleAlterarHabilidade(jogadorId, valorNumerico);
-      
-      // 3. Limpa o estado de edição e recarrega dados
-      setEditandoHabilidade({ jogadorId: null, valor: "", erro: "" });
-      await carregarDados();
-    } catch (error) {
-      setEditandoHabilidade({ ...editandoHabilidade, erro: "Erro ao salvar no servidor." });
-    }
-  };
-
-
-  // Função para iniciar a edição (mantida)
-  const handleIniciarEdicao = (jogador: Jogador) => {
-    setEditandoHabilidade({
-      jogadorId: jogador.id,
-      valor: jogador.habilidade ?? 50, // Pega o valor atual ou um default
-      erro: "",
-    });
-  };
-
-  // Função para cancelar a edição (mantida)
-  const handleCancelarEdicao = () => {
-    setEditandoHabilidade({ jogadorId: null, valor: "", erro: "" });
-  };
-  // FIM CÓDIGO DE EDIÇÃO
-
+  // Função passada para o componente Player para salvar a habilidade
   const handleAtualizarHabilidade = async (jogadorId: number, novaHabilidade: number) => {
     try {
       console.log("Atualizando habilidade para jogadorId:", jogadorId, "com valor:", novaHabilidade);
-        await atualizarPartidaUsuario(jogadorId, { habilidade: novaHabilidade }); 
+      
+      // 1. Chama o serviço de atualização (PUT)
+      await atualizarPartidaUsuario(jogadorId, { habilidade: novaHabilidade }); 
         
-        // **IMPORTANTE**: Após salvar, recarregue a lista de jogadores 
-        // para que o valor de 'jogador.habilidade' no Player seja atualizado.
-        const confirmadosData = await buscarConfirmados(Number(id));
-        setJogadoresConfirmados(confirmadosData);
+      // 2. RECUPERA A LISTA ATUALIZADA DO SERVIDOR (Este é o passo crucial!)
+      const confirmadosData = await buscarConfirmados(Number(id));
+      setJogadoresConfirmados(confirmadosData); // Atualiza o estado que é passado como prop para o Player
     } catch (error) {
-        console.error("Erro ao atualizar habilidade:", error);
-        throw error; // Lança o erro para ser capturado no componente Player (opcional, dependendo da sua necessidade)
+      console.error("Erro ao atualizar habilidade:", error);
+      throw error; // Lança o erro para que o componente Player possa exibi-lo
     }
-}
+  }
+
 
   if (loading) return <p>Carregando...</p>;
 
@@ -208,15 +140,15 @@ const PartidaDetalhes: React.FC = () => {
 
           <h3>Jogadores Confirmados ({jogadoresConfirmados.length})</h3>
           <ul>
-            {/* UTILIZANDO O NOVO COMPONENTE AQUI */}
+            {/* Renderiza o componente Player, passando a nova função de salvar */}
             {jogadoresConfirmados.map((jogador) => (
               <Player
-        key={jogador.id}
-        jogador={jogador}
-        isOrganizador={isOrganizador}
-        handleToggleJogLinha={handleToggleJogLinha}
-        handleSalvarHabilidade={handleAtualizarHabilidade} // Passando a nova função
-    />
+                key={jogador.id}
+                jogador={jogador}
+                isOrganizador={isOrganizador}
+                handleToggleJogLinha={handleToggleJogLinha}
+                handleSalvarHabilidade={handleAtualizarHabilidade} 
+              />
             ))}
           </ul>
 
