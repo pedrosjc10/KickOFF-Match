@@ -37,8 +37,9 @@ const Player: React.FC<JogadorConfirmadoItemProps> = ({
   };
 
   // Lógica de validação e salvamento
-  const handleSalvarComValidacaoInterna = async (jogadorId: number) => {
-    console.log(jogadorId);
+  const handleSalvarComValidacaoInterna = async (jog: Jogador) => {
+    console.log(jog);
+    console.log(jogador);
     const valorNumerico = Number(habilidadeEmEdicao);
 
     if (isNaN(valorNumerico)) {
@@ -54,7 +55,7 @@ const Player: React.FC<JogadorConfirmadoItemProps> = ({
     setErroEdicao(""); // Limpa o erro
     
     try {
-        await handleSalvarHabilidade(jogadorId, valorNumerico); // Chama a função de salvamento do pai
+        await handleSalvarHabilidade(jog.id, valorNumerico); // Chama a função de salvamento do pai
         setIsEditing(false); // Fecha o modo de edição se o salvamento for bem-sucedido
     } catch (error) {
         // Se a função do pai retornar um erro (ex: erro de API), você pode capturá-lo aqui
@@ -113,7 +114,7 @@ const Player: React.FC<JogadorConfirmadoItemProps> = ({
                   }}
                 />
                 <button
-                  onClick={() => handleSalvarComValidacaoInterna(jogador.id)}
+                  onClick={() => handleSalvarComValidacaoInterna(jogador)}
                   style={{ marginLeft: "5px" }}
                   disabled={!!erroEdicao} // Desabilita se houver erro
                 >
