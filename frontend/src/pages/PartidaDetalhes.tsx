@@ -171,6 +171,20 @@ const PartidaDetalhes: React.FC = () => {
   };
   // FIM CÓDIGO DE EDIÇÃO
 
+  const handleAtualizarHabilidade = async (jogadorId: number, novaHabilidade: number) => {
+    try {
+        await atualizarPartidaUsuario(jogadorId, { habilidade: novaHabilidade }); 
+        
+        // **IMPORTANTE**: Após salvar, recarregue a lista de jogadores 
+        // para que o valor de 'jogador.habilidade' no Player seja atualizado.
+        const confirmadosData = await buscarConfirmados(Number(id));
+        setJogadoresConfirmados(confirmadosData);
+    } catch (error) {
+        console.error("Erro ao atualizar habilidade:", error);
+        throw error; // Lança o erro para ser capturado no componente Player (opcional, dependendo da sua necessidade)
+    }
+}
+
   if (loading) return <p>Carregando...</p>;
 
   return (
@@ -196,16 +210,12 @@ const PartidaDetalhes: React.FC = () => {
             {/* UTILIZANDO O NOVO COMPONENTE AQUI */}
             {jogadoresConfirmados.map((jogador) => (
               <Player
-                key={jogador.id}
-                jogador={jogador}
-                isOrganizador={isOrganizador}
-                editandoHabilidade={editandoHabilidade}
-                setEditandoHabilidade={setEditandoHabilidade}
-                handleToggleJogLinha={handleToggleJogLinha}
-                handleIniciarEdicao={handleIniciarEdicao}
-                handleSalvarHabilidadeComValidacao={handleSalvarHabilidadeComValidacao}
-                handleCancelarEdicao={handleCancelarEdicao}
-              />
+        key={jogador.id}
+        jogador={jogador}
+        isOrganizador={isOrganizador}
+        handleToggleJogLinha={handleToggleJogLinha}
+        handleSalvarHabilidade={handleAtualizarHabilidade} // Passando a nova função
+    />
             ))}
           </ul>
 
