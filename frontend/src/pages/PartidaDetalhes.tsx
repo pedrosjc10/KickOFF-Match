@@ -11,6 +11,9 @@ import {
 import "../styles/PartidaDetalhes.css";
 import { useUserStore } from "../stores/userStore";
 
+// Importe o novo componente
+import Player from "../components/Player"; // Certifique-se de que o caminho está correto
+
 interface Partida {
   id: number;
   nome: string;
@@ -25,7 +28,7 @@ interface Partida {
   };
 }
 
-// Interface para rastrear a edição de habilidade de um jogador específico
+// Interface para rastrear a edição de habilidade de um jogador específico (MANTIDA AQUI)
 interface EdicaoHabilidade {
   jogadorId: number | null;
   valor: number | string;
@@ -42,13 +45,12 @@ const PartidaDetalhes: React.FC = () => {
   const [isOrganizador, setIsOrganizador] = useState<boolean>(false);
   const { usuario } = useUserStore();
 
-  // LÓGICA DE EDIÇÃO DE HABILIDADE (NOVA)
+  // LÓGICA DE EDIÇÃO DE HABILIDADE
   const [editandoHabilidade, setEditandoHabilidade] = useState<EdicaoHabilidade>({
     jogadorId: null,
     valor: "",
     erro: "",
   });
-  // FIM LÓGICA DE EDIÇÃO DE HABILIDADE (NOVA)
 
   // Encontra o usuário logado na lista de não confirmados
   const usuarioLogadoNaoConfirmou = jogadoresNaoConfirmados.find(
@@ -101,6 +103,7 @@ const PartidaDetalhes: React.FC = () => {
     }
   };
 
+  // Função passada para o componente filho (Não alterada)
   const handleToggleJogLinha = async (jogadorId: number, isChecked: boolean) => {
     try {
       await atualizarPartidaUsuario(jogadorId, {
@@ -123,7 +126,7 @@ const PartidaDetalhes: React.FC = () => {
     }
   };
 
-  // NOVA FUNÇÃO para Salvar com Validação e Controle de Estado
+  // Função para Salvar com Validação e Controle de Estado (mantida)
   const handleSalvarHabilidadeComValidacao = async (jogadorId: number) => {
     const valorNumerico = Number(editandoHabilidade.valor);
 
@@ -153,7 +156,7 @@ const PartidaDetalhes: React.FC = () => {
   };
 
 
-  // NOVA FUNÇÃO para iniciar a edição
+  // Função para iniciar a edição (mantida)
   const handleIniciarEdicao = (jogador: Jogador) => {
     setEditandoHabilidade({
       jogadorId: jogador.id,
@@ -162,11 +165,11 @@ const PartidaDetalhes: React.FC = () => {
     });
   };
 
-  // NOVA FUNÇÃO para cancelar a edição
+  // Função para cancelar a edição (mantida)
   const handleCancelarEdicao = () => {
     setEditandoHabilidade({ jogadorId: null, valor: "", erro: "" });
   };
-  // FIM NOVO CÓDIGO
+  // FIM CÓDIGO DE EDIÇÃO
 
   if (loading) return <p>Carregando...</p>;
 
@@ -190,91 +193,20 @@ const PartidaDetalhes: React.FC = () => {
 
           <h3>Jogadores Confirmados ({jogadoresConfirmados.length})</h3>
           <ul>
-            {jogadoresConfirmados.map((jogador) => {
-              // Verifica se este é o jogador atualmente em edição
-              const isEditing = editandoHabilidade.jogadorId === jogador.id;
-              
-              return (
-                <li key={jogador.id}>
-                  {jogador.nome}{" "}
-                  {jogador.organizador ? <span>(Organizador)</span> : null}
-                  {jogador.id === usuario?.id ? (
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={!!jogador.jog_linha}
-                        onChange={(e) =>
-                          handleToggleJogLinha(jogador.id, e.target.checked)
-                        }
-                      />{" "}
-                      {!!jogador.jog_linha ? "⚽ Jogador de Linha" : "🧤 Goleiro"}
-                    </label>
-                  ) : (
-                    <span>
-                      {" - "}
-                      {!!jogador.jog_linha ? "⚽ Jogador de Linha" : "🧤 Goleiro"}
-                    </span>
-                  )}
-                  {/* Campo para alterar habilidade, visível apenas para organizador */}
-                  {isOrganizador && (
-                    <span style={{ marginLeft: "10px" }}>
-                      <label>
-                        Habilidade:
-                        {isEditing ? (
-                          <>
-                            <input
-                              type="number"
-                              min={50}
-                              max={90}
-                              value={editandoHabilidade.valor}
-                              style={{ width: "40px", marginLeft: "5px" }}
-                              onChange={(e) =>
-                                setEditandoHabilidade({
-                                  ...editandoHabilidade,
-                                  valor: e.target.value,
-                                  erro: "", // Limpa o erro ao digitar
-                                })
-                              }
-                            />
-                            <button
-                              onClick={() => handleSalvarHabilidadeComValidacao(jogador.id)}
-                              style={{ marginLeft: "5px" }}
-                              disabled={!!editandoHabilidade.erro}
-                            >
-                              Salvar
-                            </button>
-                            <button
-                              onClick={handleCancelarEdicao}
-                              style={{ marginLeft: "5px" }}
-                            >
-                              Cancelar
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <span style={{ marginLeft: "5px" }}>
-                              **{jogador.habilidade ?? "N/A"}**
-                            </span>
-                            <button
-                              onClick={() => handleIniciarEdicao(jogador)}
-                              style={{ marginLeft: "5px" }}
-                            >
-                              Editar
-                            </button>
-                          </>
-                        )}
-                      </label>
-                      {/* Exibe o erro de validação específico para esta linha */}
-                      {isEditing && editandoHabilidade.erro && (
-                        <span style={{ color: "red", marginLeft: "10px" }}>
-                          ({editandoHabilidade.erro})
-                        </span>
-                      )}
-                    </span>
-                  )}
-                </li>
-              );
-            })}
+            {/* UTILIZANDO O NOVO COMPONENTE AQUI */}
+            {jogadoresConfirmados.map((jogador) => (
+              <Player
+                key={jogador.id}
+                jogador={jogador}
+                isOrganizador={isOrganizador}
+                editandoHabilidade={editandoHabilidade}
+                setEditandoHabilidade={setEditandoHabilidade}
+                handleToggleJogLinha={handleToggleJogLinha}
+                handleIniciarEdicao={handleIniciarEdicao}
+                handleSalvarHabilidadeComValidacao={handleSalvarHabilidadeComValidacao}
+                handleCancelarEdicao={handleCancelarEdicao}
+              />
+            ))}
           </ul>
 
           <hr />
