@@ -38,6 +38,7 @@ const Player: React.FC<JogadorConfirmadoItemProps> = ({
 
   // Lógica de validação e salvamento
   const handleSalvarComValidacaoInterna = async (jogadorId: number) => {
+    console.log(jogadorId);
     const valorNumerico = Number(habilidadeEmEdicao);
 
     if (isNaN(valorNumerico)) {

@@ -173,6 +173,7 @@ const PartidaDetalhes: React.FC = () => {
 
   const handleAtualizarHabilidade = async (jogadorId: number, novaHabilidade: number) => {
     try {
+      console.log("Atualizando habilidade para jogadorId:", jogadorId, "com valor:", novaHabilidade);
         await atualizarPartidaUsuario(jogadorId, { habilidade: novaHabilidade }); 
         
         // **IMPORTANTE**: Após salvar, recarregue a lista de jogadores 
