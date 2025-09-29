@@ -180,6 +180,7 @@ export class PartidaUsuarioController {
             .innerJoin("pu.usuario", "u") // Junta com a entidade Usuario (INNER JOIN garante que só retorna quem tem usuário)
             .select([
                 // Seleciona os campos da entidade Usuario e renomeia para a interface Jogador
+                "u.id AS id",
                 "u.nome AS nome",
                 
                 // Seleciona os campos da entidade PartidaUsuario (pu)
