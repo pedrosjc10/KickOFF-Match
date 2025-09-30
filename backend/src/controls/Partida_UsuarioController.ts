@@ -97,7 +97,7 @@ export class PartidaUsuarioController {
       const repo = AppDataSource.getRepository(PartidaUsuario);
       const registro = await repo.findOne({ 
         where: { usuario: { id: usuarioId }, partida: { id: partidaId } },
-        relations: ["usuario, partida"]
+        relations: ["usuario", "partida"]
       });
 
       if (!registro) {
