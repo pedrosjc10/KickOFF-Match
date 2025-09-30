@@ -19,8 +19,8 @@ export class Partida {
   })
   tipo!: TipoEnum;
 
-  @Column({ type: "date" })
-  data!: Date;
+  @Column({ type: "text" })
+  data!: string;
 
   @Column({ type: "time" })
   hora!: string;
