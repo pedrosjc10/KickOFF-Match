@@ -70,15 +70,18 @@ export class PartidaUsuarioController {
     }
   }
 
-  static async update(req: Request, res: Response) {
+  // Certifique-se de que os imports de Request e Response do Express e do AppDataSource
+// e das Entidades PartidaUsuario, Usuario e Partida estejam corretos no topo do arquivo.
+
+static async update(req: Request, res: Response) {
     try {
       const usuarioId = Number(req.params.usuarioId);
       const partidaId = Number(req.params.partidaId);
       console.log('ID RECEBIDO NA ROTA:', usuarioId); 
       console.log('ID CONVERTIDO PARA BUSCA:', Number(usuarioId)); 
-      const { confirmado } = req.body;
-      const { habilidade } = req.body;
-      const { jog_linha } = req.body;
+      
+      // Desestrutura todos os campos do corpo da requisição
+      const { confirmado, habilidade, jog_linha } = req.body;
 
       // Validações
 
@@ -104,19 +107,31 @@ export class PartidaUsuarioController {
         return res.status(404).json({ error: "Registro não encontrado" });
       }
 
-      registro.confirmado = confirmado ?? registro.confirmado;
-      registro.habilidade = habilidade ?? registro.habilidade;
-      registro.jog_linha = jog_linha ?? registro.jog_linha;
-      registro.usuario = usuarioId ? { id: usuarioId } as Usuario : registro.usuario;
-      registro.partida = partidaId ? { id: partidaId } as Partida : registro.partida;
+      // 1. ATUALIZAÇÃO DOS CAMPOS SIMPLES
+      // Verifica se o valor NÃO É 'undefined' para aceitar 0, 1, true ou false como atualização.
+      
+      if (confirmado !== undefined) {
+        registro.confirmado = confirmado;
+      }
+      if (habilidade !== undefined) {
+        registro.habilidade = habilidade;
+      }
+      if (jog_linha !== undefined) {
+        registro.jog_linha = jog_linha;
+      }
 
+      console.log('habilidade atualizado antes do save:', registro.habilidade);
+      
+      // 2. SALVAMENTO DA ENTIDADE ATUALIZADA
       const atualizado = await repo.save(registro);
+
       return res.json(atualizado);
+      
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "Erro ao atualizar" });
     }
-  }
+}
 
   static async delete(req: Request, res: Response) {
     try {
