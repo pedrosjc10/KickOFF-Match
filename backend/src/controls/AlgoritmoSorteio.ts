@@ -1,8 +1,6 @@
 // AlgoritmoSorteio.ts
 
-// --- Nova Interface Jogador baseada nos dados buscados pelo Controller ---
-// NOTA: O 'id' e 'nome' vêm da relação 'usuario' (u.id, u.nome).
-// Os demais campos vêm de 'PartidaUsuario' (pu.habilidade, pu.organizador, pu.jog_linha).
+// --- Nova Interface Jogador (mantida) ---
 export interface Jogador {
     id: number; // u.id
     nome: string; // u.nome
@@ -34,10 +32,10 @@ const AlgoritmoSorteio = {
         // 1. Pré-processamento: Categorizar e Embaralhar
         const categorias: Jogador[][] = [[], [], [], []];
         jogadores.forEach(j => {
-            // Mantenha a mesma lógica de categorização baseada em habilidade
-            if (j.habilidade <= 60) categorias[0].push(j);
-            else if (j.habilidade <= 70) categorias[1].push(j);
-            else if (j.habilidade <= 80) categorias[2].push(j);
+            // CORREÇÃO: Usando a constante RATING_FAIXAS para remover o aviso
+            if (j.habilidade <= RATING_FAIXAS.MUITO_RUIM[1]) categorias[0].push(j);
+            else if (j.habilidade <= RATING_FAIXAS.RUIM[1]) categorias[1].push(j);
+            else if (j.habilidade <= RATING_FAIXAS.BOM[1]) categorias[2].push(j);
             else categorias[3].push(j);
         });
 
@@ -53,18 +51,14 @@ const AlgoritmoSorteio = {
         // 2. Sorteio Principal (Times A e B)
         let timeIndex = 0;
         let totalJogadoresNecessarios = minJogadoresPorTime * 2;
-        // O array 'jogadoresRestantes' não é mais necessário aqui, use 'jogadores'
         
         // Loop para preencher os times A e B de forma balanceada
         while (jogadoresUsados.length < Math.min(jogadores.length, totalJogadoresNecessarios)) {
             let adicionadoNesteCiclo = false;
             
-            // Itera sobre as categorias (do pior ao melhor, ou do melhor ao pior, dependendo da ordem)
             for (const categoria of categorias) {
-                // Encontra o primeiro jogador da categoria que ainda não foi usado
                 const jogador = categoria.find(j => !jogadoresUsados.includes(j.id));
                 
-                // Distribui se houver jogador e se os times ainda não estiverem completos
                 if (jogador && times[0].jogadores.length < minJogadoresPorTime && times[1].jogadores.length < minJogadoresPorTime) {
                     times[timeIndex].jogadores.push(jogador);
                     jogadoresUsados.push(jogador.id);
@@ -75,16 +69,16 @@ const AlgoritmoSorteio = {
             if (!adicionadoNesteCiclo) break; // Sai se não houver mais jogadores disponíveis para adicionar
         }
         
-        // ... (Cálculos de Média e Lógica de Substitutos, que permanecem os mesmos)
-
-        // Calcula a média dos jogadores que foram de fato escalados
-        const mediaTotal = jogadoresUsados.reduce((sum, id) => 
-            sum + jogadores.find(j => j.id === id)!.habilidade, 0
-        ) / jogadoresUsados.length;
+        // CÁLCULO DA MÉDIA
+        // A variável 'mediaTotal' desnecessária foi removida.
         
         // Recalcula a média de habilidade para os Times A e B
-        times[0].mediaHabilidade = times[0].jogadores.reduce((sum, j) => sum + j.habilidade, 0) / times[0].jogadores.length;
-        times[1].mediaHabilidade = times[1].jogadores.reduce((sum, j) => sum + j.habilidade, 0) / times[1].jogadores.length;
+        if (times[0].jogadores.length > 0) {
+            times[0].mediaHabilidade = times[0].jogadores.reduce((sum, j) => sum + j.habilidade, 0) / times[0].jogadores.length;
+        }
+        if (times[1].jogadores.length > 0) {
+            times[1].mediaHabilidade = times[1].jogadores.reduce((sum, j) => sum + j.habilidade, 0) / times[1].jogadores.length;
+        }
         
         // 3. Geração do Terceiro Time (Lógica Sobressalente)
         const remanescentes = jogadores.filter(j => !jogadoresUsados.includes(j.id));
@@ -100,9 +94,9 @@ const AlgoritmoSorteio = {
             const vagasFaltantes = minJogadoresPorTime - remanescentes.length;
             
             if (vagasFaltantes > 0) {
-                // Lógica de Repetição/Substitutos (mantida como estava)
-                const opcao1 = times[0].jogadores[0]; // Jogador arbitrários do Time A
-                const opcao2 = times[1].jogadores[0]; // Jogador arbitrários do Time B
+                // Lógica de Repetição/Substitutos (mantida)
+                const opcao1 = times[0].jogadores[0]; 
+                const opcao2 = times[1].jogadores[0]; 
                 
                 timeC.substitutos = {
                     vaga: 1, 
