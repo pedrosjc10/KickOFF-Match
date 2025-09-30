@@ -13,7 +13,7 @@ export class PartidaUsuario {
   @Column()
   organizador!: boolean;
 
-  @Column()
+  @Column({ type: 'smallint', nullable: true })
   habilidade!: number;
   
   @Column({ name: 'jog_linha' }) // <-- Correção: Especifique o nome da coluna caso seja diferente
