@@ -120,7 +120,7 @@ static async update(req: Request, res: Response) {
         registro.jog_linha = jog_linha;
       }
 
-      console.log('habilidade atualizado antes do save:', registro.habilidade);
+      console.log('habilidade atualizado antes do save:', registro.confirmado);
       
       // 2. SALVAMENTO DA ENTIDADE ATUALIZADA
       const atualizado = await repo.save(registro);
