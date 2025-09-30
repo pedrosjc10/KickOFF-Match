@@ -89,8 +89,8 @@ const PartidaDetalhes: React.FC = () => {
     if (!usuarioLogadoNaoConfirmou || jogLinhaSelecionado === null) return;
     try {
       await atualizarPartidaUsuario(usuarioLogadoNaoConfirmou.id, partida?.id || 0, {
-        confirmado: 1,
-        jog_linha: jogLinhaSelecionado ? 1 : 0,
+        confirmado: true,
+        jog_linha: jogLinhaSelecionado ? true : false,
       });
       await carregarDados();
     } catch (error) {
@@ -101,7 +101,7 @@ const PartidaDetalhes: React.FC = () => {
   const handleToggleJogLinha = async (jogadorId: number, partidaId: number, isChecked: boolean) => {
     try {
       await atualizarPartidaUsuario(jogadorId, partidaId, {
-        jog_linha: isChecked ? 1 : 0,
+        jog_linha: isChecked ? true : false,
       });
       await carregarDados(); // Recarrega os dados para atualizar a lista
     } catch (error) {

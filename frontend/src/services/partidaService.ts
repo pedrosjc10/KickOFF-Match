@@ -19,9 +19,9 @@ export interface NovaPartida {
 export interface Jogador {
   id: number;
   nome: string;
-  confirmado: number | boolean; // 0 | 1 or boolean
-  organizador: number | boolean; // 0 | 1 or boolean
-  jog_linha: number | boolean; // 0 | 1 or boolean
+  confirmado: boolean; // 0 | 1 or boolean
+  organizador: boolean; // 0 | 1 or boolean
+  jog_linha: boolean; // 0 | 1 or boolean
   habilidade?: number; 
 }
 
@@ -98,7 +98,7 @@ export const confirmarPresenca = async (id: string, jog_linha: boolean) => {
 };
 
 // Atualiza um registro partidaUsuario (ex: só jog_linha ou confirmado)
-export const atualizarPartidaUsuario = async (usuarioId: number | string, partidaId: number | string, dados: Partial<{ jog_linha: number | boolean; confirmado: number | boolean; habilidade: number }>) => {
+export const atualizarPartidaUsuario = async (usuarioId: number | string, partidaId: number | string, dados: Partial<{ jog_linha: boolean; confirmado: boolean; habilidade: number }>) => {
   const response = await api.put(`/partidaUsuario/${usuarioId}/${partidaId}`, dados);
   return response.data;
 };
