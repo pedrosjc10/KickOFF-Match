@@ -8,8 +8,8 @@ import {
   verificarSeOrganizador,
   Jogador,
   TipoEnum,
-  sortearTimes, // <-- IMPORTADO
-  Time, // <-- IMPORTADO
+  sortearTimes, // <-- NOVO: Função para chamar o sorteio no backend
+  Time, // <-- NOVO: Interface para o resultado do sorteio
 } from "../services/partidaService";
 import "../styles/PartidaDetalhes.css";
 import { useUserStore } from "../stores/userStore";
@@ -17,7 +17,6 @@ import { useUserStore } from "../stores/userStore";
 import Player from "../components/Player";
 
 interface Partida {
-  // ... (definição da interface Partida mantida)
   id: number;
   nome: string;
   data: string;
@@ -46,7 +45,7 @@ const PartidaDetalhes: React.FC = () => {
     (jogador) => jogador.id === usuario?.id
   );
 
-  // ... (Função carregarDados mantida)
+  // Função central para buscar todos os dados
   const carregarDados = async () => {
     if (!id) return;
     if (!usuario?.id) return;
@@ -56,6 +55,7 @@ const PartidaDetalhes: React.FC = () => {
 
       let tipoConvertido = partidaData.tipo;
 
+      // CORREÇÃO: Usa o enum importado para conversão
       if (typeof tipoConvertido === "number") {
         tipoConvertido = TipoEnum[tipoConvertido] as "privado" | "publico";
       }
@@ -78,9 +78,54 @@ const PartidaDetalhes: React.FC = () => {
       setLoading(false);
     }
   };
-  // ... (useEffect e handleConfirmar/handleToggleJogLinha/handleAtualizarHabilidade mantidos)
-  
-  // Função para executar o sorteio
+
+  useEffect(() => {
+    carregarDados();
+    // eslint-disable-next-line
+  }, [id]);
+
+  const handleConfirmar = async () => {
+    if (!usuarioLogadoNaoConfirmou || jogLinhaSelecionado === null) return;
+    try {
+      await atualizarPartidaUsuario(usuarioLogadoNaoConfirmou.id, partida?.id || 0, {
+        confirmado: true,
+        jog_linha: jogLinhaSelecionado ? true : false,
+      });
+      await carregarDados();
+    } catch (error) {
+      console.error("Erro ao confirmar presença:", error);
+    }
+  };
+
+  const handleToggleJogLinha = async (jogadorId: number, partidaId: number, isChecked: boolean) => {
+    try {
+      await atualizarPartidaUsuario(jogadorId, partidaId, {
+        jog_linha: isChecked ? true : false,
+      });
+      await carregarDados(); // Recarrega os dados para atualizar a lista
+    } catch (error) {
+      console.error("Erro ao atualizar posição:", error);
+    }
+  };
+
+  // Função passada para o componente Player para salvar a habilidade
+  const handleAtualizarHabilidade = async (jogadorId: number, partidaId: number, novaHabilidade: number) => {
+    try {
+      console.log("Atualizando habilidade para jogadorId:", jogadorId, "com valor:", novaHabilidade);
+      
+      // 1. Chama o serviço de atualização (PUT)
+      await atualizarPartidaUsuario(jogadorId, partidaId, { habilidade: novaHabilidade }); 
+        
+      // 2. RECUPERA A LISTA ATUALIZADA DO SERVIDOR (Este é o passo crucial!)
+      const confirmadosData = await buscarConfirmados(Number(id));
+      setJogadoresConfirmados(confirmadosData); // Atualiza o estado que é passado como prop para o Player
+    } catch (error) {
+      console.error("Erro ao atualizar habilidade:", error);
+      throw error; // Lança o erro para que o componente Player possa exibi-lo
+    }
+  }
+
+  // NOVO: Função para executar o sorteio
   const handleSortearTimes = async () => {
     if (!partida?.id) return;
     try {
@@ -93,7 +138,7 @@ const PartidaDetalhes: React.FC = () => {
     }
   };
 
-  // Função para confirmar os times no DB e reverter o status 'confirmado' de quem não foi escalado
+  // NOVO: Função para confirmar os times no DB e reverter o status 'confirmado' de quem não foi escalado
   const handleConfirmarTimes = async () => {
     if (!partida?.id || timesSorteados.length === 0) return;
 
@@ -111,8 +156,7 @@ const PartidaDetalhes: React.FC = () => {
       console.log("Jogadores que serão desconfirmados:", idsParaDesconfirmar);
 
       // 3. Atualiza o status para 'confirmado: false' para quem não foi escalado
-      // NOTA: Para economizar chamadas, idealmente o backend teria uma rota para fazer isso em massa.
-      // Aqui, vamos apenas dar um alerta e manter a lista atual de confirmados para não sobrecarregar.
+      // Isso move os jogadores não escalados de volta para a lista de Participantes
       
       const desconfirmacaoPromessas = idsParaDesconfirmar.map(idParaDesconfirmar => 
         atualizarPartidaUsuario(idParaDesconfirmar, partida.id, { 
@@ -130,33 +174,6 @@ const PartidaDetalhes: React.FC = () => {
       console.error("Erro ao confirmar times:", error);
       alert("Erro ao confirmar times. Tente novamente.");
     }
-  };
-
-  const handleToggleJogLinha = async (jogadorId: number, partidaId: number, isChecked: boolean) => {
-    try {
-      await atualizarPartidaUsuario(jogadorId, partidaId, {
-        jog_linha: isChecked ? true : false,
-      });
-      await carregarDados(); // Recarrega os dados para atualizar a lista
-    } catch (error) {
-      console.error("Erro ao atualizar posição:", error);
-    }
-  };
-
-  const handleAtualizarHabilidade = async (jogadorId: number, partidaId: number, novaHabilidade: number) => {
-    try {
-      console.log("Atualizando habilidade para jogadorId:", jogadorId, "com valor:", novaHabilidade);
-      
-      // 1. Chama o serviço de atualização (PUT)
-      await atualizarPartidaUsuario(jogadorId, partidaId, { habilidade: novaHabilidade }); 
-        
-      // 2. RECUPERA A LISTA ATUALIZADA DO SERVIDOR (Este é o passo crucial!)
-      const confirmadosData = await buscarConfirmados(Number(id));
-      setJogadoresConfirmados(confirmadosData); // Atualiza o estado que é passado como prop para o Player
-    } catch (error) {
-      console.error("Erro ao atualizar habilidade:", error);
-      throw error; // Lança o erro para que o componente Player possa exibi-lo
-    }
   }
 
 
@@ -167,8 +184,17 @@ const PartidaDetalhes: React.FC = () => {
       {partida ? (
         <>
           <h2>{partida.nome}</h2>
-          {/* ... (informações da partida) */}
-          
+          <p>
+            <strong>Data:</strong> {new Date(partida.data).toLocaleDateString("pt-BR")} às{" "}
+            {partida.hora?.slice(0, 5)}
+          </p>
+          <p>
+            <strong>Local:</strong> {partida.local?.nome} - {partida.local?.cidade}
+          </p>
+          <p>
+            <strong>Tipo:</strong> {partida.tipo}
+          </p>
+
           <hr />
 
           {/* BOTÃO DE SORTEIO VISÍVEL APENAS PARA O ORGANIZADOR */}
@@ -195,6 +221,7 @@ const PartidaDetalhes: React.FC = () => {
                                 {time.jogadores.map((jogador) => (
                                     <li key={jogador.id}>
                                         {jogador.nome} ({jogador.habilidade})
+                                        {/* Exibe (G) se o jogador for Goleiro (jog_linha é false) e não estiver no Time C */}
                                         {time.nome !== "Time C" && jogador.jog_linha === false ? <span style={{color: 'red'}}> (G)</span> : null}
                                     </li>
                                 ))}
@@ -223,22 +250,25 @@ const PartidaDetalhes: React.FC = () => {
             </div>
           )}
 
-          {/* LISTA DE JOGADORES CONFIRMADOS */}
-          <h3>Jogadores Confirmados ({jogadoresConfirmados.length})</h3>
-          <ul>
-            {jogadoresConfirmados.map((jogador) => (
-              <Player
-                key={jogador.id}
-                jogador={jogador}
-                partida={partida}
-                isOrganizador={isOrganizador}
-                handleToggleJogLinha={handleToggleJogLinha}
-                handleSalvarHabilidade={handleAtualizarHabilidade} 
-              />
-            ))}
-          </ul>
-          
-          <hr />
+          {/* LISTA DE JOGADORES CONFIRMADOS (Visível se o sorteio não estiver sendo exibido) */}
+          {timesSorteados.length === 0 && (
+            <>
+                <h3>Jogadores Confirmados ({jogadoresConfirmados.length})</h3>
+                <ul>
+                    {jogadoresConfirmados.map((jogador) => (
+                        <Player
+                            key={jogador.id}
+                            jogador={jogador}
+                            partida={partida}
+                            isOrganizador={isOrganizador}
+                            handleToggleJogLinha={handleToggleJogLinha}
+                            handleSalvarHabilidade={handleAtualizarHabilidade} 
+                        />
+                    ))}
+                </ul>
+                <hr />
+            </>
+          )}
 
           {/* LISTA DE JOGADORES PARTICIPANTES */}
           <h3>Jogadores Participantes ({jogadoresNaoConfirmados.length})</h3>
@@ -249,9 +279,32 @@ const PartidaDetalhes: React.FC = () => {
               </li>
             ))}
           </ul>
-          
-          {/* ... (Botão para o usuário logado confirmar sua presença) */}
-          {/* ... (restante do código) */}
+
+          {/* Botão para o usuário logado confirmar sua presença */}
+          {!!usuarioLogadoNaoConfirmou && (
+            <div className="confirmar-container">
+              <label>
+                Selecione sua posição:
+                <select
+                  value={
+                    jogLinhaSelecionado === null
+                      ? ""
+                      : jogLinhaSelecionado
+                      ? "linha"
+                      : "goleiro"
+                  }
+                  onChange={(e) => setJogLinhaSelecionado(e.target.value === "linha")}
+                >
+                  <option value="">Selecione</option>
+                  <option value="linha">Jogador de Linha</option>
+                  <option value="goleiro">Goleiro</option>
+                </select>
+              </label>
+              <button onClick={handleConfirmar} disabled={jogLinhaSelecionado === null}>
+                Confirmar Minha Presença
+              </button>
+            </div>
+          )}
         </>
       ) : (
         <p>Partida não encontrada</p>
