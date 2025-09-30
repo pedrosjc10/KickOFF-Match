@@ -4,6 +4,7 @@ import { AppDataSource } from "../config/database";
 import { PartidaUsuario } from "../models/PartidaUsuario";
 import { Usuario } from "../models/Usuario";
 import { Partida } from "../models/Partida";
+import AlgoritmoSorteio from "./AlgoritmoSorteio";
 
 export class PartidaUsuarioController {
   static async create(req: Request, res: Response) {
@@ -300,5 +301,71 @@ static async update(req: Request, res: Response) {
       return res.status(500).json({ error: "Erro ao verificar organizador" });
     }
   }
+
+  static async sortearTimes(req: Request, res: Response) {
+        try {
+            const partidaId = Number(req.params.partidaId);
+            if (!Number.isInteger(partidaId) || partidaId <= 0) {
+                return res.status(400).json({ error: "ID de partida inválido" });
+            }
+
+            const partidaRepo = AppDataSource.getRepository(Partida);
+            const partida = await partidaRepo.findOne({
+                where: { id: partidaId },
+                relations: ["tipoPartida"] // Precisamos do tipoPartida para o número de jogadores
+            });
+
+            if (!partida || !partida.tipoPartida) {
+                return res.status(404).json({ error: "Partida ou Tipo de Partida não encontrado." });
+            }
+
+            const minJogadoresPorTime = partida.tipoPartida.quantidadeJogadores || 5; // Valor padrão se for null
+            const jogadoresConfirmados = await PartidaUsuarioController.buscarJogadoresConfirmadosParaSorteio(partidaId);
+            
+            // 1. VALIDAÇÃO DE NÚMERO MÍNIMO
+            const minTotalParaSorteio = 2 * (minJogadoresPorTime - 1);
+            if (jogadoresConfirmados.length < minTotalParaSorteio) {
+                return res.status(400).json({ 
+                    error: `Mínimo de ${minTotalParaSorteio} jogadores confirmados para sortear.`,
+                    minRequired: minTotalParaSorteio
+                });
+            }
+
+            // 2. EXECUTAR O ALGORITMO DE SORTEIO E BALANCEAMENTO
+            const resultadoSorteio = AlgoritmoSorteio.balancear(
+                jogadoresConfirmados, 
+                minJogadoresPorTime
+            );
+
+            return res.json(resultadoSorteio);
+
+        } catch (error) {
+            console.error("Erro no sorteio de times:", error);
+            return res.status(500).json({ error: "Erro interno ao sortear times." });
+        }
+    }
+    
+    // Função auxiliar para buscar os dados de forma mais completa
+    private static async buscarJogadoresConfirmadosParaSorteio(partidaId: number) {
+        const repo = AppDataSource.getRepository(PartidaUsuario);
+        
+        // Use a mesma lógica do getConfirmedById, mas garanta que o ID e a Habilidade estejam lá
+        const confirmados = await repo
+            .createQueryBuilder("pu")
+            .innerJoin("pu.usuario", "u") 
+            .select([
+                "u.id AS id",
+                "u.nome AS nome",
+                "pu.organizador AS organizador",
+                "pu.jog_linha AS jog_linha",
+                "pu.habilidade AS habilidade" 
+            ])
+            .where("pu.partida.id = :partidaId", { partidaId })
+            .andWhere("pu.confirmado = :confirmado", { confirmado: 1 }) 
+            .getRawMany();
+            
+        // Garante que a habilidade é um número, usando 50 como default para o sorteio
+        return confirmados.map(j => ({ ...j, habilidade: j.habilidade || 50 })); 
+    }
 
 }

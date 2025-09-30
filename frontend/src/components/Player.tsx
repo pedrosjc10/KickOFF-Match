@@ -85,8 +85,6 @@ const Player: React.FC<JogadorConfirmadoItemProps> = ({
       {isUsuarioLogado ? (
         <label>
           <input
-            type="checkbox"
-            checked={!!jogador.jog_linha}
             onChange={(e) =>
               handleToggleJogLinha(jogador.id, partida.id, e.target.checked)
             }

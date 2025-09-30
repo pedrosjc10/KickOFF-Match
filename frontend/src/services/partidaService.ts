@@ -26,8 +26,10 @@ export interface Jogador {
 }
 
 export interface Time {
-  nome: string;
-  jogadores: Jogador[];
+    nome: string;
+    jogadores: Jogador[];
+    mediaHabilidade: number;
+    substitutos?: { vaga: number; opcoes: { jogadorId: number, nome: string }[] };
 }
 
 export interface PartidaDetalhes {
@@ -112,6 +114,12 @@ export const buscarConfirmados = async (id: number) => {
 export const buscarTodosParticipantes = async (id: number) => {
   const response = await api.get<Jogador[]>(`/partidaUsuario/${id}/todos`);
   return response.data;
+};
+
+export const sortearTimes = async (partidaId: number): Promise<Time[]> => {
+    // Usamos POST porque é uma ação, mas não salvamos aqui.
+    const response = await api.post<Time[]>(`/partidaUsuario/${partidaId}/sortearTimes`);
+    return response.data;
 };
 
 /**
