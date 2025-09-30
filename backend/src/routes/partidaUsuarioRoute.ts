@@ -13,7 +13,7 @@ partidaUsuarioRouter.get('/:usuarioId(\\d+)/:partidaId(\\d+)/organizador', Parti
 
 // rotas genéricas depois
 partidaUsuarioRouter.get("/:id(\\d+)",  PartidaUsuarioController.getById);
-partidaUsuarioRouter.put("/:usuarioId(\\d+)",  PartidaUsuarioController.update);
+partidaUsuarioRouter.put("/:usuarioId/:partidaId(\\d+)",  PartidaUsuarioController.update);
 partidaUsuarioRouter.delete("/:id(\\d+)", PartidaUsuarioController.delete);
 partidaUsuarioRouter.get("/:id(\\d+)/confirmados", authMiddleware, PartidaUsuarioController.getConfirmedById);
 partidaUsuarioRouter.get("/:id(\\d+)/todos", authMiddleware, PartidaUsuarioController.getAllParticipantsById);

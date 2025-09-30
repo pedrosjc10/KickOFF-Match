@@ -73,6 +73,7 @@ export class PartidaUsuarioController {
   static async update(req: Request, res: Response) {
     try {
       const usuarioId = Number(req.params.usuarioId);
+      const partidaId = Number(req.params.partidaId);
       console.log('ID RECEBIDO NA ROTA:', usuarioId); 
       console.log('ID CONVERTIDO PARA BUSCA:', Number(usuarioId)); 
       const { confirmado } = req.body;
@@ -85,14 +86,18 @@ export class PartidaUsuarioController {
         return res.status(400).json({ error: "ID de usuário inválido" });
       }
 
+      if (!Number.isInteger(partidaId) || partidaId <= 0) {
+        return res.status(400).json({ error: "ID de partida inválido" });
+      }
+
       if (habilidade !== undefined && (typeof habilidade !== 'number' || habilidade < 50 || habilidade > 90)) {
         return res.status(400).json({ error: "Habilidade deve ser um número entre 50 e 90." });
       }
 
       const repo = AppDataSource.getRepository(PartidaUsuario);
       const registro = await repo.findOne({ 
-        where: { usuario: { id: usuarioId } },
-        relations: ["usuario"]
+        where: { usuario: { id: usuarioId }, partida: { id: partidaId } },
+        relations: ["usuario, partida"]
       });
 
       if (!registro) {
@@ -103,6 +108,7 @@ export class PartidaUsuarioController {
       registro.habilidade = habilidade ?? registro.habilidade;
       registro.jog_linha = jog_linha ?? registro.jog_linha;
       registro.usuario = usuarioId ? { id: usuarioId } as Usuario : registro.usuario;
+      registro.partida = partidaId ? { id: partidaId } as Partida : registro.partida;
 
       const atualizado = await repo.save(registro);
       return res.json(atualizado);

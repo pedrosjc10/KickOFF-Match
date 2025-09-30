@@ -2,11 +2,13 @@ import api from "../api/api";
 import { NovoLocal } from "./localService";
 
 // Tipo do enum usado no backend
-export type TipoEnum = "privado" | "publico";
-
+export enum TipoEnum {
+  privado = 0, // Ajuste 0 ou 1 conforme o seu backend envia para "privado"
+  publico = 1, // Ajuste 0 ou 1 conforme o seu backend envia para "publico"
+}
 export interface NovaPartida {
   nome: string;
-  tipo: TipoEnum;
+  tipo: TipoEnum | "privado" | "publico"; // Aceita string literals também
   data: string; // YYYY-MM-DD
   hora: string; // HH:MM
   local_id: number;
@@ -33,7 +35,7 @@ export interface PartidaDetalhes {
   nome: string;
   data: string;
   hora: string;
-  tipo: TipoEnum;
+  tipo: TipoEnum | "privado" | "publico"; // Pode ser enum ou string literals
   local?: NovoLocal[] | any;
   jogadores?: Jogador[]; // pode vir do backend ou construído no front
   times?: Time[];
@@ -96,8 +98,8 @@ export const confirmarPresenca = async (id: string, jog_linha: boolean) => {
 };
 
 // Atualiza um registro partidaUsuario (ex: só jog_linha ou confirmado)
-export const atualizarPartidaUsuario = async (id: number | string, dados: Partial<{ jog_linha: number | boolean; confirmado: number | boolean; habilidade: number }>) => {
-  const response = await api.put(`/partidaUsuario/${id}`, dados);
+export const atualizarPartidaUsuario = async (usuarioId: number | string, partidaId: number | string, dados: Partial<{ jog_linha: number | boolean; confirmado: number | boolean; habilidade: number }>) => {
+  const response = await api.put(`/partidaUsuario/${usuarioId}/${partidaId}`, dados);
   return response.data;
 };
 

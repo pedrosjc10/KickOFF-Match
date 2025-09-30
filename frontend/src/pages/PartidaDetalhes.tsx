@@ -7,18 +7,23 @@ import {
   buscarTodosParticipantes,
   verificarSeOrganizador,
   Jogador,
+  TipoEnum, // <--- Importado como um VALOR (enum)
 } from "../services/partidaService";
 import "../styles/PartidaDetalhes.css";
 import { useUserStore } from "../stores/userStore";
 
-import Player from "../components/Player"; 
+import Player from "../components/Player";
+
+// Removido: export type TipoEnum = "privado" | "publico";
+// Agora ele é importado do service.
 
 interface Partida {
   id: number;
   nome: string;
   data: string;
   hora: string;
-  tipo: string;
+  // Usamos as string literals no React, mas aceitamos o enum do service
+  tipo: "privado" | "publico";
   local?: { nome: string; cidade: string };
   tipoPartida?: {
     id?: number;
@@ -26,9 +31,6 @@ interface Partida {
     quantidadejogadores?: number;
   };
 }
-
-// A interface EdicaoHabilidade e as funções de manipulação de estado
-// foram removidas ou simplificadas, pois agora o Player as gerencia internamente.
 
 const PartidaDetalhes: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -51,7 +53,14 @@ const PartidaDetalhes: React.FC = () => {
     try {
       setLoading(true);
       const partidaData = await buscarDetalhesPartida(id);
-      setPartida(partidaData);
+
+      let tipoConvertido = partidaData.tipo;
+
+      // CORREÇÃO: Usa o enum importado para conversão
+      if (typeof tipoConvertido === "number") {
+        tipoConvertido = TipoEnum[tipoConvertido] as "privado" | "publico";
+      }
+      setPartida({ ...partidaData, tipo: tipoConvertido as "privado" | "publico" });
 
       const confirmadosData = await buscarConfirmados(Number(id));
       setJogadoresConfirmados(confirmadosData);
@@ -79,7 +88,7 @@ const PartidaDetalhes: React.FC = () => {
   const handleConfirmar = async () => {
     if (!usuarioLogadoNaoConfirmou || jogLinhaSelecionado === null) return;
     try {
-      await atualizarPartidaUsuario(usuarioLogadoNaoConfirmou.id, {
+      await atualizarPartidaUsuario(usuarioLogadoNaoConfirmou.id, partida?.id || 0, {
         confirmado: 1,
         jog_linha: jogLinhaSelecionado ? 1 : 0,
       });
@@ -89,9 +98,9 @@ const PartidaDetalhes: React.FC = () => {
     }
   };
 
-  const handleToggleJogLinha = async (jogadorId: number, isChecked: boolean) => {
+  const handleToggleJogLinha = async (jogadorId: number, partidaId: number, isChecked: boolean) => {
     try {
-      await atualizarPartidaUsuario(jogadorId, {
+      await atualizarPartidaUsuario(jogadorId, partidaId, {
         jog_linha: isChecked ? 1 : 0,
       });
       await carregarDados(); // Recarrega os dados para atualizar a lista
@@ -101,12 +110,12 @@ const PartidaDetalhes: React.FC = () => {
   };
 
   // Função passada para o componente Player para salvar a habilidade
-  const handleAtualizarHabilidade = async (jogadorId: number, novaHabilidade: number) => {
+  const handleAtualizarHabilidade = async (jogadorId: number, partidaId: number, novaHabilidade: number) => {
     try {
       console.log("Atualizando habilidade para jogadorId:", jogadorId, "com valor:", novaHabilidade);
       
       // 1. Chama o serviço de atualização (PUT)
-      await atualizarPartidaUsuario(jogadorId, { habilidade: novaHabilidade }); 
+      await atualizarPartidaUsuario(jogadorId, partidaId, { habilidade: novaHabilidade }); 
         
       // 2. RECUPERA A LISTA ATUALIZADA DO SERVIDOR (Este é o passo crucial!)
       const confirmadosData = await buscarConfirmados(Number(id));
@@ -116,7 +125,6 @@ const PartidaDetalhes: React.FC = () => {
       throw error; // Lança o erro para que o componente Player possa exibi-lo
     }
   }
-
 
   if (loading) return <p>Carregando...</p>;
 
@@ -145,6 +153,7 @@ const PartidaDetalhes: React.FC = () => {
               <Player
                 key={jogador.id}
                 jogador={jogador}
+                partida={partida}
                 isOrganizador={isOrganizador}
                 handleToggleJogLinha={handleToggleJogLinha}
                 handleSalvarHabilidade={handleAtualizarHabilidade} 

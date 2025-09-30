@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Jogador } from "../services/partidaService"; 
+import { Jogador, PartidaDetalhes } from "../services/partidaService"; 
 import { useUserStore } from "../stores/userStore"; 
 
 interface JogadorConfirmadoItemProps {
   jogador: Jogador;
+  partida: PartidaDetalhes;
   isOrganizador: boolean;
-  handleToggleJogLinha: (jogadorId: number, isChecked: boolean) => Promise<void>;
-  handleSalvarHabilidade: (jogadorId: number, novaHabilidade: number) => Promise<void>;
+  handleToggleJogLinha: (jogadorId: number, partidaId: number, isChecked: boolean) => Promise<void>;
+  handleSalvarHabilidade: (jogadorId: number, partidaId: number, novaHabilidade: number) => Promise<void>;
 }
 
 const Player: React.FC<JogadorConfirmadoItemProps> = ({
   jogador,
+  partida,
   isOrganizador,
   handleToggleJogLinha,
   handleSalvarHabilidade,
@@ -42,7 +44,7 @@ const Player: React.FC<JogadorConfirmadoItemProps> = ({
     setErroEdicao("");
   };
 
-  const handleSalvarComValidacaoInterna = async (jog: Jogador) => {
+  const handleSalvarComValidacaoInterna = async (jog: Jogador, partida: PartidaDetalhes) => {
     const valorNumerico = Number(habilidadeEmEdicao);
 
     if (isNaN(valorNumerico)) {
@@ -59,7 +61,7 @@ const Player: React.FC<JogadorConfirmadoItemProps> = ({
     
     try {
       // Chama a função do pai, que salva na API e recarrega a lista
-      await handleSalvarHabilidade(jog.id, valorNumerico); 
+      await handleSalvarHabilidade(jog.id, partida.id, valorNumerico); 
       setIsEditing(false); // Fecha o modo de edição
     } catch (error) {
       setErroEdicao("Erro ao salvar.");
@@ -86,7 +88,7 @@ const Player: React.FC<JogadorConfirmadoItemProps> = ({
             type="checkbox"
             checked={!!jogador.jog_linha}
             onChange={(e) =>
-              handleToggleJogLinha(jogador.id, e.target.checked)
+              handleToggleJogLinha(jogador.id, partida.id, e.target.checked)
             }
           />{" "}
           {!!jogador.jog_linha ? "⚽ Jogador de Linha" : "🧤 Goleiro"}
@@ -117,7 +119,7 @@ const Player: React.FC<JogadorConfirmadoItemProps> = ({
                   }}
                 />
                 <button
-                  onClick={() => handleSalvarComValidacaoInterna(jogador)}
+                  onClick={() => handleSalvarComValidacaoInterna(jogador, partida)}
                   style={{ marginLeft: "5px" }}
                   disabled={!!erroEdicao} 
                 >
