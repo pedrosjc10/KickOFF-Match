@@ -167,10 +167,22 @@ input:focus {
   }
   .login-form {
     gap: 8px;
-    max-width: 98vw;
+    max-width: 220px; /* <-- Limita a largura dos campos no mobile */
+    width: 100%;
+    margin: 0 auto;
   }
-  input {
-    font-size: 0.98rem;
-    padding: 8px 8px;
+  input,
+  .sign-in-btn {
+    max-width: 220px; /* <-- Limita a largura dos inputs e botão */
+    width: 100%;
+    margin: 0 auto;
+    display: block;
+  }
+  label {
+    max-width: 220px; /* <-- Limita a largura dos labels */
+    width: 100%;
+    margin: 0 auto 2px auto;
+    display: block;
+    text-align: left;
   }
 }
