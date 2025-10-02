@@ -9,9 +9,9 @@
 
 .cadastro-card {
   background: #fff;
-  width: 90%;
-  max-width: 428px;
-  padding: 32px;
+  width: 95%;
+  max-width: 430px;
+  padding: 32px 16px;
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(80,80,120,0.10);
 }
@@ -60,4 +60,11 @@
 .cadastro-button:hover {
   background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
   transform: scale(1.03);
+}
+
+@media (max-width: 600px) {
+  .cadastro-card {
+    padding: 18px 4px;
+    border-radius: 8px;
+  }
 }

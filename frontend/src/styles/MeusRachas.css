@@ -1,5 +1,5 @@
 .meus-rachas-container {
-  max-width: 420px;
+  max-width: 430px;
   min-height: 100vh;
   margin: 0 auto;
   padding: 20px 8px;
@@ -30,7 +30,7 @@ h1 {
   background: linear-gradient(90deg, #8960aa 0%, #6a11cb 100%);
   border-radius: 16px;
   padding: 18px;
-  position: relative;
+  margin-bottom: 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -82,6 +82,10 @@ h1 {
     padding: 10px 2px;
   }
   .racha-card {
-    padding: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
   }
 }

@@ -1,6 +1,6 @@
 .public-rachas-container {
-  width: 390px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 430px;
   margin: 0 auto;
   padding: 16px;
   box-sizing: border-box;
@@ -28,4 +28,14 @@
 .public-loading {
   text-align: center;
   padding: 20px;
+}
+@media (max-width: 600px) {
+  .public-rachas-container {
+    padding: 4px;
+    max-width: 100vw;
+  }
+  .public-racha-card {
+    padding: 8px;
+    border-radius: 6px;
+  }
 }

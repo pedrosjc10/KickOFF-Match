@@ -1,13 +1,11 @@
 /* src/styles/PartidaDetalhes.css (versão responsiva) */
 
 .detalhes-container {
-  max-width: 420px;
+  max-width: 430px;
   width: 100%;
   min-height: 100vh;
   padding: 16px;
   margin: 0 auto;
-  overflow-y: auto;
-  font-family: 'Segoe UI', Arial, sans-serif;
   background: #f9f9f9;
   box-sizing: border-box;
 }
@@ -22,7 +20,7 @@
 }
 
 .detalhes-card {
-  background: #ffffff;
+  background: #fff;
   border-radius: 12px;
   padding: 18px;
   box-shadow: 0 6px 18px rgba(8, 35, 63, 0.08);
@@ -141,6 +139,17 @@
   .detalhes-nome { font-size: 26px; }
   .detalhes-info, .detalhes-loc, .detalhes-end { font-size: 15px; }
   .confirmados-list { max-height: 320px; }
+}
+
+@media (max-width: 600px) {
+  .detalhes-container {
+    max-width: 100vw;
+    padding: 4px;
+  }
+  .detalhes-card {
+    padding: 8px;
+    border-radius: 8px;
+  }
 }
 
 .text-muted { color: #777; font-size: 13px; }
