@@ -6,7 +6,7 @@
 }
 
 body {
-  background: linear-gradient(135deg, #232526 0%, #414345 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
   min-height: 100vh;
 }
 
@@ -24,34 +24,47 @@ body {
 
 .login-card {
   width: 100%;
-  max-width: 400px;
-  background: #f9f9f9;
-  border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(80,80,120,0.10);
-  padding: 32px 24px;
+  max-width: 370px;
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 8px 32px rgba(80,80,120,0.13), 0 1.5px 0 #e0e7ff inset;
+  padding: 28px 22px 22px 22px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  border: 1.5px solid #e0e7ff;
+  position: relative;
+  overflow: hidden;
 }
-
-@media (max-width: 600px) {
-  .login-card {
-    max-width: 98vw;
-    padding: 18px 4vw;
-    border-radius: 10px;
-  }
-  .login-container {
-    padding: 12px 0;
-  }
+.login-card::before {
+  content: "";
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, #a5b4fc 0%, #fff0 80%);
+  z-index: 0;
+}
+.login-card::after {
+  content: "";
+  position: absolute;
+  bottom: -40px;
+  left: -40px;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, #c7d2fe 0%, #fff0 80%);
+  z-index: 0;
 }
 
 h1 {
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 18px;
-  color: #6a11cb;
+  color: #4f46e5;
   letter-spacing: 1px;
   text-align: center;
+  z-index: 1;
 }
 
 p {
@@ -59,60 +72,72 @@ p {
   margin-bottom: 20px;
   color: #666;
   text-align: center;
+  z-index: 1;
 }
 
 .login-form {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
+  z-index: 1;
 }
 
 label {
   text-align: left;
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 600;
-  color: #333;
+  color: #4f46e5;
+  margin-bottom: 2px;
 }
 
 input {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #bdbdbd;
+  padding: 9px 12px;
+  border: 1.5px solid #c7d2fe;
   border-radius: 8px;
   font-size: 1rem;
-  background: #fff;
-  transition: border 0.2s;
+  background: #f3f4f6;
+  transition: border 0.2s, box-shadow 0.2s;
+  margin-bottom: 2px;
 }
 input:focus {
-  border: 1.5px solid #6a11cb;
+  border: 1.5px solid #6366f1;
   outline: none;
+  box-shadow: 0 0 0 2px #a5b4fc55;
 }
 
 .forgot-password {
   text-align: right;
-  font-size: 0.95rem;
-  color: #2575fc;
+  font-size: 0.93rem;
+  color: #6366f1;
   text-decoration: none;
   margin-bottom: 10px;
   display: block;
+  z-index: 1;
+}
+.forgot-password:hover {
+  text-decoration: underline;
 }
 
 .sign-in-btn {
-  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+  background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%);
   color: white;
   border: none;
-  padding: 12px;
-  font-size: 1.1rem;
+  padding: 10px 0;
+  font-size: 1.08rem;
   font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
   margin-top: 8px;
+  box-shadow: 0 2px 8px #a5b4fc22;
+  z-index: 1;
 }
 .sign-in-btn:hover {
-  background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
-  transform: scale(1.03);
+  background: linear-gradient(90deg, #818cf8 0%, #6366f1 100%);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 16px #a5b4fc33;
 }
 
 .signup-text {
@@ -120,12 +145,34 @@ input:focus {
   margin-top: 14px;
   color: #333;
   text-align: center;
+  z-index: 1;
 }
 .signup-text a {
-  color: #6a11cb;
+  color: #6366f1;
   text-decoration: none;
   font-weight: bold;
+  transition: color 0.2s;
 }
 .signup-text a:hover {
   text-decoration: underline;
+  color: #4f46e5;
+}
+
+@media (max-width: 600px) {
+  .login-card {
+    max-width: 98vw;
+    padding: 14px 2vw 12px 2vw;
+    border-radius: 12px;
+  }
+  h1 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+  .login-form {
+    gap: 8px;
+  }
+  input {
+    font-size: 0.98rem;
+    padding: 8px 8px;
+  }
 }
