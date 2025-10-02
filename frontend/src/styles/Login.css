@@ -143,7 +143,7 @@ input:focus {
 .signup-text {
   font-size: 1rem;
   margin-top: 14px;
-  color: #333;
+  color: #ffffffff;
   text-align: center;
   z-index: 1;
 }
