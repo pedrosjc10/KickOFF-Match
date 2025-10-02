@@ -1,5 +1,5 @@
 body {
-  background: linear-gradient(135deg, #232526 0%, #414345 100%);
+  background: linear-gradient(135deg, #B2D9F7 0%, #DDE3CA 100%);
   min-height: 100vh;
 }
 
@@ -19,7 +19,7 @@ h1 {
   font-weight: bold;
   text-align: center;
   margin: 32px 0 18px 0;
-  color: #6a11cb;
+  color: #487AA1;
   letter-spacing: 1px;
 }
 
@@ -39,13 +39,13 @@ h1 {
 }
 
 .racha-card {
-  background: linear-gradient(90deg, #a770ef 0%, #f6d365 100%);
+  background: linear-gradient(90deg, #B2D9F7 0%, #487AA1 100%);
   border-radius: 18px;
   padding: 20px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 16px rgba(80,80,120,0.10);
+  box-shadow: 0 4px 16px #487AA133;
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.2s;
   border: none;
@@ -54,7 +54,7 @@ h1 {
 }
 .racha-card:hover {
   transform: scale(1.02);
-  box-shadow: 0 8px 32px rgba(80,80,120,0.18);
+  box-shadow: 0 8px 32px #487AA144;
 }
 
 .racha-info {
@@ -66,21 +66,20 @@ h1 {
 .racha-nome {
   font-weight: bold;
   font-size: 1.1rem;
-  color: #fff;
+  color: #3D3C3B;
   margin-bottom: 4px;
-  text-shadow: 0 1px 2px #0002;
   word-break: break-word;
 }
 
 .racha-local {
   font-weight: 600;
   font-size: 1rem;
-  color: #f3f3f3;
+  color: #7C8071;
 }
 
 .racha-endereco {
   font-size: 0.95rem;
-  color: #f3f3f3;
+  color: #3D3C3B;
 }
 
 .racha-icons {
@@ -91,8 +90,7 @@ h1 {
 
 .icon {
   font-size: 1.5rem;
-  color: #fff;
-  filter: drop-shadow(0 1px 2px #0005);
+  color: #3D3C3B;
 }
 
 @media (max-width: 700px) {
