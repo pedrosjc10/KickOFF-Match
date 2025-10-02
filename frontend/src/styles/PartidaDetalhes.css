@@ -1,13 +1,13 @@
 /* src/styles/PartidaDetalhes.css (versão responsiva) */
 
 .detalhes-container {
-  max-width: 420px; /* mobile base */
+  max-width: 420px;
   width: 100%;
   min-height: 100vh;
   padding: 16px;
   margin: 0 auto;
   overflow-y: auto;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
   background: #f9f9f9;
   box-sizing: border-box;
 }
@@ -23,21 +23,23 @@
 
 .detalhes-card {
   background: #ffffff;
-  border-radius: 10px;
-  padding: 16px;
-  box-shadow: 0 6px 18px rgba(8, 35, 63, 0.06);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 6px 18px rgba(8, 35, 63, 0.08);
+  margin-bottom: 18px;
 }
 
 .detalhes-nome {
-  font-size: 20px;
-  margin: 8px 0;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: bold;
+  color: #6a11cb;
+  margin-bottom: 8px;
 }
 
 .detalhes-info,
 .detalhes-loc,
 .detalhes-end {
-  font-size: 14px;
+  font-size: 15px;
   margin: 4px 0;
   color: #333333;
 }
@@ -49,6 +51,7 @@
 .detalhes-section h3 {
   font-size: 16px;
   margin-bottom: 8px;
+  color: #2575fc;
 }
 
 .detalhes-section ul {
@@ -58,14 +61,17 @@
 }
 
 .detalhes-section li {
-  margin-bottom: 6px;
-  font-size: 14px;
+  margin-bottom: 8px;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .time-group {
   margin-top: 8px;
   padding: 10px;
-  background: #fff;
+  background: #f3f4f6;
   border-radius: 8px;
   border: 1px solid #eee;
 }
@@ -90,46 +96,51 @@
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
-}
-
-.detalhes-actions button:not(.sort-btn) {
-  background: #4caf50;
+  background: linear-gradient(90deg, #4caf50 0%, #43e97b 100%);
   color: #fff;
+  font-weight: bold;
+  transition: background 0.2s, transform 0.2s;
+}
+.detalhes-actions button:not(.sort-btn):hover {
+  background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+  transform: scale(1.03);
 }
 
 .sort-btn {
-  background: #2196f3;
+  background: linear-gradient(90deg, #2196f3 0%, #6a11cb 100%);
   color: #fff;
 }
+.sort-btn:hover {
+  background: linear-gradient(90deg, #6a11cb 0%, #2196f3 100%);
+}
 
-/* Right column list inside card */
 .confirmados-list {
   max-height: 240px;
   overflow-y: auto;
   padding-right: 6px;
 }
 
-.confirmados-list li { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed #f0f0f0; }
-
-/* Small screens (mobile) */
-@media (max-width: 640px) {
-  .detalhes-container { padding: 12px; }
-  .detalhes-nome { font-size: 22px; }
-  .detalhes-info, .detalhes-loc, .detalhes-end { font-size: 14px; }
-  .layout-grid { display: block; }
+.confirmados-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px dashed #f0f0f0;
 }
 
-/* Medium and up (tablet / desktop) */
+@media (max-width: 640px) {
+  .detalhes-container { padding: 12px; }
+  .detalhes-card { padding: 10px; }
+  .detalhes-nome { font-size: 18px; }
+  .detalhes-info, .detalhes-loc, .detalhes-end { font-size: 13px; }
+}
+
 @media (min-width: 641px) {
   .detalhes-container { max-width: 960px; padding: 20px; }
-  .layout-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+  .detalhes-card { padding: 24px; }
   .detalhes-nome { font-size: 26px; }
   .detalhes-info, .detalhes-loc, .detalhes-end { font-size: 15px; }
   .confirmados-list { max-height: 320px; }
 }
 
-/* Utility */
 .text-muted { color: #777; font-size: 13px; }
-
-/* Accessibility focus styles */
-.back-btn:focus, .detalhes-actions button:focus { outline: 3px solid rgba(11,95,255,0.15); outline-offset: 2px; }

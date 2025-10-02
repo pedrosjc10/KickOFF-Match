@@ -2,15 +2,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color: #f3f4f6;
+  min-height: 100vh;
+  background: #f3f4f6;
 }
 
 .criarracha-card {
-  background-color: white;
+  background: #fff;
   padding: 2rem;
   border-radius: 1rem;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
   width: 90%;
   max-width: 400px;
 }
@@ -20,6 +20,7 @@
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 2rem;
+  color: #6a11cb;
 }
 
 .criarracha-form {
@@ -30,6 +31,7 @@
 .criarracha-label {
   margin-bottom: 0.25rem;
   font-weight: 500;
+  color: #333;
 }
 
 .criarracha-input {
@@ -37,19 +39,22 @@
   margin-bottom: 1rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
+  font-size: 15px;
+  background: #f9f9f9;
 }
 
 .criarracha-button {
-  background-color: #2563eb;
+  background: linear-gradient(90deg, #2563eb 0%, #6a11cb 100%);
   color: white;
   padding: 0.75rem;
   border: none;
   border-radius: 0.5rem;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background 0.2s, transform 0.2s;
 }
 
 .criarracha-button:hover {
-  background-color: #1d4ed8;
+  background: linear-gradient(90deg, #6a11cb 0%, #2563eb 100%);
+  transform: scale(1.03);
 }
