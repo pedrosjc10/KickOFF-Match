@@ -314,6 +314,8 @@ static async update(req: Request, res: Response) {
                 where: { id: partidaId },
                 relations: ["tipoPartida"] // Precisamos do tipoPartida para o número de jogadores
             });
+            
+            console.log("Partida encontrada para sorteio:", partidaId);
 
             if (!partida || !partida.tipoPartida) {
                 return res.status(404).json({ error: "Partida ou Tipo de Partida não encontrado." });
