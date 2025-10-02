@@ -8,7 +8,7 @@ export enum TipoEnum {
 }
 export interface NovaPartida {
   nome: string;
-  tipo: TipoEnum; // Aceita string literals também
+  tipo: TipoEnum | "privado" | "publico"; // Aceita string literals também
   data: string; // YYYY-MM-DD
   hora: string; // HH:MM
   local_id: number;
