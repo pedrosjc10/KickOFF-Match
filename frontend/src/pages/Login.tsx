@@ -30,7 +30,6 @@ const Login: React.FC = () => {
   return (
     <div className="login-container">
       <h1>SEJA BEM VINDO!</h1>
-      <p>BEM VINDO DE VOLTA! COLOQUE SUAS INFORMAÇÕES</p>
       {error && <p className="error">{error}</p>}
       <form className="login-form" onSubmit={handleLogin}>
         <label>Email</label>
