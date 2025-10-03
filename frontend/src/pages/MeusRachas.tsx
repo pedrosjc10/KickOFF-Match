@@ -51,13 +51,13 @@ const MeusRachas: React.FC = () => {
       <nav className="menu-rachas">
         <button
           className="menu-btn"
-          onClick={() => navigate('/criarracha')}
+          onClick={() => navigate('/criarrachas')}
         >
           Criar Racha
         </button>
         <button
           className="menu-btn"
-          onClick={() => navigate('/partidaspublicas')}
+          onClick={() => navigate('/publicas')}
         >
           Encontrar Partidas Públicas
         </button>
