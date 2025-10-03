@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // ⬅️ IMPORTANTE
+import { useNavigate } from 'react-router-dom';
 import { buscarRachasQueParticipo } from '../services/partidaService';
 import { useUserStore } from '../stores/userStore';
 import '../styles/MeusRachas.css';
@@ -29,7 +29,7 @@ const MeusRachas: React.FC = () => {
   const [rachas, setRachas] = useState<Racha[]>([]);
   const { usuario } = useUserStore();
   const [loading, setLoading] = useState<boolean>(true);
-  const navigate = useNavigate(); // ⬅️ Aqui
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRachas = async () => {
@@ -48,6 +48,20 @@ const MeusRachas: React.FC = () => {
 
   return (
     <div className="meus-rachas-container">
+      <nav className="menu-rachas">
+        <button
+          className="menu-btn"
+          onClick={() => navigate('/criarracha')}
+        >
+          Criar Racha
+        </button>
+        <button
+          className="menu-btn"
+          onClick={() => navigate('/partidaspublicas')}
+        >
+          Encontrar Partidas Públicas
+        </button>
+      </nav>
       <h1>MEUS RACHAS</h1>
       {loading ? (
         <p className="loading">Carregando...</p>
