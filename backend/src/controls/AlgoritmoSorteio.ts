@@ -83,7 +83,7 @@ const AlgoritmoSorteio = {
         // 3. Geração do Terceiro Time (Lógica Sobressalente)
         const remanescentes = jogadores.filter(j => !jogadoresUsados.includes(j.id));
         
-        if (remanescentes.length >= minJogadoresPorTime - 1) { 
+        if (remanescentes.length >= minJogadoresPorTime) { 
             const timeC: Time = { nome: "Time C", jogadores: remanescentes, mediaHabilidade: 0 };
             
             // Recalcula a média para o Time C
