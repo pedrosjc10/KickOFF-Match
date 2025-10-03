@@ -1,67 +1,138 @@
+/* Fundo suave com sua paleta */
+body {
+  background: linear-gradient(135deg, #B2D9F7 0%, #DDE3CA 100%);
+  min-height: 100vh;
+}
+
+/* Centraliza o card */
 .criarracha-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #f3f4f6;
+  background: transparent;
 }
 
+/* Card moderno e responsivo */
 .criarracha-card {
   background: #fff;
-  padding: 2rem 1rem;
-  border-radius: 1rem;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
-  width: 95%;
-  max-width: 400px;
+  padding: 2rem 1.2rem;
+  border-radius: 1.3rem;
+  box-shadow: 0 4px 24px #487aa133;
+  width: 100%;
+  max-width: 370px;
+  border: 1.5px solid #b2d9f7;
+  position: relative;
+  overflow: hidden;
+}
+.criarracha-card::before {
+  content: "";
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, #b2d9f7 0%, #fff0 80%);
+  z-index: 0;
+}
+.criarracha-card::after {
+  content: "";
+  position: absolute;
+  bottom: -40px;
+  left: -40px;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, #dde3ca 0%, #fff0 80%);
+  z-index: 0;
 }
 
+/* Título */
 .criarracha-title {
   text-align: center;
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: bold;
-  margin-bottom: 2rem;
-  color: #6a11cb;
+  margin-bottom: 1.5rem;
+  color: #487aa1;
+  letter-spacing: 1px;
+  z-index: 1;
 }
 
+/* Formulário */
 .criarracha-form {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  z-index: 1;
 }
 
 .criarracha-label {
-  margin-bottom: 0.25rem;
-  font-weight: 500;
-  color: #333;
+  font-size: 1rem;
+  color: #487aa1;
+  margin-bottom: 2px;
+  font-weight: 600;
 }
 
 .criarracha-input {
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 15px;
-  background: #f9f9f9;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1.5px solid #b2d9f7;
+  font-size: 1rem;
+  background: #dde3ca;
+  color: #3d3c3b;
+  margin-bottom: 2px;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.criarracha-input:focus {
+  border: 1.5px solid #487aa1;
+  outline: none;
+  box-shadow: 0 0 0 2px #b2d9f755;
 }
 
+/* Botão */
 .criarracha-button {
-  background: linear-gradient(90deg, #2563eb 0%, #6a11cb 100%);
-  color: white;
-  padding: 0.75rem;
+  margin-top: 10px;
+  padding: 10px 0;
   border: none;
-  border-radius: 0.5rem;
+  background: linear-gradient(90deg, #487aa1 0%, #7c8071 100%);
+  color: white;
   font-weight: bold;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px #b2d9f722;
   cursor: pointer;
   transition: background 0.2s, transform 0.2s;
+  font-size: 1.08rem;
 }
-
 .criarracha-button:hover {
-  background: linear-gradient(90deg, #6a11cb 0%, #2563eb 100%);
+  background: linear-gradient(90deg, #7c8071 0%, #487aa1 100%);
   transform: scale(1.03);
 }
 
+/* Mensagem de sucesso/erro */
+.criarracha-message {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 1rem;
+  color: #3d3c3b;
+  z-index: 1;
+}
+
+/* Responsividade */
 @media (max-width: 600px) {
   .criarracha-card {
-    padding: 1rem 0.5rem;
-    border-radius: 8px;
+    max-width: 98vw;
+    padding: 14px 2vw 12px 2vw;
+    border-radius: 12px;
+  }
+  .criarracha-title {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+  .criarracha-form {
+    gap: 8px;
+  }
+  .criarracha-input,
+  .criarracha-button {
+    font-size: 0.98rem;
+    padding: 8px 8px;
   }
 }
