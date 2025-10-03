@@ -84,11 +84,6 @@ const Player: React.FC<JogadorConfirmadoItemProps> = ({
       {/* Checkbox de Posição (Linha/Goleiro) */}
       {isUsuarioLogado ? (
         <label>
-          <input
-            onChange={(e) =>
-              handleToggleJogLinha(jogador.id, partida.id, e.target.checked)
-            }
-          />{" "}
           {!!jogador.jog_linha ? "⚽ Jogador de Linha" : "🧤 Goleiro"}
         </label>
       ) : (
