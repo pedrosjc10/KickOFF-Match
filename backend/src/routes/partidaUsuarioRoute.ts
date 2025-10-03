@@ -18,6 +18,7 @@ partidaUsuarioRouter.delete("/:id(\\d+)", PartidaUsuarioController.delete);
 partidaUsuarioRouter.get("/:id(\\d+)/confirmados", authMiddleware, PartidaUsuarioController.getConfirmedById);
 partidaUsuarioRouter.get("/:id(\\d+)/todos", authMiddleware, PartidaUsuarioController.getAllParticipantsById);
 partidaUsuarioRouter.post("/", authMiddleware, PartidaUsuarioController.create);
+partidaUsuarioRouter.post("/:partidaId(\\d+)/sortearTimes", PartidaUsuarioController.sortearTimes);
 partidaUsuarioRouter.get("/", authMiddleware, PartidaUsuarioController.getAll);
 
 export default partidaUsuarioRouter;

@@ -12,6 +12,12 @@ static async create(req: Request, res: Response) {
   try {
     let { tipo, data, hora, nome, local_id, tipoPartida_id } = req.body;
 
+     tipo = tipo === "publico" ? TipoEnum.PUBLICO : TipoEnum.PRIVADO;
+
+    if (!data || !hora || !nome || !local_id || !tipoPartida_id) {
+      return res.status(400).json({ error: "Dados incompletos" });
+    }
+
     const partidaRepo = AppDataSource.getRepository(Partida);
     const localRepo = AppDataSource.getRepository(Local);
     const tipoPartidaRepo = AppDataSource.getRepository(TipoPartida);
@@ -37,6 +43,8 @@ static async create(req: Request, res: Response) {
       local,
       tipoPartida,
     });
+
+    console.log("tipo:", tipo);
 
     const partidaCriada = await partidaRepo.save(novaPartida);
 
