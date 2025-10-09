@@ -3,12 +3,11 @@ import { NovoLocal } from "./localService";
 
 // Tipo do enum usado no backend
 export enum TipoEnum {
-  privado = 0, // Ajuste 0 ou 1 conforme o seu backend envia para "privado"
-  publico = 1, // Ajuste 0 ou 1 conforme o seu backend envia para "publico"
+  publico = 1, 
 }
 export interface NovaPartida {
   nome: string;
-  tipo: TipoEnum | "privado" | "publico"; // Aceita string literals também
+  tipo: TipoEnum "publico"; // Aceita string literals também
   data: string; // YYYY-MM-DD
   hora: string; // HH:MM
   local_id: number;
@@ -37,7 +36,7 @@ export interface PartidaDetalhes {
   nome: string;
   data: string;
   hora: string;
-  tipo: TipoEnum | "privado" | "publico"; // Pode ser enum ou string literals
+  tipo: TipoEnum "publico"; // Pode ser enum ou string literals
   local?: NovoLocal[] | any;
   jogadores?: Jogador[]; // pode vir do backend ou construído no front
   times?: Time[];
