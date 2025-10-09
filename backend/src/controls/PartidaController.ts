@@ -41,8 +41,6 @@ static async create(req: Request, res: Response) {
       tipoPartida,
     });
 
-    console.log("tipo:", tipo);
-
     const partidaCriada = await partidaRepo.save(novaPartida);
 
     // pega usuário logado
@@ -123,7 +121,7 @@ static async create(req: Request, res: Response) {
         return res.status(404).json({ error: "Partida não encontrada" });
       }
 
-      partidaRepo.merge(partida, dados);
+      partidaRepo.merge(partida);
       const atualizado = await partidaRepo.save(partida);
 
       return res.json(atualizado);
