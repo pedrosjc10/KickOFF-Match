@@ -77,10 +77,11 @@ const CriarRacha: React.FC = () => {
             required
           />
 
-          <label className="criarracha-label">Data</label>
+          <label className="criarracha-label">Dia da Semana</label>
           <input
-            type="date"
+            type="string"
             name="data"
+            placeholder="Quinta-Feira"
             value={form.data}
             onChange={handleChange}
             className="criarracha-input"
