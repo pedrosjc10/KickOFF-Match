@@ -132,8 +132,7 @@ const CriarRacha: React.FC = () => {
             onChange={handleChange}
             className="criarracha-input"
             required
-          >
-            <option value="privado">Privado</option>
+          >           
             <option value="publico">Público</option>
           </select>
 
