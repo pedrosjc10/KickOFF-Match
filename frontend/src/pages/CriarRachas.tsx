@@ -10,7 +10,7 @@ type TipoEnum = "privado" | "publico";
 const CriarRacha: React.FC = () => {
   const [form, setForm] = useState<Omit<NovaPartida, "organizador">>({
     nome: "",
-    tipo: "privado",
+    tipo: "publico",
     data: "",
     hora: "",
     local_id: 0,
