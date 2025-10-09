@@ -7,8 +7,6 @@ const partidarouter = Router();
 partidarouter.post("/", authMiddleware, PartidaController.create);
 partidarouter.get("/",authMiddleware, PartidaController.getAll);
 
-partidarouter.get("/publicas",authMiddleware, PartidaController.getPublicas);
-
 partidarouter.get("/:id(\\d+)", authMiddleware, PartidaController.getById);
 partidarouter.put("/:id(\\d+)", authMiddleware,PartidaController.update);
 partidarouter.delete("/:id(\\d+)", authMiddleware, PartidaController.delete);
