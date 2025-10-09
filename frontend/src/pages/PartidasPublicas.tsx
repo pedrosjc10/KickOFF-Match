@@ -1,6 +1,6 @@
 // src/pages/PublicRachas.tsx
 import React, { useEffect, useState } from "react";
-import { buscarPartidasPublicas, participarPartida, PartidaDetalhes } from "../services/partidaService";
+import { buscarPartidas, participarPartida, PartidaDetalhes } from "../services/partidaService";
 import "../styles/PartidasPublicas.css";
 
 const PublicRachas: React.FC = () => {
@@ -8,7 +8,7 @@ const PublicRachas: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    buscarPartidasPublicas()
+    buscarPartidas()
       .then(data => setRachas(data))
       .catch(console.error)
       .finally(() => setLoading(false));
