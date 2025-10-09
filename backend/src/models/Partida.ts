@@ -3,22 +3,11 @@ import { TipoPartida } from "./TipoPartida";
 import { Local } from "./Local";
 import { PartidaUsuario } from "./PartidaUsuario";
 
-export enum TipoEnum {
-  PRIVADO = 0,
-  PUBLICO = 1,
-}
-
 @Entity("partida")
 export class Partida {
   @PrimaryGeneratedColumn()
   id!: number;
-
-  @Column({
-    type: "smallint",
-    enum: TipoEnum, // agora o banco guarda 0 ou 1, mas no código tu usa o enum
-  })
-  tipo!: TipoEnum;
-
+  
   @Column({ type: "text" })
   data!: string;
 
