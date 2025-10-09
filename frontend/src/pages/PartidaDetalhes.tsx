@@ -7,7 +7,6 @@ import {
   buscarTodosParticipantes,
   verificarSeOrganizador,
   Jogador,
-  TipoEnum,
   sortearTimes, // <-- NOVO: Função para chamar o sorteio no backend
   Time, // <-- NOVO: Interface para o resultado do sorteio
 } from "../services/partidaService";
@@ -21,7 +20,6 @@ interface Partida {
   nome: string;
   data: string;
   hora: string;
-  tipo: "privado" | "publico";
   local?: { nome: string; cidade: string };
   tipoPartida?: {
     id?: number;
@@ -52,14 +50,6 @@ const PartidaDetalhes: React.FC = () => {
     try {
       setLoading(true);
       const partidaData = await buscarDetalhesPartida(id);
-
-      let tipoConvertido = partidaData.tipo;
-
-      // CORREÇÃO: Usa o enum importado para conversão
-      if (typeof tipoConvertido === "number") {
-        tipoConvertido = TipoEnum[tipoConvertido] as "privado" | "publico";
-      }
-      setPartida({ ...partidaData, tipo: tipoConvertido as "privado" | "publico" });
 
       const confirmadosData = await buscarConfirmados(Number(id));
       setJogadoresConfirmados(confirmadosData);
@@ -191,10 +181,6 @@ const PartidaDetalhes: React.FC = () => {
           <p>
             <strong>Local:</strong> {partida.local?.nome} - {partida.local?.cidade}
           </p>
-          <p>
-            <strong>Tipo:</strong> {partida.tipo}
-          </p>
-
           <hr />
 
           {/* BOTÃO DE SORTEIO VISÍVEL APENAS PARA O ORGANIZADOR */}
