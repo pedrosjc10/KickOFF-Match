@@ -2,13 +2,9 @@ import api from "../api/api";
 import { NovoLocal } from "./localService";
 
 // Tipo do enum usado no backend
-export enum TipoEnum {
-  publico = 1, 
-  publico = 0,
-}
+
 export interface NovaPartida {
   nome: string;
-  tipo: TipoEnum | "publico"; // Aceita string literals também
   data: string; // YYYY-MM-DD
   hora: string; // HH:MM
   local_id: number;
@@ -37,7 +33,6 @@ export interface PartidaDetalhes {
   nome: string;
   data: string;
   hora: string;
-  tipo: TipoEnum | "publico"; // Pode ser enum ou string literals
   local?: NovoLocal[] | any;
   jogadores?: Jogador[]; // pode vir do backend ou construído no front
   times?: Time[];
@@ -55,8 +50,8 @@ export const criarPartida = async (novaPartida: NovaPartida) => {
 };
 
 // Buscar partidas públicas
-export const buscarPartidasPublicas = async (): Promise<PartidaDetalhes[]> => {
-  const response = await api.get<PartidaDetalhes[]>("/meusrachas/publicas");
+export const buscarPartidas = async (): Promise<PartidaDetalhes[]> => {
+  const response = await api.get<PartidaDetalhes[]>("/meusrachas");
   return response.data;
 };
 
