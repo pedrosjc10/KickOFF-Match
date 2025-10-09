@@ -5,12 +5,9 @@ import { getLocais, NovoLocal } from "../services/localService";
 import { getTiposPartida, TipoPartida } from "../services/tipoPartidaService";
 import "../styles/CriarRacha.css";
 
-type TipoEnum = "privado" | "publico";
-
 const CriarRacha: React.FC = () => {
   const [form, setForm] = useState<Omit<NovaPartida, "organizador">>({
     nome: "",
-    tipo: "publico",
     data: "",
     hora: "",
     local_id: 0,
@@ -124,17 +121,6 @@ const CriarRacha: React.FC = () => {
             {tiposPartida.map(tp => (
               <option key={tp.idtipoPartida} value={tp.idtipoPartida}>{tp.nomeTipoPartida}</option>
             ))}
-          </select>
-
-          <label className="criarracha-label">Privacidade</label>
-          <select
-            name="tipo"
-            value={form.tipo}
-            onChange={handleChange}
-            className="criarracha-input"
-            required
-          >           
-            <option value="publico">Público</option>
           </select>
 
           <button type="submit" className="criarracha-button">
