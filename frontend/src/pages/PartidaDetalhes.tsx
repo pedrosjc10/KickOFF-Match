@@ -7,33 +7,24 @@ import {
   buscarTodosParticipantes,
   verificarSeOrganizador,
   Jogador,
-  sortearTimes, // <-- NOVO: Função para chamar o sorteio no backend
-  Time, // <-- NOVO: Interface para o resultado do sorteio
+  sortearTimes,
+  Time,
+  PartidaDetalhes as PartidaDetalhesType, // Renomeado para evitar conflito com o nome do componente
 } from "../services/partidaService";
 import "../styles/PartidaDetalhes.css";
 import { useUserStore } from "../stores/userStore";
 
 import Player from "../components/Player";
 
-interface Partida {
-  id: number;
-  nome: string;
-  data: string;
-  hora: string;
-  local?: { nome: string; cidade: string };
-  tipoPartida?: {
-    id?: number;
-    nometipopartida?: string;
-    quantidadejogadores?: number;
-  };
-}
+// Removida a interface 'Partida' local, usaremos a PartidaDetalhes do service
 
 const PartidaDetalhes: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [partida, setPartida] = useState<Partida | null>(null);
+  // Usando PartidaDetalhesType do service para o estado
+  const [partida, setPartida] = useState<PartidaDetalhesType | null>(null);
   const [jogadoresConfirmados, setJogadoresConfirmados] = useState<Jogador[]>([]);
   const [jogadoresNaoConfirmados, setJogadoresNaoConfirmados] = useState<Jogador[]>([]);
-  const [timesSorteados, setTimesSorteados] = useState<Time[]>([]); // NOVO ESTADO
+  const [timesSorteados, setTimesSorteados] = useState<Time[]>([]);
   const [loading, setLoading] = useState(true);
   const [jogLinhaSelecionado, setJogLinhaSelecionado] = useState<boolean | null>(null);
   const [isOrganizador, setIsOrganizador] = useState<boolean>(false);
@@ -51,6 +42,10 @@ const PartidaDetalhes: React.FC = () => {
       setLoading(true);
       const partidaData = await buscarDetalhesPartida(id);
 
+      // ***** A CORREÇÃO PRINCIPAL ESTÁ AQUI: SETAR O ESTADO DA PARTIDA *****
+      setPartida(partidaData); 
+      // ********************************************************************
+
       const confirmadosData = await buscarConfirmados(Number(id));
       setJogadoresConfirmados(confirmadosData);
 
@@ -64,6 +59,8 @@ const PartidaDetalhes: React.FC = () => {
       setIsOrganizador(organizador);
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
+      // Se houver um erro (como 404), garantimos que 'partida' é null
+      setPartida(null); 
     } finally {
       setLoading(false);
     }
@@ -102,7 +99,7 @@ const PartidaDetalhes: React.FC = () => {
   const handleAtualizarHabilidade = async (jogadorId: number, partidaId: number, novaHabilidade: number) => {
     try {
       console.log("Atualizando habilidade para jogadorId:", jogadorId, "com valor:", novaHabilidade);
-      
+        
       // 1. Chama o serviço de atualização (PUT)
       await atualizarPartidaUsuario(jogadorId, partidaId, { habilidade: novaHabilidade }); 
         
@@ -137,7 +134,7 @@ const PartidaDetalhes: React.FC = () => {
       const jogadoresEscaladosIds = new Set<number>();
       timesSorteados[0]?.jogadores.forEach(j => jogadoresEscaladosIds.add(j.id));
       timesSorteados[1]?.jogadores.forEach(j => jogadoresEscaladosIds.add(j.id));
-      
+        
       // 2. Identifica os jogadores confirmados que NÃO foram escalados
       const idsParaDesconfirmar = jogadoresConfirmados
         .filter(j => !jogadoresEscaladosIds.has(j.id))
@@ -147,7 +144,7 @@ const PartidaDetalhes: React.FC = () => {
 
       // 3. Atualiza o status para 'confirmado: false' para quem não foi escalado
       // Isso move os jogadores não escalados de volta para a lista de Participantes
-      
+        
       const desconfirmacaoPromessas = idsParaDesconfirmar.map(idParaDesconfirmar => 
         atualizarPartidaUsuario(idParaDesconfirmar, partida.id, { 
             confirmado: false 
@@ -179,7 +176,11 @@ const PartidaDetalhes: React.FC = () => {
             {partida.hora?.slice(0, 5)}
           </p>
           <p>
-            <strong>Local:</strong> {partida.local?.nome} - {partida.local?.cidade}
+            <strong>Local:</strong> {partida.local && Array.isArray(partida.local) && partida.local[0] ? `${partida.local[0].nome} - ${partida.local[0].cidade}` : 'Local não informado'}
+            {/* Ajustado o acesso ao local, pois sua interface sugere que local pode ser um array */}
+          </p>
+          <p>
+            <strong>Tipo de Partida:</strong> {partida.tipoPartida?.nometipopartida} ({partida.tipoPartida?.quantidadejogadores} por time)
           </p>
           <hr />
 
