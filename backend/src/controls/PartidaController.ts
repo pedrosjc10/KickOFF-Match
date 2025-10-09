@@ -1,7 +1,7 @@
 // src/controllers/PartidaController.ts
 import { Request, Response } from "express";
 import { AppDataSource } from "../config/database";
-import { Partida, TipoEnum } from "../models/Partida";
+import { Partida } from "../models/Partida";
 import { Local } from "../models/Local";
 import { TipoPartida } from "../models/TipoPartida";
 import { PartidaUsuario } from "../models/PartidaUsuario";
@@ -10,9 +10,7 @@ export class PartidaController {
   // src/controllers/PartidaController.ts
 static async create(req: Request, res: Response) {
   try {
-    let { tipo, data, hora, nome, local_id, tipoPartida_id } = req.body;
-
-     tipo = tipo === "publico" ? TipoEnum.PUBLICO : TipoEnum.PRIVADO;
+    let { data, hora, nome, local_id, tipoPartida_id } = req.body;
 
     if (!data || !hora || !nome || !local_id || !tipoPartida_id) {
       return res.status(400).json({ error: "Dados incompletos" });
@@ -36,7 +34,6 @@ static async create(req: Request, res: Response) {
 
     // cria a partida
     const novaPartida = partidaRepo.create({
-      tipo,
       data,
       hora,
       nome,
@@ -126,11 +123,6 @@ static async create(req: Request, res: Response) {
         return res.status(404).json({ error: "Partida não encontrada" });
       }
 
-      let { tipo, ...dados } = req.body;
-      if (tipo) {
-        dados.tipo = tipo === "publico" ? "publico" : "privado";
-      }
-
       partidaRepo.merge(partida, dados);
       const atualizado = await partidaRepo.save(partida);
 
@@ -189,22 +181,6 @@ static async create(req: Request, res: Response) {
       return res
         .status(500)
         .json({ error: "Erro ao buscar rachas que participa" });
-    }
-  }
-
-  static async getPublicas(req: Request, res: Response) {
-    try {
-      const repo = AppDataSource.getRepository(Partida);
-
-      const publicas = await repo.find({
-        where: { tipo: TipoEnum.PUBLICO } // agora funciona suave
-      });
-      console.log("Partidas públicas encontradas:", publicas);
-
-      return res.json(publicas);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Erro ao buscar partidas públicas" });
     }
   }
 
