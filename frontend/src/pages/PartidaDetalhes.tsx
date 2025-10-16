@@ -168,7 +168,7 @@ const PartidaDetalhes: React.FC = () => {
   try {
     // Acha o registro do jogador logado na lista de confirmados
     const registroPartidaUsuario = jogadoresConfirmados.find(
-      (j) => j.id === usuario?.id
+      (j) => id === id
     );
 
     if (!registroPartidaUsuario) {
