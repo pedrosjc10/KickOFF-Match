@@ -20,6 +20,6 @@ partidaUsuarioRouter.get("/:id(\\d+)/todos", authMiddleware, PartidaUsuarioContr
 partidaUsuarioRouter.post("/", authMiddleware, PartidaUsuarioController.create);
 partidaUsuarioRouter.post("/:partidaId(\\d+)/sortearTimes", PartidaUsuarioController.sortearTimes);
 partidaUsuarioRouter.get("/", authMiddleware, PartidaUsuarioController.getAll);
-partidaUsuarioRouter.get("/:partidaId(\\d+)/dbyid", authMiddleware, PartidaUsuarioController.deleteByPartidaId);
+partidaUsuarioRouter.get("/:partidaId(\\d+)/dbyid", authMiddleware, PartidaUsuarioController.deleteByPartidaId  );
 
 export default partidaUsuarioRouter;
