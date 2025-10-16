@@ -166,18 +166,9 @@ const PartidaDetalhes: React.FC = () => {
 
   const handleSairDaPartida = async () => {
   try {
-    // Procura o jogador logado tanto entre confirmados quanto não confirmados
-    const registroPartidaUsuario =
-      jogadoresConfirmados.find((j) => j.id === Number(id)) ||
-      jogadoresNaoConfirmados.find((j) => j.id === Number(id));
-
-    if (!registroPartidaUsuario) {
-      alert("Você não está vinculado a esta partida.");
-      return;
-    }
 
     // Executa o DELETE usando o id do registro partida_usuario
-    await leavePartida(registroPartidaUsuario.id);
+    await leavePartida(Number(id));
     alert("Você saiu da partida com sucesso!");
     await carregarDados();
   } catch (error) {
