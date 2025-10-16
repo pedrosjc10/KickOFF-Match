@@ -271,7 +271,7 @@ const PartidaDetalhes: React.FC = () => {
                         try {
                           // Importa o método leavePartida dinamicamente para evitar problemas de import duplicado
                           const { leavePartida } = await import('../services/partidaService');
-                          await leavePartida(partida?.id || 0, usuario.id);
+                          await leavePartida(Number(id));
                           await carregarDados();
                         } catch (error) {
                           alert('Erro ao sair da partida.');
