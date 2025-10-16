@@ -166,7 +166,6 @@ const PartidaDetalhes: React.FC = () => {
 
   const handleSairDaPartida = async () => {
   try {
-
     // Executa o DELETE usando o id do registro partida_usuario
     await leavePartida(Number(id));
     alert("Você saiu da partida com sucesso!");
@@ -308,14 +307,11 @@ const PartidaDetalhes: React.FC = () => {
               </button>
             </div>
           )}
-          {(jogadoresConfirmados.some(j => j.id === Number(id)) ||
-            jogadoresNaoConfirmados.some(j => j.id === Number(id))) && (
             <div className="sair-container">
               <button onClick={handleSairDaPartida} className="btn-sair">
                 Sair da Partida
               </button>
             </div>
-          )}
 
 
         </>
