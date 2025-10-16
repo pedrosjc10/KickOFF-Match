@@ -370,4 +370,29 @@ static async update(req: Request, res: Response) {
         return confirmados.map(j => ({ ...j, habilidade: j.habilidade || 50 })); 
     }
 
+    static async deleteByPartidaId(req: Request, res: Response) {
+      try {
+        const partidaId = Number(req.params.partidaId); // id da partida
+
+        if (!Number.isInteger(partidaId) || partidaId <= 0) {
+        return res.status(400).json({ error: "ID de partida inválido" });
+      }
+        const repo = AppDataSource.getRepository(PartidaUsuario);
+
+        const resultado = await repo.delete({ partida: { id: Number(partidaId) } });
+
+        if (resultado.affected === 0) {
+          return res.status(404).json({ error: "Nenhum registro encontrado para esta partida" });
+        }
+
+        return res.status(204).send();
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Erro ao deletar registros da partida" });
+      }
+    }
+
+
+
+
 }
