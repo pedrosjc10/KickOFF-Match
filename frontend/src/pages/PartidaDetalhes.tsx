@@ -9,10 +9,12 @@ import {
   Jogador,
   sortearTimes,
   Time,
+  leavePartida,
   PartidaDetalhes as PartidaDetalhesType, // Renomeado para evitar conflito com o nome do componente
 } from "../services/partidaService";
 import "../styles/PartidaDetalhes.css";
 import { useUserStore } from "../stores/userStore";
+
 
 import Player from "../components/Player";
 
@@ -266,18 +268,7 @@ const PartidaDetalhes: React.FC = () => {
                   {/* Botão de sair da partida para o usuário logado */}
                   {usuario?.id === jogador.id && (
                     <button
-                      style={{ marginLeft: '10px', color: 'white', background: 'red', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer' }}
-                      onClick={async () => {
-                        try {
-                          // Importa o método leavePartida dinamicamente para evitar problemas de import duplicado
-                          const { leavePartida } = await import('../services/partidaService');
-                          await leavePartida(Number(id));
-                          await carregarDados();
-                        } catch (error) {
-                          alert('Erro ao sair da partida.');
-                          console.error(error);
-                        }
-                      }}
+                      onClick={() => leavePartida(Number(id))}
                     >
                       Sair da Partida
                     </button>
