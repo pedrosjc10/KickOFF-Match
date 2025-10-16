@@ -127,7 +127,7 @@ export const verificarSeOrganizador = async (usuarioId: number, partidaId: numbe
   return !!response.data.organizador;
 };
 
-export const leavePartida = async (id: number) => {
-  const response = await api.delete(`/partidaUsuario/${id}`);
+export const leavePartida = async (partidaId: number) => {
+  const response = await api.delete(`/partidaUsuario/${partidaId}/dbyid`);
   return response.data;
 };
