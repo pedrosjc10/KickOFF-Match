@@ -166,17 +166,17 @@ const PartidaDetalhes: React.FC = () => {
 
   const handleSairDaPartida = async () => {
   try {
-    // Acha o registro do jogador logado na lista de confirmados
-    const registroPartidaUsuario = jogadoresConfirmados.find(
-      (j) => j.id === Number(id)
-    );
+    // Procura o jogador logado tanto entre confirmados quanto não confirmados
+    const registroPartidaUsuario =
+      jogadoresConfirmados.find((j) => j.id === Number(id)) ||
+      jogadoresNaoConfirmados.find((j) => j.id === Number(id));
 
     if (!registroPartidaUsuario) {
-      alert("Você não está confirmado nesta partida.");
+      alert("Você não está vinculado a esta partida.");
       return;
     }
 
-    // Chama o DELETE com o id da relação
+    // Executa o DELETE usando o id do registro partida_usuario
     await leavePartida(registroPartidaUsuario.id);
     alert("Você saiu da partida com sucesso!");
     await carregarDados();
@@ -185,6 +185,7 @@ const PartidaDetalhes: React.FC = () => {
     alert("Erro ao sair da partida. Tente novamente.");
   }
 };
+
 
 
 
@@ -316,13 +317,15 @@ const PartidaDetalhes: React.FC = () => {
               </button>
             </div>
           )}
-          {!usuarioLogadoNaoConfirmou && (
+          {(jogadoresConfirmados.some(j => j.id === Number(id)) ||
+            jogadoresNaoConfirmados.some(j => j.id === Number(id))) && (
             <div className="sair-container">
               <button onClick={handleSairDaPartida} className="btn-sair">
                 Sair da Partida
               </button>
             </div>
           )}
+
 
         </>
       ) : (
