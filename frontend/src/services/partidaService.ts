@@ -128,9 +128,8 @@ export const verificarSeOrganizador = async (usuarioId: number, partidaId: numbe
 };
 
 // Sair da partida (remover usuário como participante)
-export const leavePartida = async (partidaId: number, usuarioId: number) => {
-  const response = await api.delete(`/meusrachas/${partidaId}/sair`, {
-    data: { usuarioId }
+export const leavePartida = async (id: number) => {
+  const response = await api.delete(`/partidaUsuario/${id}`, {
   });
   return response.data;
 };
