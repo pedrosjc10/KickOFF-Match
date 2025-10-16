@@ -307,12 +307,13 @@ const PartidaDetalhes: React.FC = () => {
               </button>
             </div>
           )}
+          if (!isOrganizador && !usuarioLogadoNaoConfirmou)  {( 
             <div className="sair-container">
               <button onClick={handleSairDaPartida} className="btn-sair">
                 Sair da Partida
               </button>
             </div>
-
+          )}
 
         </>
       ) : (
