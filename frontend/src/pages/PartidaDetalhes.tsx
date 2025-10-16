@@ -167,7 +167,7 @@ const PartidaDetalhes: React.FC = () => {
   const handleSairDaPartida = async () => {
   try {
     // Executa o DELETE usando o id do registro partida_usuario
-    await leavePartida(Number(id));
+    await leavePartida(partida?.id || 0);
     alert("Você saiu da partida com sucesso!");
     await carregarDados();
   } catch (error) {
