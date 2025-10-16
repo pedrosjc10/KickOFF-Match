@@ -126,3 +126,8 @@ export const verificarSeOrganizador = async (usuarioId: number, partidaId: numbe
   // O backend retorna o registro da relação, incluindo o campo 'organizador'
   return !!response.data.organizador;
 };
+
+export const leavePartida = async (id: number) => {
+  const response = await api.delete(`/partidaUsuario/${id}`);
+  return response.data;
+};

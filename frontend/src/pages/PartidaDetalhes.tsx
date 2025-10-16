@@ -9,6 +9,7 @@ import {
   Jogador,
   sortearTimes,
   Time,
+  leavePartida,
   PartidaDetalhes as PartidaDetalhesType, // Renomeado para evitar conflito com o nome do componente
 } from "../services/partidaService";
 import "../styles/PartidaDetalhes.css";
@@ -163,6 +164,29 @@ const PartidaDetalhes: React.FC = () => {
     }
   }
 
+  const handleSairDaPartida = async () => {
+  try {
+    // Acha o registro do jogador logado na lista de confirmados
+    const registroPartidaUsuario = jogadoresConfirmados.find(
+      (j) => j.id === usuario?.id
+    );
+
+    if (!registroPartidaUsuario) {
+      alert("Você não está confirmado nesta partida.");
+      return;
+    }
+
+    // Chama o DELETE com o id da relação
+    await leavePartida(registroPartidaUsuario.id);
+    alert("Você saiu da partida com sucesso!");
+    await carregarDados();
+  } catch (error) {
+    console.error("Erro ao sair da partida:", error);
+    alert("Erro ao sair da partida. Tente novamente.");
+  }
+};
+
+
 
   if (loading) return <p>Carregando...</p>;
 
@@ -292,6 +316,14 @@ const PartidaDetalhes: React.FC = () => {
               </button>
             </div>
           )}
+          {!usuarioLogadoNaoConfirmou && (
+            <div className="sair-container">
+              <button onClick={handleSairDaPartida} className="btn-sair">
+                Sair da Partida
+              </button>
+            </div>
+          )}
+
         </>
       ) : (
         <p>Partida não encontrada</p>
