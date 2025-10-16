@@ -263,6 +263,25 @@ const PartidaDetalhes: React.FC = () => {
             {jogadoresNaoConfirmados.map((jogador) => (
               <li key={jogador.id}>
                 {jogador.nome} {jogador.organizador ? <span>(Organizador)</span> : null}
+                  {/* Botão de sair da partida para o usuário logado */}
+                  {usuario?.id === jogador.id && (
+                    <button
+                      style={{ marginLeft: '10px', color: 'white', background: 'red', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer' }}
+                      onClick={async () => {
+                        try {
+                          // Importa o método leavePartida dinamicamente para evitar problemas de import duplicado
+                          const { leavePartida } = await import('../services/partidaService');
+                          await leavePartida(partida?.id || 0, usuario.id);
+                          await carregarDados();
+                        } catch (error) {
+                          alert('Erro ao sair da partida.');
+                          console.error(error);
+                        }
+                      }}
+                    >
+                      Sair da Partida
+                    </button>
+                  )}
               </li>
             ))}
           </ul>
