@@ -20,6 +20,6 @@ partidaUsuarioRouter.get("/:id(\\d+)/todos", authMiddleware, PartidaUsuarioContr
 partidaUsuarioRouter.post("/", authMiddleware, PartidaUsuarioController.create);
 partidaUsuarioRouter.post("/:partidaId(\\d+)/sortearTimes", PartidaUsuarioController.sortearTimes);
 partidaUsuarioRouter.get("/", authMiddleware, PartidaUsuarioController.getAll);
-partidaUsuarioRouter.delete("/:usuarioId(\\d+/:partidaId(\\d+)/dbyid", authMiddleware, PartidaUsuarioController.deleteByUsuarioId);
+partidaUsuarioRouter.delete("/:usuarioId/:partidaId(\\d+)/dbyid", authMiddleware, PartidaUsuarioController.deleteByUsuarioId);
 
 export default partidaUsuarioRouter;
