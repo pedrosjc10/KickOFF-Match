@@ -1,113 +1,99 @@
-// AlgoritmoSorteio.ts
-
-// --- Nova Interface Jogador (mantida) ---
 export interface Jogador {
-    id: number; // u.id
-    nome: string; // u.nome
-    organizador: boolean; // pu.organizador
-    jog_linha: boolean; // pu.jog_linha
-    habilidade: number; // pu.habilidade
+    id: number;
+    nome: string;
+    organizador: boolean;
+    jog_linha: boolean; // false = goleiro
+    habilidade: number;
 }
-// -----------------------------------------------------------------------
-
-// Define as faixas de habilidade
-const RATING_FAIXAS = {
-    MUITO_RUIM: [50, 60], // Índice 0
-    RUIM: [61, 70],        // Índice 1
-    BOM: [71, 80],         // Índice 2
-    MUITO_BOM: [81, 90],   // Índice 3
-};
 
 export interface Time {
     nome: string;
     jogadores: Jogador[];
     mediaHabilidade: number;
-    substitutos?: { vaga: number; opcoes: { jogadorId: number, nome: string }[] };
+    substitutos?: { vaga: number; opcoes: { jogadorId: number; nome: string }[] }[];
 }
 
-const AlgoritmoSorteio = {
 
+
+const AlgoritmoSorteio = {
     balancear: (jogadores: Jogador[], minJogadoresPorTime: number): Time[] => {
-        
-        // 1. Pré-processamento: Categorizar e Embaralhar
-        const categorias: Jogador[][] = [[], [], [], []];
-        jogadores.forEach(j => {
-            // CORREÇÃO: Usando a constante RATING_FAIXAS para remover o aviso
-            if (j.habilidade <= RATING_FAIXAS.MUITO_RUIM[1]) categorias[0].push(j);
-            else if (j.habilidade <= RATING_FAIXAS.RUIM[1]) categorias[1].push(j);
-            else if (j.habilidade <= RATING_FAIXAS.BOM[1]) categorias[2].push(j);
-            else categorias[3].push(j);
+        const times: Time[] = [];
+
+        // Separar goleiros e jogadores de linha
+        const goleiros = jogadores.filter(j => !j.jog_linha);
+        const linha = jogadores.filter(j => j.jog_linha);
+
+        // Embaralhar todos para evitar padrões fixos
+        const shuffle = (arr: any[]) => arr.sort(() => 0.5 - Math.random());
+        shuffle(goleiros);
+        shuffle(linha);
+
+        // Função para calcular média
+        const calcMedia = (arr: Jogador[]) =>
+            arr.length > 0 ? arr.reduce((s, j) => s + j.habilidade, 0) / arr.length : 0;
+
+        // Criar os dois primeiros times
+        const timeA: Time = { nome: "Time A", jogadores: [], mediaHabilidade: 0 };
+        const timeB: Time = { nome: "Time B", jogadores: [], mediaHabilidade: 0 };
+        times.push(timeA, timeB);
+
+        // Atribuir goleiros (máx 1 por time)
+        if (goleiros.length > 0) timeA.jogadores.push(goleiros.shift()!);
+        if (goleiros.length > 0) timeB.jogadores.push(goleiros.shift()!);
+
+        // Ordenar jogadores por habilidade (decrescente)
+        linha.sort((a, b) => b.habilidade - a.habilidade);
+
+        // Alternar jogadores entre A e B até completarem
+        linha.forEach((j, i) => {
+            const alvo = i % 2 === 0 ? timeA : timeB;
+            if (alvo.jogadores.length < minJogadoresPorTime) {
+                alvo.jogadores.push(j);
+            } else {
+                (alvo === timeA ? timeB : timeA).jogadores.push(j);
+            }
         });
 
-        // Embaralhar cada categoria para garantir aleatoriedade no mesmo nível
-        categorias.forEach(arr => arr.sort(() => 0.5 - Math.random()));
-        
-        const times: Time[] = [
-            { nome: "Time A", jogadores: [], mediaHabilidade: 0 }, 
-            { nome: "Time B", jogadores: [], mediaHabilidade: 0 }
-        ];
-        let jogadoresUsados: number[] = [];
+        // Calcular médias
+        timeA.mediaHabilidade = calcMedia(timeA.jogadores);
+        timeB.mediaHabilidade = calcMedia(timeB.jogadores);
 
-        // 2. Sorteio Principal (Times A e B)
-        let timeIndex = 0;
-        let totalJogadoresNecessarios = minJogadoresPorTime * 2;
-        
-        // Loop para preencher os times A e B de forma balanceada
-        while (jogadoresUsados.length < Math.min(jogadores.length, totalJogadoresNecessarios)) {
-            let adicionadoNesteCiclo = false;
-            
-            for (const categoria of categorias) {
-                const jogador = categoria.find(j => !jogadoresUsados.includes(j.id));
-                
-                if (jogador && times[0].jogadores.length < minJogadoresPorTime && times[1].jogadores.length < minJogadoresPorTime) {
-                    times[timeIndex].jogadores.push(jogador);
-                    jogadoresUsados.push(jogador.id);
-                    timeIndex = 1 - timeIndex; // Alterna o time
-                    adicionadoNesteCiclo = true;
+        // Jogadores restantes (se houver mais que o necessário)
+        const usados = [...timeA.jogadores, ...timeB.jogadores].map(j => j.id);
+        let remanescentes = jogadores.filter(j => !usados.includes(j.id));
+
+        let contadorTimes = 3;
+
+        // Criar novos times enquanto restarem jogadores
+        while (remanescentes.length > 0) {
+            const novoTime: Time = { nome: `Time ${contadorTimes}`, jogadores: [], mediaHabilidade: 0 };
+            contadorTimes++;
+
+            // Adiciona goleiro se houver
+            if (goleiros.length > 0) novoTime.jogadores.push(goleiros.shift()!);
+
+            // Preenche até minJogadoresPorTime ou o quanto der
+            while (novoTime.jogadores.length < minJogadoresPorTime && remanescentes.length > 0) {
+                novoTime.jogadores.push(remanescentes.shift()!);
+            }
+
+            // Se ainda ficou incompleto, criar substituições com 2 opções
+            const vagasFaltantes = minJogadoresPorTime - novoTime.jogadores.length;
+            if (vagasFaltantes > 0) {
+                novoTime.substitutos = [];
+                for (let v = 1; v <= vagasFaltantes; v++) {
+                    novoTime.substitutos.push({
+                        vaga: v,
+                        opcoes: [
+                            { jogadorId: timeA.jogadores[0].id, nome: timeA.jogadores[0].nome },
+                            { jogadorId: timeB.jogadores[0].id, nome: timeB.jogadores[0].nome }
+                        ]
+                    });
                 }
             }
-            if (!adicionadoNesteCiclo) break; // Sai se não houver mais jogadores disponíveis para adicionar
-        }
-        
-        // CÁLCULO DA MÉDIA
-        // A variável 'mediaTotal' desnecessária foi removida.
-        
-        // Recalcula a média de habilidade para os Times A e B
-        if (times[0].jogadores.length > 0) {
-            times[0].mediaHabilidade = times[0].jogadores.reduce((sum, j) => sum + j.habilidade, 0) / times[0].jogadores.length;
-        }
-        if (times[1].jogadores.length > 0) {
-            times[1].mediaHabilidade = times[1].jogadores.reduce((sum, j) => sum + j.habilidade, 0) / times[1].jogadores.length;
-        }
-        
-        // 3. Geração do Terceiro Time (Lógica Sobressalente)
-        const remanescentes = jogadores.filter(j => !jogadoresUsados.includes(j.id));
-        
-        if (remanescentes.length >= minJogadoresPorTime) { 
-            const timeC: Time = { nome: "Time C", jogadores: remanescentes, mediaHabilidade: 0 };
-            
-            // Recalcula a média para o Time C
-            let mediaC = timeC.jogadores.reduce((sum, j) => sum + j.habilidade, 0) / timeC.jogadores.length;
-            timeC.mediaHabilidade = mediaC;
-            
-            // Vagas faltantes para fechar o Time C
-            const vagasFaltantes = minJogadoresPorTime - remanescentes.length;
-            
-            if (vagasFaltantes > 0) {
-                // Lógica de Repetição/Substitutos (mantida)
-                const opcao1 = times[0].jogadores[0]; 
-                const opcao2 = times[1].jogadores[0]; 
-                
-                timeC.substitutos = {
-                    vaga: 1, 
-                    opcoes: [
-                        { jogadorId: opcao1.id, nome: opcao1.nome },
-                        { jogadorId: opcao2.id, nome: opcao2.nome }
-                    ]
-                };
-            }
-            
-            times.push(timeC);
+
+            novoTime.mediaHabilidade = calcMedia(novoTime.jogadores);
+            times.push(novoTime);
         }
 
         return times;
