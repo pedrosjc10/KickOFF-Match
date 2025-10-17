@@ -370,25 +370,25 @@ static async update(req: Request, res: Response) {
         return confirmados.map(j => ({ ...j, habilidade: j.habilidade || 50 })); 
     }
 
-    static async deleteByPartidaId(req: Request, res: Response) {
+    static async deleteByUsuarioId(req: Request, res: Response) {
       try {
-        const partidaId = Number(req.params.partidaId); // id da partida
+        const usuarioId = Number(req.params.usuarioId); // id da partida
 
-        if (!Number.isInteger(partidaId) || partidaId <= 0) {
+        if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
           return res.status(400).json({ error: "ID de partida inválido" });
         }
 
         const repo = AppDataSource.getRepository(PartidaUsuario);
 
-        console.log("deleteByPartidaId -> partidaId:", partidaId);
+        console.log("deleteByUsuarioId -> usuarioId:", usuarioId);
 
         // 1) Buscar registros relacionados usando a relação (funciona independentemente do nome da FK)
         const registros = await repo.find({
-          where: { partida: { id: partidaId } },
+          where: { usuario: { id: usuarioId } },
           select: ["id"],
         });
 
-        console.log("deleteByPartidaId -> registros encontrados:", registros?.length ?? 0);
+        console.log("deleteByUsuarioId -> registros encontrados:", registros?.length ?? 0);
 
         if (!registros || registros.length === 0) {
           return res.status(404).json({ error: "Nenhum registro encontrado para esta partida" });
@@ -404,8 +404,4 @@ static async update(req: Request, res: Response) {
         return res.status(500).json({ error: "Erro ao deletar registros da partida" });
       }
     }
-
-
-
-
 }
