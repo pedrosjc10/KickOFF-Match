@@ -303,49 +303,47 @@ static async update(req: Request, res: Response) {
   }
 
   static async sortearTimes(req: Request, res: Response) {
-        try {
-            const partidaId = Number(req.params.partidaId);
-            if (!Number.isInteger(partidaId) || partidaId <= 0) {
-                return res.status(400).json({ error: "ID de partida inválido" });
-            }
-
-            const partidaRepo = AppDataSource.getRepository(Partida);
-            const partida = await partidaRepo.findOne({
-                where: { id: partidaId },
-                relations: ["tipoPartida"] // Precisamos do tipoPartida para o número de jogadores
-            });
-            
-            console.log("Partida encontrada para sorteio:", partida);
-
-            if (!partida || !partida.tipoPartida) {
-                return res.status(404).json({ error: "Partida ou Tipo de Partida não encontrado." });
-            }
-
-            const minJogadoresPorTime = partida.tipoPartida.quantidadeJogadores || 5; // Valor padrão se for null
-            const jogadoresConfirmados = await PartidaUsuarioController.buscarJogadoresConfirmadosParaSorteio(partidaId);
-            
-            // 1. VALIDAÇÃO DE NÚMERO MÍNIMO
-            const minTotalParaSorteio = 2 * (minJogadoresPorTime - 1);
-            if (jogadoresConfirmados.length < minTotalParaSorteio) {
-                return res.status(400).json({ 
-                    error: `Mínimo de ${minTotalParaSorteio} jogadores confirmados para sortear.`,
-                    minRequired: minTotalParaSorteio
-                });
-            }
-
-            // 2. EXECUTAR O ALGORITMO DE SORTEIO E BALANCEAMENTO
-            const resultadoSorteio = AlgoritmoSorteio.balancear(
-                jogadoresConfirmados, 
-                minJogadoresPorTime
-            );
-
-            return res.json(resultadoSorteio);
-
-        } catch (error) {
-            console.error("Erro no sorteio de times:", error);
-            return res.status(500).json({ error: "Erro interno ao sortear times." });
+    try {
+        const partidaId = Number(req.params.partidaId);
+        if (!Number.isInteger(partidaId) || partidaId <= 0) {
+            return res.status(400).json({ error: "ID de partida inválido" });
         }
+
+        const partidaRepo = AppDataSource.getRepository(Partida);
+        const partida = await partidaRepo.findOne({
+            where: { id: partidaId },
+            relations: ["tipoPartida"]
+        });
+
+        if (!partida || !partida.tipoPartida) {
+            return res.status(404).json({ error: "Partida ou Tipo de Partida não encontrado." });
+        }
+
+        const minJogadoresTotal = partida.tipoPartida.quantidadeJogadores || 10;
+        const minJogadoresPorTime = Math.floor(minJogadoresTotal / 2);
+
+        const jogadoresConfirmados = await PartidaUsuarioController.buscarJogadoresConfirmadosParaSorteio(partidaId);
+
+        // Validação de mínimo total
+        if (jogadoresConfirmados.length < minJogadoresTotal) {
+            return res.status(400).json({
+                error: É necessário pelo menos ${minJogadoresTotal} jogadores confirmados para sortear.,
+                minRequired: minJogadoresTotal
+            });
+        }
+
+        // Sorteio e balanceamento
+        const resultadoSorteio = AlgoritmoSorteio.balancear(
+            jogadoresConfirmados,
+            minJogadoresPorTime
+        );
+
+        return res.json(resultadoSorteio);
+    } catch (error) {
+        console.error("Erro no sorteio de times:", error);
+        return res.status(500).json({ error: "Erro interno ao sortear times." });
     }
+  }
     
     // Função auxiliar para buscar os dados de forma mais completa
     private static async buscarJogadoresConfirmadosParaSorteio(partidaId: number) {
