@@ -375,19 +375,28 @@ static async update(req: Request, res: Response) {
         const partidaId = Number(req.params.partidaId); // id da partida
 
         if (!Number.isInteger(partidaId) || partidaId <= 0) {
-        return res.status(400).json({ error: "ID de partida inválido" });
-      }
+          return res.status(400).json({ error: "ID de partida inválido" });
+        }
+
         const repo = AppDataSource.getRepository(PartidaUsuario);
 
-        // ajuste o nome da coluna FK se necessário: partidaId ou partida_id
-        const qbResult = await repo.createQueryBuilder()
-          .delete()
-          .where("partidaId = :partidaId", { partidaId })
-          .execute();
+        console.log("deleteByPartidaId -> partidaId:", partidaId);
 
-        if (qbResult.affected === 0) {
+        // 1) Buscar registros relacionados usando a relação (funciona independentemente do nome da FK)
+        const registros = await repo.find({
+          where: { partida: { id: partidaId } },
+          select: ["id"],
+        });
+
+        console.log("deleteByPartidaId -> registros encontrados:", registros?.length ?? 0);
+
+        if (!registros || registros.length === 0) {
           return res.status(404).json({ error: "Nenhum registro encontrado para esta partida" });
         }
+
+        // 2) Deletar por ids
+        const ids = registros.map(r => r.id);
+        await repo.delete(ids);
 
         return res.status(204).send();
       } catch (error) {
