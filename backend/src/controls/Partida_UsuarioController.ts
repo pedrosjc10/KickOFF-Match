@@ -379,9 +379,13 @@ static async update(req: Request, res: Response) {
       }
         const repo = AppDataSource.getRepository(PartidaUsuario);
 
-        const resultado = await repo.delete({ partida: { id: Number(partidaId) } });
+        // ajuste o nome da coluna FK se necessário: partidaId ou partida_id
+        const qbResult = await repo.createQueryBuilder()
+          .delete()
+          .where("partidaId = :partidaId", { partidaId })
+          .execute();
 
-        if (resultado.affected === 0) {
+        if (qbResult.affected === 0) {
           return res.status(404).json({ error: "Nenhum registro encontrado para esta partida" });
         }
 
