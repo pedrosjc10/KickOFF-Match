@@ -372,7 +372,12 @@ static async update(req: Request, res: Response) {
 
     static async deleteByUsuarioId(req: Request, res: Response) {
       try {
-        const usuarioId = Number(req.params.usuarioId); // id da partida
+        const usuarioId = Number(req.params.usuarioId);
+        const partidaId = Number(req.params.partidaId);
+
+        if (!Number.isInteger(partidaId) || partidaId <= 0) {
+          return res.status(400).json({ error: "ID de partida inválido" });
+        }
 
         if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
           return res.status(400).json({ error: "ID de partida inválido" });
@@ -384,8 +389,10 @@ static async update(req: Request, res: Response) {
 
         // 1) Buscar registros relacionados usando a relação (funciona independentemente do nome da FK)
         const registros = await repo.find({
-          where: { usuario: { id: usuarioId } },
-          select: ["id"],
+          where: { 
+            partida: { id: partidaId }, 
+            usuario: { id: usuarioId } },
+          select: ["id"] // Seleciona apenas os campos necessários,
         });
 
         console.log("deleteByUsuarioId -> registros encontrados:", registros?.length ?? 0);
