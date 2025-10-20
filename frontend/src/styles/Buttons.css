@@ -5,7 +5,6 @@
   --muted:#7C8071;
   --light:#DDE3CA;
 }
-
 /* Alvo: botões "simples" sem classe definida */
 button:not([class]),
 button[class=""],
