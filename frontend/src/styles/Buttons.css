@@ -1,0 +1,71 @@
+:root{
+  --bg1:#B2D9F7;   /* azul claro */
+  --primary:#487AA1; /* azul médio */
+  --dark:#3D3C3B;  /* texto escuro */
+  --muted:#7C8071;
+  --light:#DDE3CA;
+}
+/* Alvo: botões "simples" sem classe definida */
+button:not([class]),
+button[class=""],
+input[type="button"]:not([class]),
+input[type="submit"]:not([class]) {
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(72,122,161,0.18);
+  background: linear-gradient(90deg, var(--bg1) 0%, var(--primary) 100%);
+  color: var(--dark);
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 8px 20px rgba(72,122,161,0.10);
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+  white-space: nowrap;
+  width: auto;
+}
+
+/* Hover / active / focus */
+button:not([class]):hover,
+button[class=""]:hover,
+input[type="button"]:not([class]):hover,
+input[type="submit"]:not([class]):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(72,122,161,0.16);
+  color: #fff;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--muted) 100%);
+}
+
+button:not([class]):active,
+input[type="button"]:not([class]):active,
+input[type="submit"]:not([class]):active {
+  transform: translateY(0);
+  box-shadow: 0 6px 12px rgba(72,122,161,0.12);
+  opacity: 0.98;
+}
+
+button:not([class]):focus,
+input[type="button"]:not([class]):focus,
+input[type="submit"]:not([class]):focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(178,217,247,0.18);
+}
+
+/* Variante pequena (se quiser aplicar manualmente) */
+.btn-small {
+  padding: 6px 10px;
+  font-size: 0.88rem;
+  border-radius: 8px;
+}
+
+/* Se quiser botões full-width em formulários (aplicar classe) */
+.btn-full {
+  width: 100%;
+  display: inline-flex;
+  justify-content: center;
+}
