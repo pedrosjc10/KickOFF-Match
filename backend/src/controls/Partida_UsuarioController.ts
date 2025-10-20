@@ -322,6 +322,7 @@ export class PartidaUsuarioController {
         const minJogadoresPartida = partida.tipoPartida.quantidadeJogadores || 10;
         const jogadoresConfirmados = await PartidaUsuarioController.buscarJogadoresConfirmadosParaSorteio(partidaId);
 
+        console.log(`minimo de jogadores para partida: ${minJogadoresPartida}`);
         if (jogadoresConfirmados.length < minJogadoresPartida) {
             return res.status(400).json({
                 error: `Número insuficiente de jogadores confirmados (${jogadoresConfirmados.length}/${minJogadoresPartida}).`
