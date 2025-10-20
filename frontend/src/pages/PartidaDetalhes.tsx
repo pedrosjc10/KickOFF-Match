@@ -210,7 +210,6 @@ const PartidaDetalhes: React.FC = () => {
             <div className="sorteio-area">
               <button 
                 onClick={handleSortearTimes}
-                className="btn-sortear"
               >
                 Sortear Times
               </button>
@@ -247,10 +246,10 @@ const PartidaDetalhes: React.FC = () => {
                 </div>
                 
                 <div className="confirmar-sorteio-area">
-                    <button onClick={handleConfirmarTimes} className="btn-confirmar-sorteio">
+                    <button onClick={handleConfirmarTimes} >
                         CONFIRMAR E FECHAR TIMES
                     </button>
-                    <button onClick={() => setTimesSorteados([])} className="btn-reset-sorteio">
+                    <button onClick={() => setTimesSorteados([])} >
                         Sortear Novamente
                     </button>
                 </div>
@@ -315,7 +314,7 @@ const PartidaDetalhes: React.FC = () => {
           )}
           {( 
             <div className="sair-container">
-              <button onClick={handleSairDaPartida}  className="btn-sair">
+              <button onClick={handleSairDaPartida} >
                 Sair da Partida
               </button>
             </div>

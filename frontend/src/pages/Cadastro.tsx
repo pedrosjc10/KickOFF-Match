@@ -59,7 +59,7 @@ const Cadastro: React.FC = () => {
             required
           />
 
-          <button type="submit" className="cadastro-button">
+          <button type="submit" >
             Cadastrar
           </button>
         </form>

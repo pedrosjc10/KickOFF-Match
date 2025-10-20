@@ -40,7 +40,7 @@ import styles from '../styles/CreateLocal.module.css';
         <input className={styles.input} name="cep" placeholder="CEP" value={form.cep} onChange={handleChange} required />
         <input className={styles.input} name="logradouro" placeholder="Logradouro" value={form.logradouro} onChange={handleChange} required />
         <input className={styles.input} name="numero" placeholder="Número" value={form.numero} onChange={handleChange} required />
-        <button className={styles.button} type="submit">Cadastrar</button>
+        <button  type="submit">Cadastrar</button>
       </form>
       {message && <p className={styles.message}>{message}</p>}
     </div>

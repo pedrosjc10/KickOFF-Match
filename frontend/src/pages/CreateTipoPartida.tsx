@@ -83,7 +83,6 @@ const CreateTipoPartida: React.FC = () => {
           />
 
           <button
-            className="criartipopartida-button"
             type="submit"
             disabled={!isFormValid}
           >

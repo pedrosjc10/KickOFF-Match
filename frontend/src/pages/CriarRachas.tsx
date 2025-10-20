@@ -123,7 +123,7 @@ const CriarRacha: React.FC = () => {
             ))}
           </select>
 
-          <button type="submit" className="criarracha-button">
+          <button type="submit">
             Criar
           </button>
         </form>
