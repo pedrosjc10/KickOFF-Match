@@ -72,9 +72,9 @@ export class PartidaUsuarioController {
   }
 
   // Certifique-se de que os imports de Request e Response do Express e do AppDataSource
-// e das Entidades PartidaUsuario, Usuario e Partida estejam corretos no topo do arquivo.
+  // e das Entidades PartidaUsuario, Usuario e Partida estejam corretos no topo do arquivo.
 
-static async update(req: Request, res: Response) {
+  static async update(req: Request, res: Response) {
     try {
       const usuarioId = Number(req.params.usuarioId);
       const partidaId = Number(req.params.partidaId);
@@ -132,7 +132,7 @@ static async update(req: Request, res: Response) {
       console.error(error);
       return res.status(500).json({ error: "Erro ao atualizar" });
     }
-}
+  }
 
   static async delete(req: Request, res: Response) {
     try {
@@ -319,94 +319,86 @@ static async update(req: Request, res: Response) {
             return res.status(404).json({ error: "Partida ou Tipo de Partida não encontrado." });
         }
 
-        const minJogadoresTotal = partida.tipoPartida.quantidadeJogadores || 10;
-        const minJogadoresPorTime = Math.floor(minJogadoresTotal / 2);
-
+        const minJogadoresPartida = partida.tipoPartida.quantidadeJogadores || 10;
         const jogadoresConfirmados = await PartidaUsuarioController.buscarJogadoresConfirmadosParaSorteio(partidaId);
 
-        // Validação de mínimo total
-        if (jogadoresConfirmados.length < minJogadoresTotal) {
+        if (jogadoresConfirmados.length < minJogadoresPartida) {
             return res.status(400).json({
-                error: É necessário pelo menos ${minJogadoresTotal} jogadores confirmados para sortear.,
-                minRequired: minJogadoresTotal
+                error: `Número insuficiente de jogadores confirmados (${jogadoresConfirmados.length}/${minJogadoresPartida}).`
             });
         }
 
-        // Sorteio e balanceamento
-        const resultadoSorteio = AlgoritmoSorteio.balancear(
-            jogadoresConfirmados,
-            minJogadoresPorTime
-        );
-
+        const resultadoSorteio = AlgoritmoSorteio.balancear(jogadoresConfirmados, minJogadoresPartida);
         return res.json(resultadoSorteio);
+
     } catch (error) {
         console.error("Erro no sorteio de times:", error);
         return res.status(500).json({ error: "Erro interno ao sortear times." });
     }
   }
+
     
     // Função auxiliar para buscar os dados de forma mais completa
-    private static async buscarJogadoresConfirmadosParaSorteio(partidaId: number) {
-        const repo = AppDataSource.getRepository(PartidaUsuario);
+  static async buscarJogadoresConfirmadosParaSorteio(partidaId: number) {
+    const repo = AppDataSource.getRepository(PartidaUsuario);
+    const confirmados = await repo
+        .createQueryBuilder("pu")
+        .innerJoin("pu.usuario", "u") 
+        .select([
+            "u.id AS id",
+            "u.nome AS nome",
+            "pu.organizador AS organizador",
+            "pu.jog_linha AS jog_linha",
+            "pu.habilidade AS habilidade" 
+        ])
+        .where("pu.partida.id = :partidaId", { partidaId })
+        .andWhere("pu.confirmado = :confirmado", { confirmado: 1 }) 
+        .getRawMany();
         
-        // Use a mesma lógica do getConfirmedById, mas garanta que o ID e a Habilidade estejam lá
-        const confirmados = await repo
-            .createQueryBuilder("pu")
-            .innerJoin("pu.usuario", "u") 
-            .select([
-                "u.id AS id",
-                "u.nome AS nome",
-                "pu.organizador AS organizador",
-                "pu.jog_linha AS jog_linha",
-                "pu.habilidade AS habilidade" 
-            ])
-            .where("pu.partida.id = :partidaId", { partidaId })
-            .andWhere("pu.confirmado = :confirmado", { confirmado: 1 }) 
-            .getRawMany();
-            
-        // Garante que a habilidade é um número, usando 50 como default para o sorteio
-        return confirmados.map(j => ({ ...j, habilidade: j.habilidade || 50 })); 
+    // Garante que a habilidade é um número, usando 50 como default para o sorteio
+    return confirmados.map(j => ({ ...j, habilidade: j.habilidade || 50 })); 
     }
 
-    static async deleteByUsuarioId(req: Request, res: Response) {
-      try {
-        const usuarioId = Number(req.params.usuarioId);
-        const partidaId = Number(req.params.partidaId);
+  static async deleteByUsuarioId(req: Request, res: Response) {
+    try {
+      const usuarioId = Number(req.params.usuarioId);
+      const partidaId = Number(req.params.partidaId);
 
-        if (!Number.isInteger(partidaId) || partidaId <= 0) {
-          return res.status(400).json({ error: "ID de partida inválido" });
-        }
-
-        if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
-          return res.status(400).json({ error: "ID de partida inválido" });
-        }
-
-        const repo = AppDataSource.getRepository(PartidaUsuario);
-
-        console.log("deleteByUsuarioId -> usuarioId:", usuarioId);
-
-        // 1) Buscar registros relacionados usando a relação (funciona independentemente do nome da FK)
-        const registros = await repo.find({
-          where: { 
-            partida: { id: partidaId }, 
-            usuario: { id: usuarioId } },
-          select: ["id"] // Seleciona apenas os campos necessários,
-        });
-
-        console.log("deleteByUsuarioId -> registros encontrados:", registros?.length ?? 0);
-
-        if (!registros || registros.length === 0) {
-          return res.status(404).json({ error: "Nenhum registro encontrado para esta partida" });
-        }
-
-        // 2) Deletar por ids
-        const ids = registros.map(r => r.id);
-        await repo.delete(ids);
-
-        return res.status(204).send();
-      } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Erro ao deletar registros da partida" });
+      if (!Number.isInteger(partidaId) || partidaId <= 0) {
+        return res.status(400).json({ error: "ID de partida inválido" });
       }
+
+      if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+        return res.status(400).json({ error: "ID de partida inválido" });
+      }
+
+      const repo = AppDataSource.getRepository(PartidaUsuario);
+
+      console.log("deleteByUsuarioId -> usuarioId:", usuarioId);
+
+      // 1) Buscar registros relacionados usando a relação (funciona independentemente do nome da FK)
+      const registros = await repo.find({
+        where: { 
+          partida: { id: partidaId }, 
+          usuario: { id: usuarioId } },
+        select: ["id"] // Seleciona apenas os campos necessários,
+      });
+
+      console.log("deleteByUsuarioId -> registros encontrados:", registros?.length ?? 0);
+
+      if (!registros || registros.length === 0) {
+        return res.status(404).json({ error: "Nenhum registro encontrado para esta partida" });
+      }
+
+      // 2) Deletar por ids
+      const ids = registros.map(r => r.id);
+      await repo.delete(ids);
+
+      return res.status(204).send();
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro ao deletar registros da partida" });
     }
+  }
 }
+
