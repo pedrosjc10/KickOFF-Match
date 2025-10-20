@@ -91,34 +91,25 @@ const AlgoritmoSorteio = {
             } else t.mediaHabilidade = 0;
         });
 
-        // preenche times incompletos
-        const jogadoresUsados = times.flatMap(t => t.jogadores.map(j => j.id));
-        const remanescentes = jogadores.filter(j => !jogadoresUsados.includes(j.id));
-
         const ultimoTime = times[times.length - 1];
         const vagasFaltantes = minPorTime - ultimoTime.jogadores.length;
 
         if (vagasFaltantes > 0) {
-        ultimoTime.substitutos = [];
-
-        for (let v = 0; v < vagasFaltantes; v++) {
-            if (remanescentes.length === 0) break;
-
-            const indiceAleatorio = Math.floor(Math.random() * remanescentes.length);
-            const jogador = remanescentes.splice(indiceAleatorio, 1)[0]; // remove da lista pra não repetir
-
-            ultimoTime.substitutos.push({
-            vaga: v + 1,
-            opcoes: [{                
-                nome: jogador.nome,
-                jogadorId: jogador.id,
-            }]
-            });
-        }
+            ultimoTime.substitutos = [];
+            for (let v = 0; v < vagasFaltantes; v++) {
+                const opcao1 = times[0].jogadores[Math.floor(Math.random() * times[0].jogadores.length)];
+                const opcao2 = times[1].jogadores[Math.floor(Math.random() * times[1].jogadores.length)];
+                ultimoTime.substitutos.push({
+                    vaga: v + 1,
+                    opcoes: [
+                        { jogadorId: opcao1.id, nome: opcao1.nome },
+                        { jogadorId: opcao2.id, nome: opcao2.nome },
+                    ],
+                });
+            }
         }
 
         return times;
-
     }
 };
 
