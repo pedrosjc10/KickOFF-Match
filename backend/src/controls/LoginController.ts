@@ -32,7 +32,7 @@ export class LoginController {
       const token = jwt.sign(
         { userId: usuario.id },
         process.env.JWT_SECRET as string,
-        { expiresIn: "1h" }
+        { expiresIn: "168h" }
       );
 
       return res.json({
