@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   buscarDetalhesPartida,
   buscarConfirmados,
@@ -30,6 +30,7 @@ const PartidaDetalhes: React.FC = () => {
   const [jogLinhaSelecionado, setJogLinhaSelecionado] = useState<boolean | null>(null);
   const [isOrganizador, setIsOrganizador] = useState<boolean>(false);
   const { usuario } = useUserStore();
+  const navigate = useNavigate();
 
   const usuarioLogadoNaoConfirmou = jogadoresNaoConfirmados.find(
     (jogador) => jogador.id === usuario?.id
@@ -165,15 +166,16 @@ const PartidaDetalhes: React.FC = () => {
   }
 
   const handleSairDaPartida = async () => {
-  try {
-    // Executa o DELETE usando o id do registro partida_usuario
-    await leavePartida(usuario?.id || 0, partida?.id || 0);
-    alert("Você saiu da partida com sucesso!");
-    await carregarDados();
-  } catch (error) {
-    console.error("Erro ao sair da partida:", error);
-    alert("Erro ao sair da partida. Tente novamente.");
-  }
+    try {
+      // Executa o DELETE usando o id do registro partida_usuario
+      await leavePartida(usuario?.id || 0, partida?.id || 0);
+      alert("Você saiu da partida com sucesso!");
+      await carregarDados();
+    } catch (error) {
+      console.error("Erro ao sair da partida:", error);
+      alert("Erro ao sair da partida. Tente novamente.");
+    }
+  navigate(`/meusrachas`);
 };
 
 
@@ -191,7 +193,11 @@ const PartidaDetalhes: React.FC = () => {
             {partida.hora?.slice(0, 5)}
           </p>
           <p>
-            <strong>Local:</strong> {partida.local && Array.isArray(partida.local) && partida.local[0] ? `${partida.local[0].nome} - ${partida.local[0].cidade}` : 'Local não informado'}
+            {partida && Array.isArray(partida.local) && partida.local.length > 0 ? (
+            <p>{`${partida.local[0].nome} - ${partida.local[0].cidade}`}</p>
+            ) : (
+            <p>Local não informado</p>
+            )}
             {/* Ajustado o acesso ao local, pois sua interface sugere que local pode ser um array */}
           </p>
           <p>
@@ -309,7 +315,7 @@ const PartidaDetalhes: React.FC = () => {
           )}
           {( 
             <div className="sair-container">
-              <button onClick={handleSairDaPartida} className="btn-sair">
+              <button onClick={handleSairDaPartida}  className="btn-sair">
                 Sair da Partida
               </button>
             </div>

@@ -7,14 +7,13 @@ const Cadastro: React.FC = () => {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [cpf, setCpf] = useState("");
   const navigate = useNavigate();
 
   const handleCadastro = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      await cadastrarUsuario({ nome, email, senha, cpf });
+      await cadastrarUsuario({ nome, email, senha });
       alert("Cadastro realizado com sucesso!");
       navigate("/login");
     } catch (error) {
@@ -46,16 +45,6 @@ const Cadastro: React.FC = () => {
             placeholder="********"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            className="cadastro-input"
-            required
-          />
-
-          <label className="cadastro-label">Digite seu CPF</label>
-          <input
-            type="text"
-            placeholder="000.000.000-00"
-            value={cpf}
-            onChange={(e) => setCpf(e.target.value)}
             className="cadastro-input"
             required
           />
