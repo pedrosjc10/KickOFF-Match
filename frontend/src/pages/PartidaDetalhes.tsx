@@ -230,6 +230,10 @@ const PartidaDetalhes: React.FC = () => {
     <div className="detalhes-container">
       {partida ? (
         <>
+        <button onClick={() => navigate("/meusrachas")}>
+         Voltar para Meus Rachões
+        </button>
+
           <h2>{partida.nome}</h2>
           <p>
             <strong>Data:</strong> {new Date(partida.data).toLocaleDateString("pt-BR")} às{" "}

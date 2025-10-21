@@ -1,12 +1,12 @@
 // src/pages/PublicRachas.tsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { buscarPartidas, participarPartida, PartidaDetalhes } from "../services/partidaService";
 import "../styles/PartidasPublicas.css";
-
 const PublicRachas: React.FC = () => {
+  const navigate = useNavigate();
   const [rachas, setRachas] = useState<PartidaDetalhes[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     buscarPartidas()
       .then(data => setRachas(data))
@@ -18,11 +18,14 @@ const PublicRachas: React.FC = () => {
 
   return (
     <div className="public-rachas-container">
+        <button onClick={() => navigate("/meusrachas")}>
+         Voltar para Meus Rachões
+        </button>
       <h1>Partidas Públicas</h1>
       {rachas.length === 0 ? (
         <p>Nenhuma partida pública disponível.</p>
       ) : (
-        <ul className="public-rachas-list">
+        <ul className="public-rachas-list">          
           {rachas.map(r => (
             <li key={r.id} className="public-racha-card">
               <h2>{r.nome}</h2>
