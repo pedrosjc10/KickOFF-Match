@@ -33,17 +33,21 @@ function classificarFaixa(habilidade: number): keyof typeof RATING_FAIXAS {
     return "MUITO_BOM";
 }
 
-// ... (Interfaces, RATING_FAIXAS, embaralhar, classificarFaixa permanecem iguais)
-
 const AlgoritmoSorteio = {
     balancear: (jogadores: Jogador[], minJogadoresPartida: number): Time[] => {
         const jogadoresPorTime = Math.ceil(minJogadoresPartida / 2);
         
-        // ... (Verificação de Mínimo permanece igual)
-
-        // Determina o número máximo de times
-        const totalTimes = Math.max(2, Math.ceil(jogadores.length / jogadoresPorTime));
-
+        // Regra de Mínimo: Pelo menos 2 times completos
+        if (jogadores.length < 2 * jogadoresPorTime) {
+            throw new Error(
+                `Número insuficiente de jogadores para formar 2 times completos. Mínimo necessário: ${2 * jogadoresPorTime}`
+            );
+        }
+        
+        // O total de times é o máximo possível + 1 (para o resto, se houver)
+        const maxTimesCompletos = Math.floor(jogadores.length / jogadoresPorTime);
+        const totalTimes = Math.max(2, maxTimesCompletos + (jogadores.length % jogadoresPorTime > 0 ? 1 : 0));
+        
         // Cria os times
         const times: Time[] = Array.from({ length: totalTimes }, (_, i) => ({
             nome: `Time ${String.fromCharCode(65 + i)}`,
@@ -54,69 +58,91 @@ const AlgoritmoSorteio = {
         const todosJogadores = embaralhar([...jogadores]);
         const jogadoresUsados = new Set<number>();
 
-        // Separa goleiros e jogadores de linha
-        const goleiros = todosJogadores.filter(j => !j.jog_linha);
-        const linha = todosJogadores.filter(j => j.jog_linha);
+        // 1. Separação de Goleiros
+        let goleiros = todosJogadores.filter(j => !j.jog_linha);
+        let linha = todosJogadores.filter(j => j.jog_linha);
         
-        // 1. Distribuição inicial de jogadores de linha por faixa (para balanceamento)
+        // 2. Classificação e Embaralhamento de jogadores de linha
         const faixas: Record<string, Jogador[]> = {
-            MUITO_RUIM: [], RUIM: [], BOM: [], MUITO_BOM: [],
+            MUITO_BOM: [], BOM: [], RUIM: [], MUITO_RUIM: [],
         };
         linha.forEach(j => faixas[classificarFaixa(j.habilidade)].push(j));
         Object.keys(faixas).forEach(k => (faixas[k] = embaralhar(faixas[k])));
+        
+        // 3. PRIORIDADE: Preenchimento de Time A (índice 0) e Time B (índice 1)
+        const timesParaCompletar = [times[0], times[1]];
+        let teamIndex = 0; // Alterna entre Time A e Time B
 
-        for (const key of Object.keys(faixas)) {
+        // Itera por faixas (do melhor para o pior) para balancear
+        for (const key of Object.keys(faixas).reverse()) {
             const grupo = faixas[key];
-            let i = 0;
-            for (const jogador of grupo) {
-                // Distribui em rodízio entre todos os times
-                times[i % totalTimes].jogadores.push(jogador);
-                jogadoresUsados.add(jogador.id);
-                i++;
+            while (grupo.length > 0) {
+                if (timesParaCompletar[0].jogadores.length === jogadoresPorTime && 
+                    timesParaCompletar[1].jogadores.length === jogadoresPorTime) {
+                    break; // Ambos estão completos
+                }
+
+                const timeAtual = timesParaCompletar[teamIndex];
+                
+                if (timeAtual.jogadores.length < jogadoresPorTime) {
+                    const jogador = grupo.shift()!;
+                    timeAtual.jogadores.push(jogador);
+                    jogadoresUsados.add(jogador.id);
+                }
+                
+                // Alterna o time
+                teamIndex = (teamIndex + 1) % 2;
+            }
+            if (timesParaCompletar[0].jogadores.length === jogadoresPorTime && 
+                timesParaCompletar[1].jogadores.length === jogadoresPorTime) {
+                break; 
             }
         }
         
-        // 2. Distribuição inicial de goleiros
-        let goleirosRestantes = [...goleiros];
-        for(let i = 0; i < totalTimes && goleirosRestantes.length > 0; i++) {
-             if (!times[i].jogadores.some(j => !j.jog_linha)) {
-                 const goleiro = goleirosRestantes.shift()!;
+        // Juntar jogadores de linha que sobraram
+        let linhaRestante = Object.values(faixas).flat();
+        
+        // 4. Distribuição de Goleiros
+        // Tenta dar 1 goleiro para A e 1 para B
+        for (let i = 0; i < 2 && goleiros.length > 0; i++) {
+             if (!times[i].jogadores.some(j => !j.jog_linha) && times[i].jogadores.length < jogadoresPorTime) {
+                 const goleiro = goleiros.shift()!;
                  times[i].jogadores.push(goleiro);
                  jogadoresUsados.add(goleiro.id);
              }
         }
-        
-        // --- NOVO POOL: Goleiros não alocados + Jogadores de Linha não distribuídos (não há mais de linha não distribuído, mas mantemos por segurança)
-        const poolParaPreenchimento = todosJogadores.filter(j => !jogadoresUsados.has(j.id));
-        let poolIndex = 0; // Índice de controle para o pool
+        // Goleiros restantes são adicionados ao pool de jogadores restantes
+        let restantes = [...linhaRestante, ...goleiros];
 
-        // 3. PRIORIDADE: Preenchimento de vagas em ordem (Time A, Time B, C, ...)
-        for (const time of times) {
-            const vagasFaltando = jogadoresPorTime - time.jogadores.length;
-            
-            for (let i = 0; i < vagasFaltando; i++) {
-                if (poolIndex < poolParaPreenchimento.length) {
-                    const jogadorExtra = poolParaPreenchimento[poolIndex++];
-                    time.jogadores.push(jogadorExtra);
-                    // Não precisa atualizar jogadoresUsados, pois o pool já é o que sobrou
-                } else {
-                    // Se o pool acabar, paramos de preencher
-                    break;
-                }
+        // 5. Preenchimento de vagas finais para A e B (caso falhe o passo 3 e 4)
+        for (let i = 0; i < 2; i++) {
+            const vagasFaltando = jogadoresPorTime - times[i].jogadores.length;
+            for (let v = 0; v < vagasFaltando && restantes.length > 0; v++) {
+                const jogador = restantes.shift()!;
+                times[i].jogadores.push(jogador);
+                jogadoresUsados.add(jogador.id);
             }
         }
         
-        // 4. Jogadores que sobraram após preencher o máximo de times possível
-        // Sobras são os que não foram alocados do pool de preenchimento:
-        let sobrasParaSubstitutos = poolParaPreenchimento.slice(poolIndex);
-
-        // 5. Lógica de substituição cruzada para o ÚLTIMO time INCOMPLETO
+        // 6. Alocação dos jogadores restantes nos times C, D, ...
+        // Se houver mais times, eles recebem o restante
+        for (let i = 2; i < totalTimes && restantes.length > 0; i++) {
+            const time = times[i];
+            const vagasFaltando = jogadoresPorTime - time.jogadores.length;
+            
+            for (let v = 0; v < vagasFaltando && restantes.length > 0; v++) {
+                const jogador = restantes.shift()!;
+                time.jogadores.push(jogador);
+                jogadoresUsados.add(jogador.id);
+            }
+        }
         
-        // Encontrar o último time incompleto que ainda precisa de substitutos
+        // 7. Lógica de substituição cruzada para o ÚLTIMO time INCOMPLETO
+        
+        // Encontrar o último time incompleto
         let ultimoTimeIncompleto: Time | undefined = undefined;
         let vagasUltimoTime = 0;
         
-        // Percorrer de trás para frente para achar o último que precisa de ajuda
         for (let i = times.length - 1; i >= 0; i--) {
             const t = times[i];
             const vagasFaltando = jogadoresPorTime - t.jogadores.length;
@@ -126,13 +152,14 @@ const AlgoritmoSorteio = {
                 break;
             }
         }
-
-        if (ultimoTimeIncompleto && sobrasParaSubstitutos.length > 0) {
+        
+        // O pool de substitutos são os jogadores que sobraram (lista 'restantes')
+        if (ultimoTimeIncompleto && restantes.length > 0) {
             
-            // Separa as sobras em dois pools: Pool A (simula Time 1) e Pool B (simula Time 2)
-            const metade = Math.ceil(sobrasParaSubstitutos.length / 2);
-            let poolSubstitutoA = sobrasParaSubstitutos.slice(0, metade);
-            let poolSubstitutoB = sobrasParaSubstitutos.slice(metade);
+            // Pool A (simula Time 1) e Pool B (simula Time 2)
+            const metade = Math.ceil(restantes.length / 2);
+            let poolSubstitutoA = restantes.slice(0, metade);
+            let poolSubstitutoB = restantes.slice(metade);
             
             ultimoTimeIncompleto.substitutos = [];
             
@@ -159,7 +186,7 @@ const AlgoritmoSorteio = {
             }
         }
         
-        // 6. Calcula média de habilidade de cada time (permanece igual)
+        // 8. Calcula média de habilidade de cada time
         times.forEach(t => {
             if (t.jogadores.length > 0) {
                 const soma = t.jogadores.reduce((acc, j) => acc + j.habilidade, 0);
