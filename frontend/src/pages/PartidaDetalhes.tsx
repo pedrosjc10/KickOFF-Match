@@ -160,33 +160,53 @@ const PartidaDetalhes: React.FC = () => {
     if (!partida?.id) return;
     if (!isOrganizador) return;
 
-    const ok = window.confirm('Tem certeza que deseja desconfirmar TODOS os jogadores confirmados? Isso irá movê-los para a lista de participantes.');
+    const ok = window.confirm(
+      "Tem certeza que deseja desconfirmar TODOS os jogadores confirmados? Isso irá movê-los para a lista de participantes."
+    );
     if (!ok) return;
 
     try {
       setDesconfirmandoAll(true);
 
-      // Recarrega a lista de confirmados do servidor para garantir que usamos os IDs corretos
+      // Recarrega os confirmados atuais
       const confirmadosAtual = await buscarConfirmados(Number(partida.id));
+
       if (!confirmadosAtual || confirmadosAtual.length === 0) {
-        alert('Não há jogadores confirmados para desconfirmar.');
+        alert("Não há jogadores confirmados para desconfirmar.");
         setDesconfirmandoAll(false);
         return;
       }
 
-      const promessas = confirmadosAtual.map(j =>
-        atualizarPartidaUsuario(j.id, partida.id, { confirmado: false })
+      console.log("Desconfirmando jogadores:", confirmadosAtual.map(j => j.nome));
+
+      // Aqui a gente usa o id do usuário e o id da partida,
+      // assumindo que a rota é tipo /partida/:partidaId/usuario/:usuarioId
+      const promessas = confirmadosAtual.map(jogador =>
+        atualizarPartidaUsuario(jogador.id, partida.id, { confirmado: false })
       );
-      await Promise.all(promessas);
+
+      // Espera todas as requisições terminarem
+      const resultados = await Promise.allSettled(promessas);
+
+      const falhas = resultados.filter(r => r.status === "rejected");
+      if (falhas.length > 0) {
+        console.error("Falhas ao desconfirmar:", falhas);
+        alert(
+          `Alguns jogadores não foram desconfirmados corretamente (${falhas.length}). Veja o console.`
+        );
+      } else {
+        alert("Todos os jogadores confirmados foram desconfirmados.");
+      }
+
+      // Atualiza os dados da tela
       await carregarDados();
-      alert('Todos os jogadores confirmados foram desconfirmados.');
     } catch (error) {
-      console.error('Erro ao desconfirmar todos:', error);
-      alert('Erro ao desconfirmar jogadores. Tente novamente.');
+      console.error("Erro ao desconfirmar todos:", error);
+      alert("Erro ao desconfirmar jogadores. Tente novamente.");
     } finally {
       setDesconfirmandoAll(false);
     }
-  }
+  };
 
   const handleSairDaPartida = async () => {
     try {
