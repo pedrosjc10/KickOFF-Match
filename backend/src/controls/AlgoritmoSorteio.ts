@@ -45,7 +45,11 @@ const AlgoritmoSorteio = {
         const jogadoresPorTime = Math.ceil(minJogadoresPartida / 2);
 
         // Quantos times dá pra formar
-        const totalTimes = Math.floor(jogadores.length / jogadoresPorTime);
+        let totalTimes = Math.max(1, Math.floor(jogadores.length / jogadoresPorTime));
+        const jogadoresSobrando = jogadores.length % jogadoresPorTime;
+        if (jogadoresSobrando > 0) {
+            totalTimes += 1;
+        }
 
         // Cria os times
         const times: Time[] = Array.from({ length: totalTimes }, (_, i) => ({
@@ -125,4 +129,4 @@ const AlgoritmoSorteio = {
     },
 };
 
-export default AlgoritmoSorteio;    
+export default AlgoritmoSorteio;
