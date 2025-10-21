@@ -233,6 +233,9 @@ const PartidaDetalhes: React.FC = () => {
     <div className="detalhes-container">
       {partida ? (
         <>
+          <button onClick={() => navigate("/meusrachas")}>
+           Voltar para Meus Rachas
+          </button>
           <h2>{partida.nome}</h2>
           <p>
             <strong>Data:</strong> {new Date(partida.data).toLocaleDateString("pt-BR")} às{" "}
@@ -272,7 +275,6 @@ const PartidaDetalhes: React.FC = () => {
                 <div className="times-grid">
                     {timesSorteados.map((time) => (
                         <div key={time.nome} className={`time-card ${time.nome.replace(' ', '-').toLowerCase()}`}>
-                            <h4>{time.nome} (Média: {time.mediaHabilidade.toFixed(2)})</h4>
                             <ul>
                                 {time.jogadores.map((jogador) => (
                                     <li key={jogador.id}>
