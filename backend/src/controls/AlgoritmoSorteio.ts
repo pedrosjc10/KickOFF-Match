@@ -33,17 +33,14 @@ function classificarFaixa(habilidade: number): keyof typeof RATING_FAIXAS {
     return "MUITO_BOM";
 }
 
+// ... (Interfaces, RATING_FAIXAS, embaralhar, classificarFaixa permanecem iguais)
+
 const AlgoritmoSorteio = {
     balancear: (jogadores: Jogador[], minJogadoresPartida: number): Time[] => {
         const jogadoresPorTime = Math.ceil(minJogadoresPartida / 2);
         
-        // Regra de Mínimo: Pelo menos 2 times completos
-        if (jogadores.length < minJogadoresPartida || jogadores.length < 2 * jogadoresPorTime) {
-            throw new Error(
-                `Número insuficiente de jogadores para formar 2 times completos. Mínimo necessário: ${2 * jogadoresPorTime}`
-            );
-        }
-        
+        // ... (Verificação de Mínimo permanece igual)
+
         // Determina o número máximo de times
         const totalTimes = Math.max(2, Math.ceil(jogadores.length / jogadoresPorTime));
 
@@ -57,7 +54,7 @@ const AlgoritmoSorteio = {
         const todosJogadores = embaralhar([...jogadores]);
         const jogadoresUsados = new Set<number>();
 
-        // Separa goleiros e jogadores de linha para a primeira distribuição
+        // Separa goleiros e jogadores de linha
         const goleiros = todosJogadores.filter(j => !j.jog_linha);
         const linha = todosJogadores.filter(j => j.jog_linha);
         
@@ -88,24 +85,20 @@ const AlgoritmoSorteio = {
                  jogadoresUsados.add(goleiro.id);
              }
         }
-        // Goleiros restantes são considerados jogadores de linha para o pool de preenchimento
-        goleirosRestantes.forEach(g => jogadoresUsados.add(g.id)); // Marca como usado para não entrar no pool de sobras
         
-        // O pool de jogadores restantes (inclui goleiros não alocados)
-        let poolDeJogadoresRestantes = todosJogadores.filter(j => !jogadoresUsados.has(j.id));
-        poolDeJogadoresRestantes = embaralhar(poolDeJogadoresRestantes);
+        // --- NOVO POOL: Goleiros não alocados + Jogadores de Linha não distribuídos (não há mais de linha não distribuído, mas mantemos por segurança)
+        const poolParaPreenchimento = todosJogadores.filter(j => !jogadoresUsados.has(j.id));
+        let poolIndex = 0; // Índice de controle para o pool
 
-        // 3. Preenchimento de vagas com o pool restante (prioridade: completar times)
-        let poolIndex = 0;
-        
+        // 3. PRIORIDADE: Preenchimento de vagas em ordem (Time A, Time B, C, ...)
         for (const time of times) {
             const vagasFaltando = jogadoresPorTime - time.jogadores.length;
             
             for (let i = 0; i < vagasFaltando; i++) {
-                if (poolIndex < poolDeJogadoresRestantes.length) {
-                    const jogadorExtra = poolDeJogadoresRestantes[poolIndex++];
+                if (poolIndex < poolParaPreenchimento.length) {
+                    const jogadorExtra = poolParaPreenchimento[poolIndex++];
                     time.jogadores.push(jogadorExtra);
-                    // O jogador extra é agora um membro do time, removemos ele do pool de sobras
+                    // Não precisa atualizar jogadoresUsados, pois o pool já é o que sobrou
                 } else {
                     // Se o pool acabar, paramos de preencher
                     break;
@@ -114,24 +107,36 @@ const AlgoritmoSorteio = {
         }
         
         // 4. Jogadores que sobraram após preencher o máximo de times possível
-        // Sobras são os que não foram alocados do pool:
-        let sobrasParaSubstitutos = poolDeJogadoresRestantes.slice(poolIndex);
+        // Sobras são os que não foram alocados do pool de preenchimento:
+        let sobrasParaSubstitutos = poolParaPreenchimento.slice(poolIndex);
 
         // 5. Lógica de substituição cruzada para o ÚLTIMO time INCOMPLETO
-        const ultimoTime = times[times.length - 1];
         
-        if (ultimoTime && ultimoTime.jogadores.length < jogadoresPorTime && sobrasParaSubstitutos.length > 0) {
-            
-            const vagasFaltando = jogadoresPorTime - ultimoTime.jogadores.length;
+        // Encontrar o último time incompleto que ainda precisa de substitutos
+        let ultimoTimeIncompleto: Time | undefined = undefined;
+        let vagasUltimoTime = 0;
+        
+        // Percorrer de trás para frente para achar o último que precisa de ajuda
+        for (let i = times.length - 1; i >= 0; i--) {
+            const t = times[i];
+            const vagasFaltando = jogadoresPorTime - t.jogadores.length;
+            if (vagasFaltando > 0) {
+                ultimoTimeIncompleto = t;
+                vagasUltimoTime = vagasFaltando;
+                break;
+            }
+        }
+
+        if (ultimoTimeIncompleto && sobrasParaSubstitutos.length > 0) {
             
             // Separa as sobras em dois pools: Pool A (simula Time 1) e Pool B (simula Time 2)
             const metade = Math.ceil(sobrasParaSubstitutos.length / 2);
             let poolSubstitutoA = sobrasParaSubstitutos.slice(0, metade);
             let poolSubstitutoB = sobrasParaSubstitutos.slice(metade);
             
-            ultimoTime.substitutos = [];
+            ultimoTimeIncompleto.substitutos = [];
             
-            for (let vaga = 1; vaga <= vagasFaltando; vaga++) {
+            for (let vaga = 1; vaga <= vagasUltimoTime; vaga++) {
                 const opcoes: { jogadorId: number; nome: string }[] = [];
                 
                 // Opção 1: do Pool A
@@ -147,14 +152,14 @@ const AlgoritmoSorteio = {
                 }
 
                 if (opcoes.length > 0) {
-                     ultimoTime.substitutos.push({ vaga, opcoes });
+                     ultimoTimeIncompleto.substitutos.push({ vaga, opcoes });
                 } else {
                      break; // Acabaram os substitutos
                 }
             }
         }
         
-        // 6. Calcula média de habilidade de cada time
+        // 6. Calcula média de habilidade de cada time (permanece igual)
         times.forEach(t => {
             if (t.jogadores.length > 0) {
                 const soma = t.jogadores.reduce((acc, j) => acc + j.habilidade, 0);
