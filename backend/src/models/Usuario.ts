@@ -14,9 +14,6 @@ export class Usuario {
   email!: string;
 
   @Column()
-  cpf!: string;
-
-  @Column()
   senha!: string;
 
   @BeforeInsert()

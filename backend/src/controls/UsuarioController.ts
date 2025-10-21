@@ -5,7 +5,7 @@ import { Usuario } from "../models/Usuario";
 export class UsuarioController {
   static async create(req: Request, res: Response) {
     try {
-      const { nome, email, senha, cpf } = req.body;
+      const { nome, email, senha } = req.body;
       const repo = AppDataSource.getRepository(Usuario);
 
       const emailExistente = await repo.findOne({ where: { email } });
@@ -13,7 +13,7 @@ export class UsuarioController {
         return res.status(400).json({ error: "Email já cadastrado" });
       }
 
-      const novoUsuario = repo.create({ nome, email, senha, cpf });
+      const novoUsuario = repo.create({ nome, email, senha });
       const usuarioCriado = await repo.save(novoUsuario);
       return res.status(201).json(usuarioCriado);
 
@@ -52,7 +52,7 @@ export class UsuarioController {
   static async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { nome, email, senha, cpf } = req.body;
+      const { nome, email, senha } = req.body;
       const repo = AppDataSource.getRepository(Usuario);
 
       const usuario = await repo.findOne({ where: { id: Number(id) } });
@@ -70,7 +70,6 @@ export class UsuarioController {
       usuario.nome = nome ?? usuario.nome;
       usuario.email = email ?? usuario.email;
       usuario.senha = senha ?? usuario.senha;
-      usuario.cpf = cpf ?? usuario.cpf;
 
       const usuarioAtualizado = await repo.save(usuario);
       return res.json(usuarioAtualizado);
