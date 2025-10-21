@@ -294,6 +294,7 @@ const PartidaDetalhes: React.FC = () => {
                                     <p>
                                         **Falta vaga** (Substituindo vaga {substituto.vaga})
                                         <br/>
+                                        {/* Garantindo que 'opcoes' é mapeado corretamente */}
                                         **Opções de Repetição:** {substituto.opcoes?.map((o: { nome: string }) => o.nome).join(' ou ')}
                                     </p>
                                 </div>
