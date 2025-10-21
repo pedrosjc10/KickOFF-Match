@@ -287,7 +287,7 @@ const PartidaDetalhes: React.FC = () => {
                                 <p>
                                     **Falta {time.substitutos.vaga} vaga**
                                     <br/>
-                                    Opções de Repetição: {time.substitutos.opcoes.map(o => o.nome).join(' ou ')}
+                                    Opções de Repetição: {time.substitutos.opcoes?.map(o => o.nome).join(' ou ')}
                                 </p>
                             )}
                         </div>
