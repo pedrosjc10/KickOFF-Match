@@ -36,27 +36,29 @@ function classificarFaixa(habilidade: number): keyof typeof RATING_FAIXAS {
 const AlgoritmoSorteio = {
     balancear: (jogadores: Jogador[], minJogadoresPartida: number): Time[] => {
         if (jogadores.length < minJogadoresPartida) {
-            throw new Error(`Número insuficiente de jogadores para o sorteio. Mínimo necessário: ${minJogadoresPartida}`);
+            throw new Error(
+                `Número insuficiente de jogadores para o sorteio. Mínimo necessário: ${minJogadoresPartida}`
+            );
         }
 
-        // Quantidade mínima por time (metade do mínimo total exigido)
-        const minPorTime = Math.ceil(minJogadoresPartida / 2);
+        // Número fixo de jogadores por time (metade do mínimo exigido)
+        const jogadoresPorTime = Math.ceil(minJogadoresPartida / 2);
 
-        // Define quantos times dá pra formar
-        const totalTimes = Math.ceil(jogadores.length / minPorTime);
+        // Quantos times dá pra formar
+        const totalTimes = Math.floor(jogadores.length / jogadoresPorTime);
 
-        // Cria os times vazios
+        // Cria os times
         const times: Time[] = Array.from({ length: totalTimes }, (_, i) => ({
             nome: `Time ${String.fromCharCode(65 + i)}`,
             jogadores: [],
             mediaHabilidade: 0,
         }));
 
-        // Separa goleiros e linha
+        // Separa goleiros e jogadores de linha
         const goleiros = jogadores.filter(j => !j.jog_linha);
         const linha = jogadores.filter(j => j.jog_linha);
 
-        // Classifica por faixa
+        // Classifica jogadores por faixa
         const faixas: Record<string, Jogador[]> = {
             MUITO_RUIM: [],
             RUIM: [],
@@ -64,9 +66,9 @@ const AlgoritmoSorteio = {
             MUITO_BOM: [],
         };
         linha.forEach(j => faixas[classificarFaixa(j.habilidade)].push(j));
-        Object.keys(faixas).forEach(k => faixas[k] = embaralhar(faixas[k]));
+        Object.keys(faixas).forEach(k => (faixas[k] = embaralhar(faixas[k])));
 
-        // Distribui equilibradamente os jogadores de linha por faixa
+        // Distribui os jogadores de linha de forma equilibrada entre os times
         for (const key of Object.keys(faixas)) {
             const grupo = faixas[key];
             let i = 0;
@@ -76,42 +78,51 @@ const AlgoritmoSorteio = {
             }
         }
 
-        // Distribui goleiros (máx 1 por time)
+        // Distribui goleiros (1 por time, se possível)
         for (const g of goleiros) {
-            const possiveis = times.filter(t => !t.jogadores.some(j => !j.jog_linha));
+            const possiveis = times.filter(
+                t => !t.jogadores.some(j => !j.jog_linha)
+            );
             if (possiveis.length === 0) break;
             embaralhar(possiveis)[0].jogadores.push(g);
         }
 
-        // Calcula médias
+        // Garante que cada time tenha exatamente "jogadoresPorTime"
+        // Se sobrar jogador, vira substituto do último time
+        const todosJogadores = [...jogadores];
+        const jogadoresUsados = new Set<number>();
+        times.forEach(t => {
+            while (t.jogadores.length < jogadoresPorTime) {
+                const resto = todosJogadores.filter(j => !jogadoresUsados.has(j.id));
+                if (resto.length === 0) break;
+                const j = resto[Math.floor(Math.random() * resto.length)];
+                t.jogadores.push(j);
+                jogadoresUsados.add(j.id);
+            }
+        });
+
+        // Se sobrar jogador, cria substitutos pro último time
+        const sobras = todosJogadores.filter(j => !jogadoresUsados.has(j.id));
+        const ultimoTime = times[times.length - 1];
+        if (sobras.length > 0) {
+            ultimoTime.substitutos = sobras.map((j, i) => ({
+                vaga: i + 1,
+                opcoes: [{ jogadorId: j.id, nome: j.nome }],
+            }));
+        }
+
+        // Calcula média de habilidade de cada time
         times.forEach(t => {
             if (t.jogadores.length > 0) {
                 const soma = t.jogadores.reduce((acc, j) => acc + j.habilidade, 0);
                 t.mediaHabilidade = soma / t.jogadores.length;
-            } else t.mediaHabilidade = 0;
+            } else {
+                t.mediaHabilidade = 0;
+            }
         });
 
-        // Preenche último time caso fique incompleto
-        const ultimoTime = times[times.length - 1];
-        const vagasFaltantes = minPorTime - ultimoTime.jogadores.length;
-
-        if (vagasFaltantes > 0) {
-            ultimoTime.substitutos = [];
-            for (let v = 0; v < vagasFaltantes; v++) {
-                const opcao1 = times[0].jogadores[Math.floor(Math.random() * times[0].jogadores.length)];
-                const opcao2 = times[1].jogadores[Math.floor(Math.random() * times[1].jogadores.length)];
-                ultimoTime.substitutos.push({
-                    vaga: v + 1,
-                    opcoes: [
-                        { jogadorId: opcao1.id, nome: opcao1.nome },
-                        { jogadorId: opcao2.id, nome: opcao2.nome },
-                    ],
-                });
-            }
-        }
-
         return times;
-    }
+    },
 };
 
-export default AlgoritmoSorteio;
+export default AlgoritmoSorteio;    
