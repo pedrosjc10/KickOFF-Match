@@ -29,6 +29,7 @@ const PartidaDetalhes: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [jogLinhaSelecionado, setJogLinhaSelecionado] = useState<boolean | null>(null);
   const [isOrganizador, setIsOrganizador] = useState<boolean>(false);
+  const [desconfirmandoAll, setDesconfirmandoAll] = useState<boolean>(false);
   const { usuario } = useUserStore();
   const navigate = useNavigate();
 
@@ -163,7 +164,17 @@ const PartidaDetalhes: React.FC = () => {
     if (!ok) return;
 
     try {
-      const promessas = jogadoresConfirmados.map(j =>
+      setDesconfirmandoAll(true);
+
+      // Recarrega a lista de confirmados do servidor para garantir que usamos os IDs corretos
+      const confirmadosAtual = await buscarConfirmados(Number(partida.id));
+      if (!confirmadosAtual || confirmadosAtual.length === 0) {
+        alert('Não há jogadores confirmados para desconfirmar.');
+        setDesconfirmandoAll(false);
+        return;
+      }
+
+      const promessas = confirmadosAtual.map(j =>
         atualizarPartidaUsuario(j.id, partida.id, { confirmado: false })
       );
       await Promise.all(promessas);
@@ -172,6 +183,8 @@ const PartidaDetalhes: React.FC = () => {
     } catch (error) {
       console.error('Erro ao desconfirmar todos:', error);
       alert('Erro ao desconfirmar jogadores. Tente novamente.');
+    } finally {
+      setDesconfirmandoAll(false);
     }
   }
 
@@ -222,8 +235,9 @@ const PartidaDetalhes: React.FC = () => {
               <button
                 onClick={handleDesconfirmarTodos}
                 style={{ marginLeft: 12, background: '#f66', color: '#fff' }}
+                disabled={desconfirmandoAll}
               >
-                Desconfirmar Todos
+                {desconfirmandoAll ? 'Desconfirmando...' : 'Desconfirmar Todos'}
               </button>
             </div>
           )}
