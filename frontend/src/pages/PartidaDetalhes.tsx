@@ -17,6 +17,9 @@ import { useUserStore } from "../stores/userStore";
 
 import Player from "../components/Player";
 
+
+
+
 // Removida a interface 'Partida' local, usaremos a PartidaDetalhes do service
 
 const PartidaDetalhes: React.FC = () => {
@@ -280,13 +283,20 @@ const PartidaDetalhes: React.FC = () => {
                                 ))}
                             </ul>
                             {/* Exibição de substitutos, se houver (Time C) */}
-                            {time.substitutos && (
-                                <p>
-                                    **Falta {time.substitutos.vaga} vaga**
-                                    <br/>
-                                    Opções de Repetição: {time.substitutos.opcoes.map(o => o.nome).join(' ou ')}
-                                </p>
-                            )}
+                            {Array.isArray(time.substitutos) && time.substitutos.length > 0 && (
+                            <div>
+                              <h5>Substitutos:</h5>
+                              {time.substitutos.map((sub, i) => {
+                                const opcoes = Array.isArray(sub?.opcoes) ? sub!.opcoes : [];
+                                return (
+                                  <p key={i}>
+                                    <strong>Vaga {sub?.vaga}:</strong>{" "}
+                                    {opcoes.length > 0 ? opcoes.map((o: { nome: any; }) => o.nome).join(" ou ") : "Sem opções"}
+                                  </p>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                     ))}
                 </div>
