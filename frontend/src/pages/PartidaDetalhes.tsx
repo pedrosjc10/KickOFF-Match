@@ -132,21 +132,9 @@ const PartidaDetalhes: React.FC = () => {
     if (!partida?.id || timesSorteados.length === 0) return;
 
     try {
-      // 1. Identifica todos os IDs dos jogadores escalados (Time A e Time B)
-      const jogadoresEscaladosIds = new Set<number>();
-      timesSorteados[0]?.jogadores.forEach(j => jogadoresEscaladosIds.add(j.id));
-      timesSorteados[1]?.jogadores.forEach(j => jogadoresEscaladosIds.add(j.id));
-        
-      // 2. Identifica os jogadores confirmados que NÃO foram escalados
-      const idsParaDesconfirmar = jogadoresConfirmados
-        .filter(j => !jogadoresEscaladosIds.has(j.id))
-        .map(j => j.id);
-
+      const idsParaDesconfirmar = jogadoresConfirmados.map(j => j.id);
       console.log("Jogadores que serão desconfirmados:", idsParaDesconfirmar);
 
-      // 3. Atualiza o status para 'confirmado: false' para quem não foi escalado
-      // Isso move os jogadores não escalados de volta para a lista de Participantes
-        
       const desconfirmacaoPromessas = idsParaDesconfirmar.map(idParaDesconfirmar => 
         atualizarPartidaUsuario(idParaDesconfirmar, partida.id, { 
             confirmado: false 
