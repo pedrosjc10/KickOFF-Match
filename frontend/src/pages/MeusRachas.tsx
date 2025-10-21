@@ -80,9 +80,6 @@ const MeusRachas: React.FC = () => {
                 <span className="racha-local">{racha.local?.nome}</span>
                 <span className="racha-endereco">{racha.local?.logradouro || 'Endereço não informado'}</span>
               </div>
-              <div className="racha-icons">
-                <span className="icon">✔️</span>
-              </div>
             </div>
           ))}
         </div>
