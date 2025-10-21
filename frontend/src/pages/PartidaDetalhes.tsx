@@ -231,7 +231,7 @@ const PartidaDetalhes: React.FC = () => {
       {partida ? (
         <>
         <button onClick={() => navigate("/meusrachas")}>
-         Voltar para Meus Rachões
+         Voltar para Meus Rachas
         </button>
 
           <h2>{partida.nome}</h2>

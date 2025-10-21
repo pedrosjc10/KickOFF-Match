@@ -19,7 +19,7 @@ const PublicRachas: React.FC = () => {
   return (
     <div className="public-rachas-container">
         <button onClick={() => navigate("/meusrachas")}>
-         Voltar para Meus Rachões
+         Voltar para Meus Rachas
         </button>
       <h1>Partidas Públicas</h1>
       {rachas.length === 0 ? (
