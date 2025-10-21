@@ -51,6 +51,12 @@ const MeusRachas: React.FC = () => {
       <nav className="menu-rachas">
         <button
           className="menu-btn"
+          onClick={() => navigate('/login')}
+        >
+          Sair
+        </button>
+        <button
+          className="menu-btn"
           onClick={() => navigate('/criarrachas')}
         >
           Criar Racha
