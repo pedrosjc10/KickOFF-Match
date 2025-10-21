@@ -132,11 +132,12 @@ const PartidaDetalhes: React.FC = () => {
     if (!partida?.id || timesSorteados.length === 0) return;
 
     try {
-      const idsParaDesconfirmar = jogadoresConfirmados.map(j => j.id);
-      console.log("Jogadores que serão desconfirmados:", idsParaDesconfirmar);
+      // Recupera a lista de jogadores confirmados e extrai os seus IDs
+      const confirmadosList = await buscarConfirmados(Number(partida.id));
+      console.log("Jogadores que serão desconfirmados:", confirmadosList);
 
-      const desconfirmacaoPromessas = idsParaDesconfirmar.map(idParaDesconfirmar => 
-        atualizarPartidaUsuario(idParaDesconfirmar, partida.id, { 
+      const desconfirmacaoPromessas = confirmadosList.map(jogador => 
+        atualizarPartidaUsuario(jogador.id, partida.id, { 
             confirmado: false 
         })
       );
@@ -150,6 +151,27 @@ const PartidaDetalhes: React.FC = () => {
     } catch (error) {
       console.error("Erro ao confirmar times:", error);
       alert("Erro ao confirmar times. Tente novamente.");
+    }
+  }
+
+  // Função para desconfirmar todos os jogadores confirmados (visível para organizador)
+  const handleDesconfirmarTodos = async () => {
+    if (!partida?.id) return;
+    if (!isOrganizador) return;
+
+    const ok = window.confirm('Tem certeza que deseja desconfirmar TODOS os jogadores confirmados? Isso irá movê-los para a lista de participantes.');
+    if (!ok) return;
+
+    try {
+      const promessas = jogadoresConfirmados.map(j =>
+        atualizarPartidaUsuario(j.id, partida.id, { confirmado: false })
+      );
+      await Promise.all(promessas);
+      await carregarDados();
+      alert('Todos os jogadores confirmados foram desconfirmados.');
+    } catch (error) {
+      console.error('Erro ao desconfirmar todos:', error);
+      alert('Erro ao desconfirmar jogadores. Tente novamente.');
     }
   }
 
@@ -196,10 +218,12 @@ const PartidaDetalhes: React.FC = () => {
           {/* BOTÃO DE SORTEIO VISÍVEL APENAS PARA O ORGANIZADOR */}
           {isOrganizador && timesSorteados.length === 0 && jogadoresConfirmados.length > 0 && (
             <div className="sorteio-area">
-              <button 
-                onClick={handleSortearTimes}
+              <button onClick={handleSortearTimes}>Sortear Times</button>
+              <button
+                onClick={handleDesconfirmarTodos}
+                style={{ marginLeft: 12, background: '#f66', color: '#fff' }}
               >
-                Sortear Times
+                Desconfirmar Todos
               </button>
             </div>
           )}
