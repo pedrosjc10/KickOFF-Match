@@ -330,6 +330,10 @@ export class PartidaUsuarioController {
         }
 
         const resultadoSorteio = AlgoritmoSorteio.balancear(jogadoresConfirmados, minJogadoresPartida);
+        const jogadoresConfirmadosFalse = jogadoresConfirmados.map(j => ({ ...j, confirmado: 0 }));
+        if (jogadoresConfirmadosFalse == null) {
+            return res.status(404).json({ error: "Nenhum jogador confirmado encontrado para redefinir status." });
+        }
         return res.json(resultadoSorteio);
 
     } catch (error) {
