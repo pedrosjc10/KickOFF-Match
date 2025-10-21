@@ -10,18 +10,15 @@ import {
   sortearTimes,
   Time,
   leavePartida,
-  PartidaDetalhes as PartidaDetalhesType, // Renomeado para evitar conflito com o nome do componente
+  PartidaDetalhes as PartidaDetalhesType,
 } from "../services/partidaService";
 import "../styles/PartidaDetalhes.css";
 import { useUserStore } from "../stores/userStore";
 
 import Player from "../components/Player";
 
-// Removida a interface 'Partida' local, usaremos a PartidaDetalhes do service
-
 const PartidaDetalhes: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  // Usando PartidaDetalhesType do service para o estado
   const [partida, setPartida] = useState<PartidaDetalhesType | null>(null);
   const [jogadoresConfirmados, setJogadoresConfirmados] = useState<Jogador[]>([]);
   const [jogadoresNaoConfirmados, setJogadoresNaoConfirmados] = useState<Jogador[]>([]);
@@ -46,7 +43,7 @@ const PartidaDetalhes: React.FC = () => {
       const partidaData = await buscarDetalhesPartida(id);
 
       // ***** A CORREÇÃO PRINCIPAL ESTÁ AQUI: SETAR O ESTADO DA PARTIDA *****
-      setPartida(partidaData); 
+      setPartida(partidaData);
       // ********************************************************************
 
       const confirmadosData = await buscarConfirmados(Number(id));
@@ -63,7 +60,7 @@ const PartidaDetalhes: React.FC = () => {
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
       // Se houver um erro (como 404), garantimos que 'partida' é null
-      setPartida(null); 
+      setPartida(null);
     } finally {
       setLoading(false);
     }
@@ -102,10 +99,10 @@ const PartidaDetalhes: React.FC = () => {
   const handleAtualizarHabilidade = async (jogadorId: number, partidaId: number, novaHabilidade: number) => {
     try {
       console.log("Atualizando habilidade para jogadorId:", jogadorId, "com valor:", novaHabilidade);
-        
+
       // 1. Chama o serviço de atualização (PUT)
-      await atualizarPartidaUsuario(jogadorId, partidaId, { habilidade: novaHabilidade }); 
-        
+      await atualizarPartidaUsuario(jogadorId, partidaId, { habilidade: novaHabilidade });
+
       // 2. RECUPERA A LISTA ATUALIZADA DO SERVIDOR (Este é o passo crucial!)
       const confirmadosData = await buscarConfirmados(Number(id));
       setJogadoresConfirmados(confirmadosData); // Atualiza o estado que é passado como prop para o Player
@@ -137,16 +134,16 @@ const PartidaDetalhes: React.FC = () => {
       const confirmadosList = await buscarConfirmados(Number(partida.id));
       console.log("Jogadores que serão desconfirmados:", confirmadosList);
 
-      const desconfirmacaoPromessas = confirmadosList.map(jogador => 
-        atualizarPartidaUsuario(jogador.id, partida.id, { 
-            confirmado: false 
+      const desconfirmacaoPromessas = confirmadosList.map(jogador =>
+        atualizarPartidaUsuario(jogador.id, partida.id, {
+          confirmado: false
         })
       );
       await Promise.all(desconfirmacaoPromessas);
 
       // 4. Limpa o sorteio e recarrega os dados para refletir as mudanças
       setTimesSorteados([]);
-      await carregarDados(); 
+      await carregarDados();
       alert("Times confirmados! Jogadores não escalados foram movidos para a lista de participantes.");
 
     } catch (error) {
@@ -218,8 +215,8 @@ const PartidaDetalhes: React.FC = () => {
       console.error("Erro ao sair da partida:", error);
       alert("Erro ao sair da partida. Tente novamente.");
     }
-  navigate(`/meusrachas`);
-};
+    navigate(`/meusrachas`);
+  };
 
 
 
@@ -230,9 +227,9 @@ const PartidaDetalhes: React.FC = () => {
     <div className="detalhes-container">
       {partida ? (
         <>
-        <button onClick={() => navigate("/meusrachas")}>
-         Voltar para Meus Rachas
-        </button>
+          <button onClick={() => navigate("/meusrachas")}>
+            Voltar para Meus Rachas
+          </button>
 
           <h2>{partida.nome}</h2>
           <p>
@@ -241,9 +238,9 @@ const PartidaDetalhes: React.FC = () => {
           </p>
           <p>
             {partida && Array.isArray(partida.local) && partida.local.length > 0 ? (
-            <p>{`${partida.local[0].nome} - ${partida.local[0].cidade}`}</p>
+              <p>{`${partida.local[0].nome} - ${partida.local[0].cidade}`}</p>
             ) : (
-            <p>Local não informado</p>
+              <p>Local não informado</p>
             )}
             {/* Ajustado o acesso ao local, pois sua interface sugere que local pode ser um array */}
           </p>
@@ -266,63 +263,77 @@ const PartidaDetalhes: React.FC = () => {
             </div>
           )}
 
-          {/* TABELA DE TIMES SORTEADOS */}
+          {/* TABELA DE TIMES SORTEADOS - LÓGICA DE RENDERIZAÇÃO CORRIGIDA */}
           {timesSorteados.length > 0 && (
             <div className="times-sorteados-container">
-                <h3>Resultado do Sorteio</h3>
-                <div className="times-grid">
-                    {timesSorteados.map((time) => (
-                        <div key={time.nome} className={`time-card ${time.nome.replace(' ', '-').toLowerCase()}`}>
-                            <ul>
-                                {time.jogadores.map((jogador) => (
-                                    <li key={jogador.id}>
-                                        {jogador.nome} ({jogador.habilidade})
-                                        {/* Exibe (G) se o jogador for Goleiro (jog_linha é false) e não estiver no Time C */}
-                                        {time.nome !== "Time C" && jogador.jog_linha === false ? <span style={{color: 'red'}}> (G)</span> : null}
-                                    </li>
-                                ))}
-                            </ul>
-                            {/* Exibição de substitutos, se houver (Time C) */}
-                            {time.substitutos && (
-                                <p>
-                                    **Falta {time.substitutos.vaga} vaga**
-                                    <br/>
-                                    Opções de Repetição: {time.substitutos.opcoes?.map(o => o.nome).join(' ou ')}
-                                </p>
-                            )}
+              <h3>Resultado do Sorteio</h3>
+              <div className="times-grid">
+                {timesSorteados.map((time) => (
+                  <div key={time.nome} className={`time-card ${time.nome.replace(' ', '-').toLowerCase()}`}>
+                    
+                    {/* Exibição do nome do time e média (Opcional, mas útil) */}
+                    <h4>{time.nome} (Média: {Math.round(Number(time.mediaHabilidade))})</h4> 
+                    
+                    <ul>
+                      {time.jogadores.map((jogador) => (
+                        <li key={jogador.id}>
+                          {jogador.nome} ({jogador.habilidade})
+                          {/* Exibe (G) se o jogador for Goleiro (jog_linha é false) e não for um time de substituição */}
+                          {time.nome !== "Time C" && jogador.jog_linha === false ? <span style={{color: 'red'}}> (G)</span> : null}
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    {/* CORREÇÃO APLICADA AQUI: Tratamento de 'substitutos' como um array */}
+                    {time.substitutos && Array.isArray(time.substitutos) && time.substitutos.length > 0 && (
+                        <div className="substitutos-area">
+                            <hr/>
+                            <h4>Opções de Substituição:</h4>
+                            {time.substitutos.map((substituto, index) => (
+                                <div key={index}>
+                                    <p>
+                                        **Falta vaga** (Substituindo vaga {substituto.vaga})
+                                        <br/>
+                                        **Opções de Repetição:** {substituto.opcoes?.map((o: { nome: string }) => o.nome).join(' ou ')}
+                                    </p>
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
-                
-                <div className="confirmar-sorteio-area">
-                    <button onClick={handleConfirmarTimes} >
-                        CONFIRMAR E FECHAR TIMES
-                    </button>
-                    <button onClick={() => setTimesSorteados([])} >
-                        Sortear Novamente
-                    </button>
-                </div>
-                <hr />
+                    )}
+                    {/* FIM DA CORREÇÃO */}
+                  </div>
+                ))}
+              </div>
+              
+              <div className="confirmar-sorteio-area">
+                <button onClick={handleConfirmarTimes} >
+                  CONFIRMAR E FECHAR TIMES
+                </button>
+                <button onClick={() => setTimesSorteados([])} >
+                  Sortear Novamente
+                </button>
+              </div>
+              <hr />
             </div>
           )}
 
           {/* LISTA DE JOGADORES CONFIRMADOS (Visível se o sorteio não estiver sendo exibido) */}
           {timesSorteados.length === 0 && (
             <>
-                <h3>Jogadores Confirmados ({jogadoresConfirmados.length})</h3>
-                <ul>
-                    {jogadoresConfirmados.map((jogador) => (
-                        <Player
-                            key={jogador.id}
-                            jogador={jogador}
-                            partida={partida}
-                            isOrganizador={isOrganizador}
-                            handleToggleJogLinha={handleToggleJogLinha}
-                            handleSalvarHabilidade={handleAtualizarHabilidade} 
-                        />
-                    ))}
-                </ul>
-                <hr />
+              <h3>Jogadores Confirmados ({jogadoresConfirmados.length})</h3>
+              <ul>
+                {jogadoresConfirmados.map((jogador) => (
+                  <Player
+                    key={jogador.id}
+                    jogador={jogador}
+                    partida={partida}
+                    isOrganizador={isOrganizador}
+                    handleToggleJogLinha={handleToggleJogLinha}
+                    handleSalvarHabilidade={handleAtualizarHabilidade}
+                  />
+                ))}
+              </ul>
+              <hr />
             </>
           )}
 
@@ -361,7 +372,7 @@ const PartidaDetalhes: React.FC = () => {
               </button>
             </div>
           )}
-          {( 
+          {(
             <div className="sair-container">
               <button onClick={handleSairDaPartida} >
                 Sair da Partida
